@@ -379,9 +379,6 @@ EzspGetParentChildParametersResponse [childCount=6, parentEui64=0000000000000000
             const idx = this.links.findIndex(oldLink => oldLink.sourceAddr === link.sourceAddr && oldLink.targetAddr === link.targetAddr && oldLink.type === link.type);
             if (idx < 0) return false;
 
-
-            console.log('remove link', config.accumulate, config.accumulate.includes(link.type));
-
             // Just mark old links as not 'alive' - don't actually remove them
             if (!force && config.accumulate.includes(link.type)) {
                 if (!link.alive) return false;
