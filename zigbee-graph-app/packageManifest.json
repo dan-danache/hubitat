@@ -18,5 +18,14 @@
         "required": true,
         "oauth": false,
         "description": "Allows you to visually render getChildAndRouteInfo of your Hubitat system."
+    }],
+    "apps" : [{
+        "id" : "d39ec476-b4e0-4663-96c8-952c60c83525",
+        "name": "Zigbee Graph",
+        "namespace": "dandanache",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-graph-app_2.0.0/zigbee-graph-app/zigbee-graph.groovy",
+        "required": true,
+        "oauth": false,
+        "description": "Allows you to visually render getChildAndRouteInfo of your Hubitat system."
     }]
 }
