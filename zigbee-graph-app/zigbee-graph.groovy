@@ -11,7 +11,7 @@ definition(
     author: "Dan Danache",
     description: "Allows you to visually render getChildAndRouteInfo of your Hubitat system.",
     documentationLink: "https://community.hubitat.com/t/zigbee-visual-render-for-getchildandrouteinfo/119074",
-    importUrl: "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-graph-app_2.3.0/zigbee-graph-app/zigbee-graph.groovyy",
+    importUrl: "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-graph-app_2.3.0/zigbee-graph-app/zigbee-graph.groovy",
     category: "Utility",
     singleInstance: true,
     installOnOpen: true,
