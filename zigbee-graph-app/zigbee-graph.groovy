@@ -35,8 +35,8 @@ def mainPage() {
     dynamicPage (name: "mainPage", title: "Zigbee Graph - v${releaseVer() + ' - ' + appVerDate()}", install: showInstall, uninstall: !showInstall) {
         if (app.getInstallationState() == "COMPLETE") {
             section {
-		        paragraph "What would you like to do?"
-		        href (
+                paragraph "What would you like to do?"
+                href (
                     name: "show",
                     title: "Show zigbee graph",
                     description: "Tap Here to go to the zigbee graph.",
@@ -139,11 +139,11 @@ def refresh() {
 
 // Button handler
 def appButtonHandler(btn) {
-	switch (btn) {
-		case "btnMakerAPI":
+    switch (btn) {
+        case "btnMakerAPI":
             log.debug "Saving Maker API settings..."
-			break
-	}
+            break
+    }
 }
 
 private buildGraphURL() {
