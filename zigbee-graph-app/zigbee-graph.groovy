@@ -21,8 +21,8 @@ definition(
 )
 
 /**********************************************************************************************************************************************/
-private releaseVer() { return "2.2.0" }
-private appVerDate() { return "2023-06-23" }
+private releaseVer() { return "2.3.0" }
+private appVerDate() { return "2023-06-30" }
 private htmlFileName() { return "zigbee-graph.html" }
 /**********************************************************************************************************************************************/
 preferences {
@@ -71,13 +71,18 @@ def mainPage() {
 
 def changelogPage() {
     dynamicPage (name: "changelogPage", title: "Zigbee Graph - Change Log", install: false, uninstall: false) {
-        
-        section ("v2.2.0 - 2023-06-23", hideable: true, hidden: false) {
+
+        section ("v2.3.0 - 2023-06-30", hideable: true, hidden: false) {
+            paragraph "<li>Add feature to filter the devices list</li>" +
+                "<li>On the devices list, click the eye icon to zoom the graph on that device</li>"
+        }
+
+        section ("v2.2.0 - 2023-06-23", hideable: true, hidden: true) {
             paragraph "<li>Show dates using the \"time ago\" format</li>" +
                 "<li>Move contents of the \"Help\" tab inside the \"Status\" tab</li>" +
                 "<li>Add option to display room name in the device name (using the Maker API built-in app)</li>"
         }
-        
+
         section ("v2.1.0 - 2023-06-21", hideable: true, hidden: true) {
             paragraph "<li>Add \"Node repulsion force\" config option to better visualize graphs with many devices</li>"
         }
@@ -90,29 +95,29 @@ def changelogPage() {
                 "<li>Add FAQ section to try to add some meaning to the graph (content is taken mostly from the Hubitat community, thanks!)</li>" +
                 "<li>Other small UI improvements</li>"
         }
-        
+
         section ("v1.4.0 - 2023-05-25", hideable: true, hidden: true) {
             paragraph "<li>Add the \"Config\" tab with basic settings</li>"
         }
-        
+
         section ("v1.3.1 - 2023-05-24", hideable: true, hidden: true) {
             paragraph "<li>Bugfix: Devices table keeps accumulating records instead of clearing its contents</li>"
         }
-        
+
         section ("v1.3.0 - 2023-05-23", hideable: true, hidden: true) {
             paragraph "<li>Add a new tab containing a list with all zigbee devices</li>"
         }
-        
+
         section ("v1.2.0 - 2023-05-23", hideable: true, hidden: true) {
             paragraph "<li>Click a node to go to the device edit page</li>" +
                 "<li>Add embed=true URL parameter to hide controls</li>" +
                 "<li>Make application interface friendlier</li>"
         }
-        
+
         section ("v1.1.0 - 2023-05-23", hideable: true, hidden: true) {
             paragraph "<li>Integrate zigbee logs into the graph</li>"
         }
-        
+
         section ("v1.0.0 - 2023-05-22", hideable: true, hidden: true) {
             paragraph "<li>Initial release</li>"
         }
