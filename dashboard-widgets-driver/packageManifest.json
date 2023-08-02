@@ -43,5 +43,5 @@
         "required": true,
         "oauth": false,
         "description": "Wind dashboard widget."
-    },]
+    }]
 }
