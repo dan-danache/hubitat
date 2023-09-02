@@ -1,5 +1,6 @@
 /**
  * IKEA Symfonisk Sound Remote Gen2 (E2123) Driver
+ * Ver: 1.0.1
  *
  * @see https://www.ikea.com/us/en/p/symfonisk-sound-remote-gen-2-30527312/
  * @see https://zigbee.blakadder.com/Ikea_E2123.html
