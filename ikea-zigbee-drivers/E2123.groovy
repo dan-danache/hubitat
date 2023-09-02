@@ -31,10 +31,10 @@ metadata {
         capability "Switch"
         capability "SwitchLevel"
 
-        // For remotes with firmware 1.0.012 (20211214)
+        // For firmware 1.0.012 (20211214)
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57", outClusters:"0003,0004,0006,0008,0019,1000,FC7F", model:"SYMFONISK sound remote gen2", manufacturer:"IKEA of Sweden"
         
-        // For remotes with firmware 1.0.35 (20230411)
+        // For firmware 1.0.35 (20230411)
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC7C", outClusters:"0003,0004,0006,0008,0019,1000", model:"SYMFONISK sound remote gen2", manufacturer:"IKEA of Sweden"
     }
 
@@ -125,9 +125,9 @@ def configure() {
     // Add binds
     cmds.add("zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}") // Generic - On/Off
     cmds.add("zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}") // Generic - Level Control
-    cmds.add("zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC7F {${device.zigbeeId}} {}") // 64639 --> For remotes with firmware 1.0.012 (20211214)
-    cmds.add("zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0xFC80 {${device.zigbeeId}} {}") // Heiman - Specific Scenes --> For remotes with firmware 1.0.35 (20230411)
-    cmds.add("zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0xFC80 {${device.zigbeeId}} {}") // Heiman - Specific Scenes --> For remotes with firmware 1.0.35 (20230411)
+    cmds.add("zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC7F {${device.zigbeeId}} {}") // 64639 --> For firmware 1.0.012 (20211214)
+    cmds.add("zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0xFC80 {${device.zigbeeId}} {}") // Heiman - Specific Scenes --> For firmware 1.0.35 (20230411)
+    cmds.add("zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0xFC80 {${device.zigbeeId}} {}") // Heiman - Specific Scenes --> For firmware 1.0.35 (20230411)
 
     // Query device attributes
     cmds.addAll(zigbee.readAttribute(0x0000, 0x0001))  // ApplicationVersion
