@@ -1,5 +1,9 @@
 # IKEA Zigbee drivers
 
+Supported devices:
+* [IKEA Tradfri Remote Control (E1810)](#symfonisk-sound-remote-gen2-e2123)
+* [IKEA Tradfri Remote Control (E1810)](#tradfri-remote-control-e1810)
+
 ## Driver Install
 ### Install using HPM (offers automatic updates)
 Follow the steps below if you already have the "Hubitat Package Manager" app installed in your Hubitat hub:
@@ -45,7 +49,7 @@ Follow the steps below in order to pair your IKEA Sound Remote with your Hubitat
    * Close the device battery compartiment
    * That's it, Have fun!
 
-## IKEA Tradfri Remote Control (E1810)
+## Tradfri Remote Control (E1810)
 
 | Parameter | Details |
 |-----------|-------------|
