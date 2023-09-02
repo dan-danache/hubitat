@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.1] - 2023-09-03
 ### Added
-- Add driver for IKEA Tradfri Remote Control (E1810)
+- E1810: Add support for Tradfri Remote Control (E1810)
 - E2123: Add "ReleasableButton" capability for the dots buttons
 
 ## [1.0.1] - 2023-09-02
