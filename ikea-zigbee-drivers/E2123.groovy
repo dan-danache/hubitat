@@ -1,6 +1,6 @@
 /**
  * IKEA Symfonisk Sound Remote Gen2 (E2123) Driver
- * Ver: 1.0.1
+ * Ver: 1.1.0
  *
  * @see https://www.ikea.com/us/en/p/symfonisk-sound-remote-gen-2-30527312/
  * @see https://zigbee.blakadder.com/Ikea_E2123.html
@@ -27,6 +27,7 @@ metadata {
         capability "PushableButton"
         capability "DoubleTapableButton"
         capability "HoldableButton"
+        capability "ReleasableButton"
         capability "Switch"
         capability "SwitchLevel"
 
@@ -110,9 +111,11 @@ def configure() {
     push(0)
     doubleTap(0)
     hold(0)
+    release(0)
     on()
     setLevel(25)
-    sendEvent(name: "numberOfButtons", value: 7, descriptionText: "Number of buttons set to 7")
+    def numberOfButtons = BUTTONS.count{_ -> true}
+    sendEvent(name: "numberOfButtons", value: numberOfButtons, descriptionText: "Number of buttons set to: ${numberOfButtons}")
 
     List<String> cmds = []
 
@@ -152,6 +155,11 @@ def doubleTap(buttonNumber) {
 // capability.holdableButton
 def hold(buttonNumber) {
     triggerUserEvent(name: "held", value: buttonNumber, descriptionText: "Button #${buttonNumber} was held")
+}
+
+// capability.releasableButton
+def release(buttonNumber) {
+    triggerUserEvent(name: "released", value: buttonNumber, descriptionText: "Button #${buttonNumber} was released")
 }
 
 // capability.switch
@@ -395,7 +403,7 @@ def parse(String description) {
         }
 
         // 1 Dot / 2 Dots button was held
-        // Commands are issued in this order: 01 (key-down = ignored) -> 02 (button is held = update "held" attribute) -> 04 (button released = ignored)
+        // Commands are issued in this order: 01 (key-down = ignored) -> 02 (button is held = update "held" attribute) -> 04 (button released = update "released" attribute)
         if (msg.command == "02") {
             return triggerZigbeeEvent(name: "held", value: button[0], descriptionText: "Button #${button[0]} (${button[1]}) was held")
         }
@@ -405,9 +413,9 @@ def parse(String description) {
             return triggerZigbeeEvent(name: "pushed", value: button[0], descriptionText: "Button #${button[0]} (${button[1]}) was pressed")
         }
 
-        // IGNORED: 1 Dot / 2 Dots button was released (ignored)
+        // IGNORED: 1 Dot / 2 Dots button was released
         if (msg.command == "04") {
-            return zigbeeDebug("Button #${button[0]} (${button[1]}) was released after a long hold (ignored)")
+            return triggerZigbeeEvent(name: "released", value: button[0], descriptionText: "Button #${button[0]} (${button[1]}) was released")
         }
         
         // 1 Dot / 2 Dots button was double tapped
