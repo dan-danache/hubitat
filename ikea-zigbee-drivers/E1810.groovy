@@ -27,7 +27,7 @@ metadata {
         capability "Switch"
         capability "SwitchLevel"
 
-        // For remotes with firmware 24.4.5 (24040005)
+        // For firmware 24.4.5 (24040005)
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57,FC7C", outClusters:"0003,0004,0005,0006,0008,0019,1000", model:"TRADFRI remote control", manufacturer:"IKEA of Sweden" 
     }
 
