@@ -17,6 +17,7 @@ device:
       - { cluster: '0x0006', attr: '0x0000', description: 'Switch status = { 0x00:OFF, 0x01:ON }' }
       - { cluster: '0x0006', attr: '0x4003', description: 'StartupOnOff = { 0x00:OFF, 0x01:ON, 0xFF:PREVIOUS' }
     StartupOnOff: true
+    Switch: true
     ZigbeeRouter: true
 
 zigbee:
@@ -56,6 +57,9 @@ zigbee:
     - cluster: '0x0006'
       command: '0x00'
       name: Unknown Zigbee Response with weird payload
+
+    - cluster: '0x8001'
+      name: IEEE Address Response
 
     - cluster: '0x8034'
       name: Leave Response

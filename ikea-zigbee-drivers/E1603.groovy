@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field def DRIVER_NAME = "IKEA Tradfri Control Outlet (E1603)"
-@Field def DRIVER_VERSION = "2.3.0"
+@Field def DRIVER_VERSION = "2.3.1"
 @Field def ZDP_STATUS = ["00":"SUCCESS", "80":"INV_REQUESTTYPE", "81":"DEVICE_NOT_FOUND", "82":"INVALID_EP", "83":"NOT_ACTIVE", "84":"NOT_SUPPORTED", "85":"TIMEOUT", "86":"NO_MATCH", "88":"NO_ENTRY", "89":"NO_DESCRIPTOR", "8A":"INSUFFICIENT_SPACE", "8B":"NOT_PERMITTED", "8C":"TABLE_FULL", "8D":"NOT_AUTHORIZED", "8E":"DEVICE_BINDING_TABLE_FULL"]
 
 // Health Check config
@@ -26,6 +26,7 @@ metadata {
         capability "Outlet"
         capability "PowerSource"
         capability "Refresh"
+        capability "Switch"
 
         // For firmwares: 2.0.024
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC7C", outClusters:"0005,0019,0020,1000", model:"TRADFRI control outlet", manufacturer:"IKEA of Sweden"
@@ -130,6 +131,9 @@ def configure() {
     state.lastRx = 0
     state.lastTx = 0
 
+    // capability.Switch
+    on()
+
     // capability.PowerSource
     sendEvent name:"powerSource", value:"mains", descriptionText:"Power source set to mains"
 
@@ -202,6 +206,14 @@ def refresh() {
     cmds += zigbee.readAttribute(0x0006, 0x4003)  // StartupOnOff = { 0x00:OFF, 0x01:ON, 0xFF:PREVIOUS
 
     Utils.sendZigbeeCommands(cmds)
+}
+
+// capability.Switch
+def on() {
+    Utils.sendDigitalEvent name:"switch", value:"on", descriptionText:"Was turned on"
+}
+def off() {
+    Utils.sendDigitalEvent name:"switch", value:"off", descriptionText:"Was turned off"
 }
 
 // capability.ZigbeeRouter
@@ -420,6 +432,9 @@ def parse(String description) {
 
         case { contains it, [clusterInt:0x0006, commandInt:0x00] }:
             return Utils.ignoredZigbeeMessage("Unknown Zigbee Response with weird payload", msg)
+
+        case { contains it, [clusterInt:0x8001] }:
+            return Utils.ignoredZigbeeMessage("IEEE Address Response", msg)
 
         case { contains it, [clusterInt:0x8034] }:
             return Utils.ignoredZigbeeMessage("Leave Response", msg)
