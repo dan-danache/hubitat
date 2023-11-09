@@ -16,7 +16,7 @@ capability "PushableButton"
 {{# @configure }}
 
 // Configuration for capability.PushableButton
-def numberOfButtons = BUTTONS.count{_ -> true}
+Integer numberOfButtons = BUTTONS.count{_ -> true}
 sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}

@@ -1,9 +1,11 @@
-#
-# IMPORTANT: Still waiting for a firmware upgrade for this device as it still uses group bindings and Hubitat does not support this behavior
-#
 device:
-  model: IKEA Tradfri Motion Sensor
-  type: E1745
+  model: IKEA Tradfri Motion Sensor (E1745)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1745.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E1745.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/MotionSensor.groovy
@@ -16,11 +18,15 @@ device:
         checkInterval: 3600  # every hour
         thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage at least every 12 hours)
     - file: src/capabilities/PowerSource.groovy
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
     - file: src/capabilities/FirmwareUpdate.groovy
 
 zigbee:
   fingerprints:
-  - firmwares: 24.4.5
+  - firmwares: 24.4.5 (117C-11C8-24040005)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57,FC7C", outClusters:"0003,0004,0006,0008,0019,1000", model:"TRADFRI motion sensor", manufacturer:"IKEA of Sweden"
 
   binds:

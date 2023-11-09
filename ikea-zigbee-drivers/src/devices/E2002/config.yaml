@@ -1,6 +1,11 @@
 device:
-  model: IKEA Styrbar Remote Control N2
-  type: E2002
+  model: IKEA Styrbar Remote Control N2 (E2002)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2002.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E2002.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/Battery.groovy
@@ -20,6 +25,10 @@ device:
         - { id: 'MINUS', name: '🔅',   number: 2 }
         - { id: 'NEXT',  name: 'Next',  number: 3 }
         - { id: 'PREV',  name: 'Prev',  number: 4 }
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
     - file: src/capabilities/ReleasableButton.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
 
@@ -28,7 +37,7 @@ zigbee:
   - firmwares: 1.0.024
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57", outClusters:"0003,0006,0008,0019,1000", model:"Remote Control N2", manufacturer:"IKEA of Sweden"
 
-  - firmwares: 2.4.5
+  - firmwares: 2.4.5 (117C-11CB-02040005)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57,FC7C", outClusters:"0003,0005,0006,0008,0019,1000", model:"Remote Control N2", manufacturer:"IKEA of Sweden"
 
   binds:

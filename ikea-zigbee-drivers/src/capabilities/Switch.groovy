@@ -73,8 +73,9 @@ Utils.sendZigbeeCommands zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBeha
 
 // Configuration for capability.Switch
 sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report battery at least every 10 minutes
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report On/Off status at least every 10 minutes
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
@@ -111,25 +112,15 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x4003] }:
         case 0xFF: newValue = "RESTORE_PREVIOUS_STATE"; break
         default: return Log.warn("Received attribute value: powerOnBehavior=${msg.value}")
     }
-
     powerOnBehavior = newValue
-    device.clearSetting "powerOnBehavior"
-    device.removeSetting "powerOnBehavior"
-    device.updateSetting "powerOnBehavior", newValue
-    return Utils.processedZclMessage("Read Attributes Response", "powerOnBehavior=${newValue}")
+    device.updateSetting("powerOnBehavior",[ value:newValue, type:"enum" ])
+
+    return Utils.processedZclMessage("Read Attributes Response", "PowerOnBehavior=${newValue}")
 {{/ params.powerOnBehavior }}
 
 // Other events that we expect but are not usefull for capability.Switch behavior
-
-// Write Attribute Response (0x04)
-case { contains it, [clusterInt:0x0006, commandInt:0x04] }:
-    if (msg.data[0] != "00") return Utils.failedZclMessage("Write Attribute Response", msg.data[0], msg)
-    return Utils.processedZclMessage("Write Attribute Response", "cluster=0x${msg.clusterId}")
-
-// ConfigureReportingResponse := { 08:Status, 08:Direction, 16:AttributeIdentifier }
-// Success example: [00] -> status = SUCCESS
-case { contains it, [clusterInt:0x0006, commandInt:0x07] }:
-    if (msg.data[0] != "00") return Utils.failedZclMessage("Configure Reporting Response", msg.data[0], msg)
-    return Utils.processedZclMessage("Configure Reporting Response", "cluster=0x${msg.clusterId}, data=${msg.data}")
+case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
+case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // ConfigureReportingResponse
+    return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

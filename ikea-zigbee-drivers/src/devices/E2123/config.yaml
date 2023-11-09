@@ -1,6 +1,11 @@
 device:
-  model: IKEA Symfonisk Sound Remote Gen2
-  type: E2123
+  model: IKEA Symfonisk Sound Remote Gen2 (E2123)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2123.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E2123.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/Battery.groovy
@@ -24,6 +29,10 @@ device:
         - { id: 'PREV',  name: 'Prev',  number: 5 }
         - { id: 'DOT_1', name: '•',     number: 6 }
         - { id: 'DOT_2', name: '••',    number: 7 }
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
     - file: src/capabilities/ReleasableButton.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
 
@@ -31,7 +40,8 @@ zigbee:
   fingerprints:
   - firmwares: 1.0.012
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57", outClusters:"0003,0004,0006,0008,0019,1000,FC7F", model:"SYMFONISK sound remote gen2", manufacturer:"IKEA of Sweden"
-  - firmwares: 1.0.35
+
+  - firmwares: 1.0.35 (117C-110E-01000035)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC7C", outClusters:"0003,0004,0006,0008,0019,1000", model:"SYMFONISK sound remote gen2", manufacturer:"IKEA of Sweden"
 
   binds:

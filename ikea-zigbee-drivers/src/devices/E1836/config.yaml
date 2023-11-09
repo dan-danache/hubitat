@@ -1,7 +1,11 @@
 device:
-  model: IKEA Askvader On/Off Switch
-  zigbeeId: ASKVADER on/off switch
-  type: E1836
+  model: IKEA Askvader On/Off Switch (E1836)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1836.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E1836.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/Switch.groovy
@@ -17,14 +21,14 @@ device:
     - file: src/capabilities/Refresh.groovy
       params:
         readAttributes:
-        - { cluster: '0x0006', attr: '0x0000', description: 'OnOff := { 0x00:Off, 0x01:On }' }
-        - { cluster: '0x0006', attr: '0x4003', description: 'PowerOnBehavior := { 0x00:TurnPowerOff, 0x01:TurnPowerOn, 0xFF:RestorePreviousState }' }
+        - { cluster: '0x0006', attr: '0x0000', description: 'OnOff' }
+        - { cluster: '0x0006', attr: '0x4003', description: 'PowerOnBehavior' }
     - file: src/capabilities/ZigbeeRouter.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
 
 zigbee:
   fingerprints:
-  - firmwares: 1.0.002
+  - firmwares: 1.0.002 (117C-110D-00010002)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC57", outClusters:"0019", model:"ASKVADER on/off switch", manufacturer:"IKEA of Sweden"
 
   messages:

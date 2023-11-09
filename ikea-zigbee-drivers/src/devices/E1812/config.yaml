@@ -1,6 +1,11 @@
 device:
-  model: IKEA Tradfri Shortcut Button
-  type: E1812
+  model: IKEA Tradfri Shortcut Button (E1812)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1812.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E1812.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/Battery.groovy
@@ -18,15 +23,19 @@ device:
       params:
         buttons:
         - { id: 'ONOFF', name: 'On/Off', number: 1 }
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
     - file: src/capabilities/ReleasableButton.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
 
 zigbee:
   fingerprints:
-  - firmwares: 2.3.015 (23015631)
+  - firmwares: 2.3.015 (117C-11C6-23015631)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0009,0020,1000", outClusters:"0003,0004,0006,0008,0019,0102,1000", model:"TRADFRI SHORTCUT Button", manufacturer:"IKEA of Sweden"
 
-  - firmwares: 24.4.6
+  - firmwares: 24.4.6 (117C-11C6-24040006)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0009,0020,1000,FC7C", outClusters:"0003,0004,0006,0008,0019,0102,1000", model:"TRADFRI SHORTCUT Button", manufacturer:"IKEA of Sweden"
 
   binds:

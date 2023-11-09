@@ -6,7 +6,7 @@ capability "SwitchLevel"
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
-// Inputs for capability.ChangeLevel
+// Inputs for capability.Brightness
 input(
     name: "levelStep",
     type: "enum",
@@ -39,7 +39,7 @@ input(
     required: true
 )
 
-// Inputs for capability.SwitchLevel
+// Inputs for capability.Brightness
 input(
     name: "turnOnBehavior",
     type: "enum",
@@ -83,14 +83,14 @@ input(
 {{!--------------------------------------------------------------------------}}
 {{# @commands }}
 
-// Commands for capability.ChangeLevel
+// Commands for capability.Brightness
 command "levelUp"
 command "levelDown"
 {{/ @commands }}
 {{!--------------------------------------------------------------------------}}
 {{# @implementation }}
 
-// Implementation for capability.ChangeLevel
+// Implementation for capability.Brightness
 def startLevelChange(direction) {
     Log.debug "Starting brightness change ${direction}wards with a rate of ${startLevelChangeRate}% / second"
 
@@ -123,7 +123,7 @@ def levelDown() {
     Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114302 ${payload}}"])
 }
 
-// Implementation for capability.SwitchLevel
+// Implementation for capability.Brightness
 def setLevel(level, duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
     Log.debug "Setting brightness to ${newLevel}% during ${duration} seconds"
@@ -163,7 +163,7 @@ def turnOnCallback(switchState) {
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
-// Preferences for capability.ChangeLevel
+// Preferences for capability.Brightness
 Log.info "🛠️ levelStep = ${levelStep}%"
 Log.info "🛠️ startLevelChangeRate = ${startLevelChangeRate}% / second"
 
@@ -171,9 +171,7 @@ Log.info "🛠️ startLevelChangeRate = ${startLevelChangeRate}% / second"
 Log.info "🛠️ turnOnBehavior = ${turnOnBehavior}"
 if (turnOnBehavior == "FIXED_VALUE") {
     Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
-    device.clearSetting "onLevelValue"
-    device.removeSetting "onLevelValue"
-    device.updateSetting "onLevelValue", lvl
+    device.updateSetting("onLevelValue",[ value:lvl, type:"number" ])
     Log.info "🛠️ onLevelValue = ${lvl}%"
     setOnLevel(lvl)
 } else {
@@ -186,16 +184,16 @@ Utils.sendZigbeeCommands(zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.par
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for capability.SwitchLevel
+// Configuration for capability.Brightness
 sendEvent name:"level", value:"100", type:"digital", descriptionText:"Brightness initialized to 100%"
 cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel at least every 10 minutes
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
-//cmds += zigbee.readAttribute(0x0008, 0x0000) // CurrentLevel
+cmds += zigbee.readAttribute(0x0008, 0x0000) // CurrentLevel
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for capability.SwitchLevel
+// Events for capability.Brightness
 
 // Report Attributes: CurrentLevel
 // Read Attributes Reponse: CurrentLevel
@@ -229,17 +227,9 @@ case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
     }
     return
 
-// Other events that we expect but are not usefull for capability.SwitchLevel behavior
-
-// Write Attribute Response (0x04)
-case { contains it, [clusterInt:0x0008, commandInt:0x04] }:
-    if (msg.data[0] != "00") return Utils.failedZclMessage("Write Attribute Response", msg.data[0], msg)
-    return Utils.processedZclMessage("Write Attribute Response", "cluster=0x${msg.clusterId}")
-
-// ConfigureReportingResponse := { 08:Status, 08:Direction, 16:AttributeIdentifier }
-// Success example: [00] -> status = SUCCESS
-case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
-    if (msg.data[0] != "00") return Utils.failedZclMessage("Configure Reporting Response", msg.data[0], msg)
-    return Utils.processedZclMessage("Configure Reporting Response", "cluster=0x${msg.clusterId}, data=${msg.data}")
+// Other events that we expect but are not usefull for capability.Brightness behavior
+case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
+case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // ConfigureReportingResponse
+    return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

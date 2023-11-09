@@ -1,6 +1,11 @@
 device:
-  model: IKEA Tradfri Remote Control
-  type: E1810
+  model: IKEA Tradfri Remote Control (E1810)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1810.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E1810.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/Battery.groovy
@@ -21,12 +26,16 @@ device:
         - { id: 'MINUS', name: '🔅',   number: 3 }
         - { id: 'NEXT',  name: 'Next',  number: 4 }
         - { id: 'PREV',  name: 'Prev',  number: 5 }
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
     - file: src/capabilities/ReleasableButton.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
 
 zigbee:
   fingerprints:
-  - firmwares: 24.4.5
+  - firmwares: 24.4.5 (117C-11C1-24040005)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57,FC7C", outClusters:"0003,0004,0005,0006,0008,0019,1000", model:"TRADFRI remote control", manufacturer:"IKEA of Sweden" 
   
   binds:

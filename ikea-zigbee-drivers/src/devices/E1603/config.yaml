@@ -1,6 +1,11 @@
 device:
-  model: IKEA Tradfri Control Outlet
-  type: E1603
+  model: IKEA Tradfri Control Outlet (E1603)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1603.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E1603.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
     - file: src/capabilities/Switch.groovy
@@ -16,8 +21,8 @@ device:
     - file: src/capabilities/Refresh.groovy
       params:
         readAttributes:
-        - { cluster: '0x0006', attr: '0x0000', description: 'OnOff := { 0x00:Off, 0x01:On }' }
-        - { cluster: '0x0006', attr: '0x4003', description: 'PowerOnBehavior := { 0x00:TurnPowerOff, 0x01:TurnPowerOn, 0xFF:RestorePreviousState }' }
+        - { cluster: '0x0006', attr: '0x0000', description: 'OnOff' }
+        - { cluster: '0x0006', attr: '0x4003', description: 'PowerOnBehavior' }
     - file: src/capabilities/ZigbeeRouter.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
 
@@ -26,7 +31,7 @@ zigbee:
   - firmwares: 2.0.024
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC7C", outClusters:"0005,0019,0020,1000", model:"TRADFRI control outlet", manufacturer:"IKEA of Sweden"
 
-  - firmwares: 2.3.089
+  - firmwares: 2.3.089 (117C-1101-23089631)
     value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC7C", outClusters:"0019,0020,1000", model:"TRADFRI control outlet", manufacturer:"IKEA of Sweden"
 
   messages:

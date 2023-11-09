@@ -1,15 +1,13 @@
 /**
- * IKEA Tradfri On/Off Switch (E1743)
+ * Philips Wall Switch Module (RDM001)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E1743.html
- * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
- * @see https://static.homesmart.ikea.com/releaseNotes/
+ * @see https://zigbee.blakadder.com/Philips_RDM001.html
  */
 import groovy.time.TimeCategory
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = "IKEA Tradfri On/Off Switch (E1743)"
+@Field static final String DRIVER_NAME = "Philips Wall Switch Module (RDM001)"
 @Field static final String DRIVER_VERSION = "3.4.0"
 
 // Fields for capability.HealthCheck
@@ -20,23 +18,31 @@ import groovy.transform.Field
 
 // Fields for capability.PushableButton
 @Field static final Map<String, List<String>> BUTTONS = [
-    "ON": ["1", "On"],
-    "OFF": ["2", "Off"],
+    "BUTTON_1": ["1", "Left"],
+    "BUTTON_2": ["2", "Right"],
+]
+
+// Fields for capability.RDM001_SwitchStyle
+@Field static final Map<Integer, String> RDM001_SWITCH_STYLE = [
+    "00": "Single Rocker",
+    "01": "Single Push Button",
+    "02": "Dual Rocker",
+    "03": "Dual Push Button"
 ]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1743.groovy") {
+    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/RDM001.groovy") {
         capability "Configuration"
         capability "Battery"
         capability "HealthCheck"
-        capability "HoldableButton"
         capability "PowerSource"
+        capability "HoldableButton"
         capability "PushableButton"
         capability "Refresh"
         capability "ReleasableButton"
 
-        // For firmware: 2.2.010, 24.4.6 (117C-11C5-24040006)
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0009,0020,1000,FC7C", outClusters:"0003,0004,0006,0008,0019,0102,1000", model:"TRADFRI on/off switch", manufacturer:"IKEA of Sweden"
+        // For firmware: 1.0.5 (100B-011C-0000041A)
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,FC00", outClusters:"0003,0004,0006,0008,0019", model:"RDM001", manufacturer:"Signify Netherlands B.V."
         
         // Attributes for capability.HealthCheck
         attribute "healthStatus", "ENUM", ["offline", "online", "unknown"]
@@ -58,6 +64,17 @@ metadata {
                 "4":"Error - log errors"
             ],
             defaultValue: "2",
+            required: true
+        )
+        
+        // Inputs for capability.RDM001_SwitchStyle
+        input(
+            name: "switchStyle",
+            type: "enum",
+            title: "Switch Style",
+            description: "<small>Configure the button configuration</small>",
+            options: RDM001_SWITCH_STYLE,
+            defaultValue: "02",
             required: true
         )
     }
@@ -83,6 +100,15 @@ def updated(auto = false) {
     
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, "healthCheck"
+    
+    // Preferences for capability.RDM001_SwitchStyle
+    if (switchStyle == null) switchStyle = "02"
+    Log.info "🛠️ switchStyle = ${switchStyle} (${RDM001_SWITCH_STYLE[switchStyle]})"
+    Utils.sendZigbeeCommands(["he raw ${device.deviceNetworkId} 0x01 0x01 0x0000 {040B104302 3400 30 ${switchStyle}}"])
+    Integer numberOfButtons = (switchStyle == "00" || switchStyle == "01") ? 1 : 2
+    sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
+    Log.info "🛠️ numberOfButtons = ${numberOfButtons}"
+    
 }
 
 // ===================================================================================================================
@@ -128,11 +154,11 @@ def configure(auto = false) {
 
     List<String> cmds = []
 
-    // Configure IKEA Tradfri On/Off Switch (E1743) specific Zigbee reporting
+    // Configure Philips Wall Switch Module (RDM001) specific Zigbee reporting
     // -- No reporting needed
 
-    // Add IKEA Tradfri On/Off Switch (E1743) specific Zigbee binds
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+    // Add Philips Wall Switch Module (RDM001) specific Zigbee binds
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Button
     
     // Configuration for capability.Battery
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x9AB0 {01} {}" // Report battery at least every 11 hours
@@ -256,25 +282,29 @@ def parse(String description) {
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
-        // Handle IKEA Tradfri On/Off Switch (E1743) specific Zigbee messages
+        // Handle Philips Wall Switch Module (RDM001) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
 
-        // I/O button was pressed
-        case { contains it, [clusterInt:0x0006, commandInt:0x00] }:
-        case { contains it, [clusterInt:0x0006, commandInt:0x01] }:
-            def button = msg.commandInt == 0x00 ? BUTTONS.OFF : BUTTONS.ON
-            return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+        // Button was pressed := { 16:Button, 08:EventType, 08:NextValueType, 08:Action, 08:NextValueType, 16:DurationRotation}
+        // EventType := { 0x00:Button, 0x01:Rotary }
+        // Action := { 0x00:Press, 0x01:Hold/Start, 0x02:Release/Repeat, 0x03:LongRelease }
+        // [02, 00,  00,  30,  02,  21,  01, 00] -> Button=2(0x0002), EventType=Button(0x00), NextValueType=enum8(0x30), Action=Release(0x02), NextValueType=uint16(0x21), DurationRotation=0x0001
+        case { contains it, [clusterInt:0xFC00, commandInt:0x00] }:
+            def button = msg.data[0] == "01" ? BUTTONS.BUTTON_1 : BUTTONS.BUTTON_2
         
-        // I/O button was held
-        case { contains it, [clusterInt:0x0008, commandInt:0x01] }:
-        case { contains it, [clusterInt:0x0008, commandInt:0x05] }:
-            def button = msg.commandInt == 0x01 ? BUTTONS.OFF : BUTTONS.ON
-            return Utils.sendEvent(name:"held", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held")
+            // Rocker Mode: Only listen to "Press" (00) actions
+            if (switchStyle == "00" || switchStyle == "02") {
+                if (msg.data[4] != "00") return
+                return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+            }
         
-        // I/O button was released
-        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
-            def button = device.currentValue("held", true) == 1 ? BUTTONS.ON : BUTTONS.OFF
-            return Utils.sendEvent(name:"released", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released")
+            // Dimmer Mode: Only listen to Release (02), Hold (01) and LongRelease (03)
+            switch (msg.data[4]) {
+                case "02": return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+                case "01": return Utils.sendEvent(name:"held", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held")
+                case "03": return Utils.sendEvent(name:"released", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released")
+            }
+            return
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle capabilities Zigbee messages
@@ -325,6 +355,22 @@ def parse(String description) {
             }
             Utils.sendEvent name:"powerSource", value:powerSource, type:"digital", descriptionText:"Power source is ${powerSource}"
             return Utils.processedZclMessage("Read Attributes Response", "PowerSource=${msg.value}")
+        
+        // Events for capability.RDM001_SwitchStyle (Write Attributes Response)
+        case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x04, isClusterSpecific:false, isManufacturerSpecific:true, manufacturerId:"100B"] }:
+            return Log.info("Switch Style successfully configured!")
+        
+        // Events for capability.RDM001_SwitchStyle (Read Attributes Response)
+        case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x01, attrInt:0x0034] }:
+        case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x0A, attrInt:0x0034] }:
+            device.clearSetting "switchStyle"
+            device.removeSetting "vswitchStyle"
+            device.updateSetting "switchStyle", msg.value
+        
+            Integer numberOfButtons = msg.value == "01" || msg.value == "02" ? 1 : 2
+            sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
+            Log.info "🛠️ numberOfButtons = ${numberOfButtons}"
+            return
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle common messages (e.g.: received during pairing when we query the device for information)

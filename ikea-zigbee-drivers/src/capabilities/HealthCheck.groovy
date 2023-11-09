@@ -29,7 +29,7 @@ schedule HEALTH_CHECK.schedule, "healthCheck"
 // Helpers for capability.HealthCheck
 def healthCheck() {
     Log.debug '⏲️ Automatically running health check'
-    def healthStatus = state.lastRx == 0 ? "unknown" : (now() - state.lastRx < Integer.parseInt(HEALTH_CHECK.thereshold) * 1000 ? "online" : "offline")
+    String healthStatus = state.lastRx == 0 || state.lastRx == null ? "unknown" : (now() - state.lastRx < Integer.parseInt(HEALTH_CHECK.thereshold) * 1000 ? "online" : "offline")
     Utils.sendEvent name:"healthStatus", value:healthStatus, type:"physical", descriptionText:"Health status is ${healthStatus}"
 }
 {{/ @helpers }}
@@ -37,8 +37,6 @@ def healthCheck() {
 {{# @configure }}
 
 // Configuration for capability.HealthCheck
-state.lastRx == 0
-state.lastTx == 0
 sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
 sendEvent name:"checkInterval", value:{{ params.checkInterval }}, unit:"second", descriptionText:"Health check interval is {{ params.checkInterval }} seconds"
 {{/ @configure }}
@@ -58,16 +56,16 @@ def pingExecute() {
         return Log.info("Did not sent any messages since it was last configured")
     }
 
-    def now = new Date(Math.round(now() / 1000) * 1000)
-    def lastRx = new Date(Math.round(state.lastRx / 1000) * 1000)
-    def lastRxAgo = TimeCategory.minus(now, lastRx).toString().replace(".000 seconds", " seconds")
+    Date now = new Date(Math.round(now() / 1000) * 1000)
+    Date lastRx = new Date(Math.round(state.lastRx / 1000) * 1000)
+    String lastRxAgo = TimeCategory.minus(now, lastRx).toString().replace(".000 seconds", " seconds")
     Log.info "Sent last message at ${lastRx.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${lastRxAgo} ago)"
 
-    def thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
-    def theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
+    Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
+    String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
     Log.info "Will me marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
 
-    def offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
+    String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
     Log.info "Will me marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
 }
 {{/ @implementation }}

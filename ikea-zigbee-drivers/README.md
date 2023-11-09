@@ -1,7 +1,7 @@
 # IKEA Zigbee drivers
 
 Supported devices:
-* [Tradfri Control Outlet (E1603)](#tradfri-control-outlet-e1603)
+* [Tradfri Control Outlet (E1603, E1706)](#tradfri-control-outlet-e1603-e1706)
 * [Tradfri On/Off Switch (E1743)](#tradfri-onoff-switch-e1743)
 * [Tradfri Motion Sensor (E1745)](#tradfri-motion-sensor-e1745)
 * [Tradfri Open/Close Remote (E1766)](#tradfri-openclose-remote-e1766)
@@ -31,12 +31,12 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
    * Click "Save" in the top right
 
 
-## Tradfri Control Outlet (E1603)
+## Tradfri Control Outlet (E1603, E1706)
 
 | Parameter | Details |
 |-----------|-------------|
-| Product Image | <img src="https://zigbee.blakadder.com/assets/images/devices/Ikea_E1603.webp" style="width: 200px"> |
-| Product Code | `304.883.63` |
+| Product Image | <img src="https://zigbee.blakadder.com/assets/images/devices/Ikea_E1603.webp" style="width: 200px"><img src="https://zigbee.blakadder.com/assets/images/devices/Ikea_E1706.webp" style="width: 200px"> |
+| Product Code | `304.883.63`｜`303.561.69` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1603.groovy` |
 | Tested firmwares | `2.0.0244`｜`2.3.089` |
 
