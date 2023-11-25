@@ -40,12 +40,12 @@ metadata {
             title: "Log verbosity",
             description: "<small>Select what type of messages are added in the \"Logs\" section</small>",
             options: [
-                "1":"Debug - log everything",
-                "2":"Info - log important events",
-                "3":"Warning - log events that require attention",
-                "4":"Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
-            defaultValue: "2",
+            defaultValue: "1",
             required: true
         )
         {{# device.capabilities }}
@@ -69,6 +69,11 @@ def updated(auto = false) {
     Log.info "Saving preferences${auto ? " (auto)" : ""} ..."
 
     unschedule()
+
+    if (logLevel == null) {
+        logLevel = "1"
+        device.updateSetting("logLevel", [value:logLevel, type:"enum"])
+    }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${logLevel}"
     {{# device.capabilities }}
@@ -195,7 +200,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing current state ..."
+            Log.info "Rejoined the Zigbee mesh! Refreshing current state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)
@@ -210,6 +215,7 @@ def parse(String description) {
             return Log.info("Device is leaving the Zigbee mesh. See you later, Aligator!")
 
         // Ignore the following Zigbee messages
+        case { contains it, [commandInt:0x0A] }:                                       // ZCL: Attribute report we don't care about (configured by other driver)
         case { contains it, [clusterInt:0x0003, commandInt:0x01] }:                    // ZCL: Identify Query Command
         case { contains it, [endpointInt:0x00, clusterInt:0x8001, commandInt:0x00] }:  // ZDP: IEEE_addr_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp

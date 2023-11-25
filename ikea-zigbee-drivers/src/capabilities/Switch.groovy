@@ -64,6 +64,10 @@ def onWithTimedOff(onTime = 1) {
 {{# params.powerOnBehavior }}
 
 // Preferences for capability.Switch
+if (powerOnBehavior == null) {
+    powerOnBehavior = "RESTORE_PREVIOUS_STATE"
+    device.updateSetting("powerOnBehavior", [value:powerOnBehavior, type:"enum"])
+}
 Log.info "🛠️ powerOnBehavior = ${powerOnBehavior}"
 Utils.sendZigbeeCommands zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
 {{/ params.powerOnBehavior }}

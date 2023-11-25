@@ -8,7 +8,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "Philips Wall Switch Module (RDM001)"
-@Field static final String DRIVER_VERSION = "3.4.1"
+@Field static final String DRIVER_VERSION = "3.4.2"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -58,12 +58,12 @@ metadata {
             title: "Log verbosity",
             description: "<small>Select what type of messages are added in the \"Logs\" section</small>",
             options: [
-                "1":"Debug - log everything",
-                "2":"Info - log important events",
-                "3":"Warning - log events that require attention",
-                "4":"Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
-            defaultValue: "2",
+            defaultValue: "1",
             required: true
         )
         
@@ -72,7 +72,7 @@ metadata {
             name: "switchStyle",
             type: "enum",
             title: "Switch Style",
-            description: "<small>Configure the button configuration</small>",
+            description: "<small>Select physical switch button configuration</small>",
             options: RDM001_SWITCH_STYLE,
             defaultValue: "02",
             required: true
@@ -95,6 +95,11 @@ def updated(auto = false) {
     Log.info "Saving preferences${auto ? " (auto)" : ""} ..."
 
     unschedule()
+
+    if (logLevel == null) {
+        logLevel = "1"
+        device.updateSetting("logLevel", [value:logLevel, type:"enum"])
+    }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${logLevel}"
     
@@ -102,13 +107,16 @@ def updated(auto = false) {
     schedule HEALTH_CHECK.schedule, "healthCheck"
     
     // Preferences for capability.RDM001_SwitchStyle
-    if (switchStyle == null) switchStyle = "02"
+    if (switchStyle == null) {
+        switchStyle = "02"
+        device.updateSetting("switchStyle", [value:switchStyle, type:"enum"])
+    }
     Log.info "🛠️ switchStyle = ${switchStyle} (${RDM001_SWITCH_STYLE[switchStyle]})"
     Utils.sendZigbeeCommands(["he raw ${device.deviceNetworkId} 0x01 0x01 0x0000 {040B104302 3400 30 ${switchStyle}}"])
+    
     Integer numberOfButtons = (switchStyle == "00" || switchStyle == "01") ? 1 : 2
     sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
     Log.info "🛠️ numberOfButtons = ${numberOfButtons}"
-    
 }
 
 // ===================================================================================================================
@@ -161,7 +169,7 @@ def configure(auto = false) {
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Button
     
     // Configuration for capability.Battery
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x9AB0 {01} {}" // Report battery at least every 11 hours
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report battery at least every 5 hours (min 1% change)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
     cmds += zigbee.readAttribute(0x0001, 0x0021)  // BatteryPercentage
     
@@ -176,6 +184,16 @@ def configure(auto = false) {
     // Configuration for capability.PushableButton
     Integer numberOfButtons = BUTTONS.count{_ -> true}
     sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
+    
+    // Configuration for capability.RDM001_SwitchStyle
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {01} {}" // Report battery at least every 5 hours
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+    cmds += zigbee.readAttribute(0x0001, 0x0021)  // BatteryPercentage
+    
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0000 0x0034 0x30 0x0000 0x0000 {} {0x100B}" // Report switch style whenever it changes
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0000 {${device.zigbeeId}} {}" // Basic cluster
+    
+    cmds += zigbee.writeAttribute(0x0000, 0x0031, 0x19, 0x0B00, [mfgCode: "0x100B"]) // Write Philips magic attribute
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
@@ -206,10 +224,10 @@ def pingExecute() {
 
     Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
     String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
+    Log.info "Will be marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
+    Log.info "Will be marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
 }
 
 // Implementation for capability.HoldableButton
@@ -236,6 +254,7 @@ def refresh(buttonPress = true) {
     }
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
+    cmds += zigbee.writeAttribute(0x0000, 0x0031, 0x19, 0x0B00, [mfgCode: "0x100B"]) // Philips magic attribute
     Utils.sendZigbeeCommands cmds
 }
 
@@ -375,6 +394,10 @@ def parse(String description) {
             sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
             Log.info "🛠️ numberOfButtons = ${numberOfButtons}"
             return
+        
+        // Other events that we expect but are not usefull for capability.RDM001_SwitchStyle behavior
+        case { contains it, [clusterInt:0x0000, commandInt:0x07] }:  // ConfigureReportingResponse
+            return
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle common messages (e.g.: received during pairing when we query the device for information)
@@ -382,7 +405,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing current state ..."
+            Log.info "Rejoined the Zigbee mesh! Refreshing current state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)
@@ -397,6 +420,7 @@ def parse(String description) {
             return Log.info("Device is leaving the Zigbee mesh. See you later, Aligator!")
 
         // Ignore the following Zigbee messages
+        case { contains it, [commandInt:0x0A] }:                                       // ZCL: Attribute report we don't care about (configured by other driver)
         case { contains it, [clusterInt:0x0003, commandInt:0x01] }:                    // ZCL: Identify Query Command
         case { contains it, [endpointInt:0x00, clusterInt:0x8001, commandInt:0x00] }:  // ZDP: IEEE_addr_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp

@@ -17,23 +17,39 @@ input(
     name: "switchStyle",
     type: "enum",
     title: "Switch Style",
-    description: "<small>Configure the button configuration</small>",
+    description: "<small>Select physical switch button configuration</small>",
     options: RDM001_SWITCH_STYLE,
     defaultValue: "02",
     required: true
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
+{{# @configure }}
+
+// Configuration for capability.RDM001_SwitchStyle
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {01} {}" // Report battery at least every 5 hours
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+cmds += zigbee.readAttribute(0x0001, 0x0021)  // BatteryPercentage
+
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0000 0x0034 0x30 0x0000 0x0000 {} {0x100B}" // Report switch style whenever it changes
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0000 {${device.zigbeeId}} {}" // Basic cluster
+
+cmds += zigbee.writeAttribute(0x0000, 0x0031, 0x19, 0x0B00, [mfgCode: "0x100B"]) // Write Philips magic attribute
+{{/ @configure }}
+{{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
 // Preferences for capability.RDM001_SwitchStyle
-if (switchStyle == null) switchStyle = "02"
+if (switchStyle == null) {
+    switchStyle = "02"
+    device.updateSetting("switchStyle", [value:switchStyle, type:"enum"])
+}
 Log.info "🛠️ switchStyle = ${switchStyle} (${RDM001_SWITCH_STYLE[switchStyle]})"
 Utils.sendZigbeeCommands(["he raw ${device.deviceNetworkId} 0x01 0x01 0x0000 {040B104302 3400 30 ${switchStyle}}"])
+
 Integer numberOfButtons = (switchStyle == "00" || switchStyle == "01") ? 1 : 2
 sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
 Log.info "🛠️ numberOfButtons = ${numberOfButtons}"
-
 {{/ @updated }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
@@ -52,6 +68,10 @@ case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x0A, attrI
     Integer numberOfButtons = msg.value == "01" || msg.value == "02" ? 1 : 2
     sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
     Log.info "🛠️ numberOfButtons = ${numberOfButtons}"
+    return
+
+// Other events that we expect but are not usefull for capability.RDM001_SwitchStyle behavior
+case { contains it, [clusterInt:0x0000, commandInt:0x07] }:  // ConfigureReportingResponse
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

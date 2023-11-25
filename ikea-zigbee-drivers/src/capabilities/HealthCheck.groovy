@@ -63,10 +63,10 @@ def pingExecute() {
 
     Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
     String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
+    Log.info "Will be marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
+    Log.info "Will be marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
 }
 {{/ @implementation }}
 {{!--------------------------------------------------------------------------}}

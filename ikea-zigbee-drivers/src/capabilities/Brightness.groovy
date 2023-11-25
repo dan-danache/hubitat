@@ -164,10 +164,22 @@ def turnOnCallback(switchState) {
 {{# @updated }}
 
 // Preferences for capability.Brightness
+if (levelStep == null) {
+    levelStep = "20"
+    device.updateSetting("levelStep", [value:levelStep, type:"enum"])
+}
 Log.info "🛠️ levelStep = ${levelStep}%"
+
+if (startLevelChangeRate == null) {
+    startLevelChangeRate = "20"
+    device.updateSetting("startLevelChangeRate", [value:startLevelChangeRate, type:"enum"])
+}
 Log.info "🛠️ startLevelChangeRate = ${startLevelChangeRate}% / second"
 
-// Preferences for capability.SwitchLevel
+if (turnOnBehavior == null) {
+    turnOnBehavior = "RESTORE_PREVIOUS_LEVEL"
+    device.updateSetting("turnOnBehavior", [value:turnOnBehavior, type:"enum"])
+}
 Log.info "🛠️ turnOnBehavior = ${turnOnBehavior}"
 if (turnOnBehavior == "FIXED_VALUE") {
     Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
@@ -177,6 +189,11 @@ if (turnOnBehavior == "FIXED_VALUE") {
 } else {
     Log.debug "Disabling OnLevel (0xFF)"
     Utils.sendZigbeeCommands zigbee.writeAttribute(0x0008, 0x0011, 0x20, 0xFF)
+}
+
+if (transitionTime == null) {
+    transitionTime = "5"
+    device.updateSetting("transitionTime", [value:transitionTime, type:"enum"])
 }
 Log.info "🛠️ transitionTime = ${Integer.parseInt(transitionTime) / 10} second(s)"
 Utils.sendZigbeeCommands(zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.parseInt(transitionTime)))

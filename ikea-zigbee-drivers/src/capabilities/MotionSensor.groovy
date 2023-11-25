@@ -55,7 +55,16 @@ def clearMotion() {
 {{# @updated }}
 
 // Preferences for capability.MotionSensor
+if (clearMotionPeriod == null) {
+    clearMotionPeriod = "180"
+    device.updateSetting("clearMotionPeriod", [value:clearMotionPeriod, type:"enum"])
+}
 Log.info "🛠️ clearMotionPeriod = ${clearMotionPeriod} seconds"
+
+if (onlyTriggerInDimLight == null) {
+    onlyTriggerInDimLight = false
+    device.updateSetting("onlyTriggerInDimLight", [value:onlyTriggerInDimLight, type:"bool"])
+}
 Log.info "🛠️ onlyTriggerInDimLight = ${onlyTriggerInDimLight}"
 {{/ @updated }}
 {{!--------------------------------------------------------------------------}}

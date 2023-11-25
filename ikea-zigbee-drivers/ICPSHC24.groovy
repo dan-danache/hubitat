@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri LED Driver (ICPSHC24)"
-@Field static final String DRIVER_VERSION = "3.4.1"
+@Field static final String DRIVER_VERSION = "3.4.2"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -67,12 +67,12 @@ metadata {
             title: "Log verbosity",
             description: "<small>Select what type of messages are added in the \"Logs\" section</small>",
             options: [
-                "1":"Debug - log everything",
-                "2":"Info - log important events",
-                "3":"Warning - log events that require attention",
-                "4":"Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
-            defaultValue: "2",
+            defaultValue: "1",
             required: true
         )
         
@@ -182,18 +182,39 @@ def updated(auto = false) {
     Log.info "Saving preferences${auto ? " (auto)" : ""} ..."
 
     unschedule()
+
+    if (logLevel == null) {
+        logLevel = "1"
+        device.updateSetting("logLevel", [value:logLevel, type:"enum"])
+    }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${logLevel}"
     
     // Preferences for capability.Switch
+    if (powerOnBehavior == null) {
+        powerOnBehavior = "RESTORE_PREVIOUS_STATE"
+        device.updateSetting("powerOnBehavior", [value:powerOnBehavior, type:"enum"])
+    }
     Log.info "🛠️ powerOnBehavior = ${powerOnBehavior}"
     Utils.sendZigbeeCommands zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
     
     // Preferences for capability.Brightness
+    if (levelStep == null) {
+        levelStep = "20"
+        device.updateSetting("levelStep", [value:levelStep, type:"enum"])
+    }
     Log.info "🛠️ levelStep = ${levelStep}%"
+    
+    if (startLevelChangeRate == null) {
+        startLevelChangeRate = "20"
+        device.updateSetting("startLevelChangeRate", [value:startLevelChangeRate, type:"enum"])
+    }
     Log.info "🛠️ startLevelChangeRate = ${startLevelChangeRate}% / second"
     
-    // Preferences for capability.SwitchLevel
+    if (turnOnBehavior == null) {
+        turnOnBehavior = "RESTORE_PREVIOUS_LEVEL"
+        device.updateSetting("turnOnBehavior", [value:turnOnBehavior, type:"enum"])
+    }
     Log.info "🛠️ turnOnBehavior = ${turnOnBehavior}"
     if (turnOnBehavior == "FIXED_VALUE") {
         Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
@@ -203,6 +224,11 @@ def updated(auto = false) {
     } else {
         Log.debug "Disabling OnLevel (0xFF)"
         Utils.sendZigbeeCommands zigbee.writeAttribute(0x0008, 0x0011, 0x20, 0xFF)
+    }
+    
+    if (transitionTime == null) {
+        transitionTime = "5"
+        device.updateSetting("transitionTime", [value:transitionTime, type:"enum"])
     }
     Log.info "🛠️ transitionTime = ${Integer.parseInt(transitionTime) / 10} second(s)"
     Utils.sendZigbeeCommands(zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.parseInt(transitionTime)))
@@ -402,10 +428,10 @@ def pingExecute() {
 
     Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
     String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
+    Log.info "Will be marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
+    Log.info "Will be marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
 }
 
 // Implementation for capability.Refresh
@@ -617,7 +643,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing current state ..."
+            Log.info "Rejoined the Zigbee mesh! Refreshing current state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)
@@ -632,6 +658,7 @@ def parse(String description) {
             return Log.info("Device is leaving the Zigbee mesh. See you later, Aligator!")
 
         // Ignore the following Zigbee messages
+        case { contains it, [commandInt:0x0A] }:                                       // ZCL: Attribute report we don't care about (configured by other driver)
         case { contains it, [clusterInt:0x0003, commandInt:0x01] }:                    // ZCL: Identify Query Command
         case { contains it, [endpointInt:0x00, clusterInt:0x8001, commandInt:0x00] }:  // ZDP: IEEE_addr_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp

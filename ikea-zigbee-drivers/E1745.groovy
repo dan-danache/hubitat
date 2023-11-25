@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri Motion Sensor (E1745)"
-@Field static final String DRIVER_VERSION = "3.4.1"
+@Field static final String DRIVER_VERSION = "3.4.2"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -48,12 +48,12 @@ metadata {
             title: "Log verbosity",
             description: "<small>Select what type of messages are added in the \"Logs\" section</small>",
             options: [
-                "1":"Debug - log everything",
-                "2":"Info - log important events",
-                "3":"Warning - log events that require attention",
-                "4":"Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
-            defaultValue: "2",
+            defaultValue: "1",
             required: true
         )
         
@@ -105,11 +105,25 @@ def updated(auto = false) {
     Log.info "Saving preferences${auto ? " (auto)" : ""} ..."
 
     unschedule()
+
+    if (logLevel == null) {
+        logLevel = "1"
+        device.updateSetting("logLevel", [value:logLevel, type:"enum"])
+    }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${logLevel}"
     
     // Preferences for capability.MotionSensor
+    if (clearMotionPeriod == null) {
+        clearMotionPeriod = "180"
+        device.updateSetting("clearMotionPeriod", [value:clearMotionPeriod, type:"enum"])
+    }
     Log.info "🛠️ clearMotionPeriod = ${clearMotionPeriod} seconds"
+    
+    if (onlyTriggerInDimLight == null) {
+        onlyTriggerInDimLight = false
+        device.updateSetting("onlyTriggerInDimLight", [value:onlyTriggerInDimLight, type:"bool"])
+    }
     Log.info "🛠️ onlyTriggerInDimLight = ${onlyTriggerInDimLight}"
     
     // Preferences for capability.HealthCheck
@@ -166,7 +180,7 @@ def configure(auto = false) {
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
     
     // Configuration for capability.Battery
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x9AB0 {01} {}" // Report battery at least every 11 hours
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report battery at least every 5 hours (min 1% change)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
     cmds += zigbee.readAttribute(0x0001, 0x0021)  // BatteryPercentage
     
@@ -212,10 +226,10 @@ def pingExecute() {
 
     Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
     String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
+    Log.info "Will be marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
-    Log.info "Will me marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
+    Log.info "Will be marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
 }
 
 // Implementation for capability.Refresh
@@ -355,7 +369,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing current state ..."
+            Log.info "Rejoined the Zigbee mesh! Refreshing current state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)
@@ -370,6 +384,7 @@ def parse(String description) {
             return Log.info("Device is leaving the Zigbee mesh. See you later, Aligator!")
 
         // Ignore the following Zigbee messages
+        case { contains it, [commandInt:0x0A] }:                                       // ZCL: Attribute report we don't care about (configured by other driver)
         case { contains it, [clusterInt:0x0003, commandInt:0x01] }:                    // ZCL: Identify Query Command
         case { contains it, [endpointInt:0x00, clusterInt:0x8001, commandInt:0x00] }:  // ZDP: IEEE_addr_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp

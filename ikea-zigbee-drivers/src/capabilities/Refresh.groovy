@@ -14,9 +14,12 @@ def refresh(buttonPress = true) {
         }
     }
     List<String> cmds = []
-    {{#  params.readAttributes }}
-    cmds += zigbee.readAttribute({{ cluster }}, {{ attr }}) // {{ description }}
-    {{/  params.readAttributes }}
+    {{# params.readAttributes }}
+    cmds += zigbee.readAttribute({{ cluster }}, {{ attr }}{{# mfgCode }}, [mfgCode: "{{ mfgCode }}"]{{/ mfgCode }}) // {{ description }}
+    {{/ params.readAttributes }}
+    {{# params.writeAttributes }}
+    cmds += zigbee.writeAttribute({{ cluster }}, {{ attr }}, {{ type }}, {{ value }}{{# mfgCode }}, [mfgCode: "{{ mfgCode }}"]{{/ mfgCode }}) // {{ description }}
+    {{/ params.writeAttributes }}
     Utils.sendZigbeeCommands cmds
 }
 {{/ @implementation }}

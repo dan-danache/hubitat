@@ -6,7 +6,7 @@ capability "Battery"
 {{# @configure }}
 
 // Configuration for capability.Battery
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x9AB0 {01} {}" // Report battery at least every 11 hours
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report battery at least every 5 hours (min 1% change)
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
 cmds += zigbee.readAttribute(0x0001, 0x0021)  // BatteryPercentage
 {{/ @configure }}
