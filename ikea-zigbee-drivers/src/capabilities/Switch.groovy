@@ -11,7 +11,7 @@ input(
     name: "powerOnBehavior",
     type: "enum",
     title: "Power On behaviour",
-    description: "<small>Select what happens after a power outage</small>",
+    description: "<small>Select what happens after a power outage.</small>",
     options: [
         "TURN_POWER_ON": "Turn power On",
         "TURN_POWER_OFF": "Turn power Off",
@@ -27,9 +27,9 @@ input(
 
 // Commands for capability.Switch
 command "toggle"
-{{#  params.onWithTimedOff }}
+{{# params.onWithTimedOff }}
 command "onWithTimedOff", [[name:"On time*", type:"NUMBER", description:"After how many seconds power will be turned Off [1..6500]"]]
-{{/  params.onWithTimedOff }}
+{{/ params.onWithTimedOff }}
 {{/ @commands }}
 {{!--------------------------------------------------------------------------}}
 {{# @implementation }}
@@ -57,7 +57,7 @@ def onWithTimedOff(onTime = 1) {
     String payload = "00 ${zigbee.swapOctets(zigbee.convertToHexString(delay * 10, 4))} 0000"
     Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114342 ${payload}}"])
 }
-{{/  params.onWithTimedOff }}
+{{/ params.onWithTimedOff }}
 {{/ @implementation }}
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
@@ -69,7 +69,7 @@ if (powerOnBehavior == null) {
     device.updateSetting("powerOnBehavior", [value:powerOnBehavior, type:"enum"])
 }
 Log.info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-Utils.sendZigbeeCommands zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
+cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
 {{/ params.powerOnBehavior }}
 {{/ @updated }}
 {{!--------------------------------------------------------------------------}}

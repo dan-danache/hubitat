@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri Motion Sensor (E1745)"
-@Field static final String DRIVER_VERSION = "3.4.2"
+@Field static final String DRIVER_VERSION = "3.4.3"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -46,12 +46,12 @@ metadata {
             name: "logLevel",
             type: "enum",
             title: "Log verbosity",
-            description: "<small>Select what type of messages are added in the \"Logs\" section</small>",
+            description: "<small>Select what type of messages are added in the \"Logs\" section.</small>",
             options: [
-                "1" : "Debug - log everything",
-                "2" : "Info - log important events",
-                "3" : "Warning - log events that require attention",
-                "4" : "Error - log errors"
+                "1": "Debug - log everything",
+                "2": "Info - log important events",
+                "3": "Warning - log events that require attention",
+                "4": "Error - log errors"
             ],
             defaultValue: "1",
             required: true
@@ -62,7 +62,7 @@ metadata {
             name: "clearMotionPeriod",
             type: "enum",
             title: "Clear motion after",
-            description: "<small>Set status inactive if no motion is detected in this period</small>",
+            description: "<small>Set status inactive if no motion is detected in this period.</small>",
             options: [
                 "60"  : "1 minute",
                 "120" : "2 minutes",
@@ -83,7 +83,7 @@ metadata {
             name: "onlyTriggerInDimLight",
             type: "bool",
             title: "Only detect motion in the dark",
-            description: "<small>Select the night mode 🌙 option on device for this to work</small>",
+            description: "<small>Select the night mode 🌙 option on device for this to work.</small>",
             defaultValue: false,
             required: true
         )
@@ -103,6 +103,7 @@ def installed() {
 // Called when the "Save Preferences" button is clicked
 def updated(auto = false) {
     Log.info "Saving preferences${auto ? " (auto)" : ""} ..."
+    List<String> cmds = []
 
     unschedule()
 
@@ -128,6 +129,8 @@ def updated(auto = false) {
     
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, "healthCheck"
+
+    Utils.sendZigbeeCommands cmds
 }
 
 // ===================================================================================================================
@@ -418,6 +421,7 @@ def parse(String description) {
 
 @Field def Utils = [
     sendZigbeeCommands: { List<String> cmds ->
+        if (cmds.isEmpty()) { return }
         List<String> send = delayBetween(cmds.findAll { !it.startsWith("delay") }, 1000)
         Log.debug "◀ Sending Zigbee messages: ${send}"
         state.lastTx = now()

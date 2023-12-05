@@ -17,7 +17,7 @@ input(
     name: "clearMotionPeriod",
     type: "enum",
     title: "Clear motion after",
-    description: "<small>Set status inactive if no motion is detected in this period</small>",
+    description: "<small>Set status inactive if no motion is detected in this period.</small>",
     options: [
         "60"  : "1 minute",
         "120" : "2 minutes",
@@ -38,7 +38,7 @@ input(
     name: "onlyTriggerInDimLight",
     type: "bool",
     title: "Only detect motion in the dark",
-    description: "<small>Select the night mode 🌙 option on device for this to work</small>",
+    description: "<small>Select the night mode 🌙 option on device for this to work.</small>",
     defaultValue: false,
     required: true
 )

@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri LED Driver (ICPSHC24)"
-@Field static final String DRIVER_VERSION = "3.4.2"
+@Field static final String DRIVER_VERSION = "3.4.3"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -65,12 +65,12 @@ metadata {
             name: "logLevel",
             type: "enum",
             title: "Log verbosity",
-            description: "<small>Select what type of messages are added in the \"Logs\" section</small>",
+            description: "<small>Select what type of messages are added in the \"Logs\" section.</small>",
             options: [
-                "1" : "Debug - log everything",
-                "2" : "Info - log important events",
-                "3" : "Warning - log events that require attention",
-                "4" : "Error - log errors"
+                "1": "Debug - log everything",
+                "2": "Info - log important events",
+                "3": "Warning - log events that require attention",
+                "4": "Error - log errors"
             ],
             defaultValue: "1",
             required: true
@@ -81,7 +81,7 @@ metadata {
             name: "powerOnBehavior",
             type: "enum",
             title: "Power On behaviour",
-            description: "<small>Select what happens after a power outage</small>",
+            description: "<small>Select what happens after a power outage.</small>",
             options: [
                 "TURN_POWER_ON": "Turn power On",
                 "TURN_POWER_OFF": "Turn power Off",
@@ -96,15 +96,16 @@ metadata {
             name: "levelStep",
             type: "enum",
             title: "Brightness up/down step",
-            description: "<small>Level adjust when using the levelUp/levelDown commands</small>",
+            description: "<small>Level adjust when using the levelUp/levelDown commands.</small>",
             options: [
-                "1" : "1%",
-                "2" : "2%",
-                "5" : "5%",
+                 "1": "1%",
+                 "2": "2%",
+                 "5": "5%",
                 "10": "10%",
                 "20": "20%",
                 "25": "25%",
-                "33": "33%"],
+                "33": "33%"
+            ],
             defaultValue: "20",
             required: true
         )
@@ -112,24 +113,22 @@ metadata {
             name: "startLevelChangeRate",
             type: "enum",
             title: "Brightness change rate",
-            description: "<small>The rate of brightness change when using the startLevelChange() command</small>",
+            description: "<small>The rate of brightness change when using the startLevelChange() command.</small>",
             options: [
-                "10" : "10% / second : from 0% to 100% in 10 seconds",
-                "20" : "20% / second : from 0% to 100% in 5 seconds",
-                "33" : "33% / second : from 0% to 100% in 3 seconds",
-                "50" : "50% / seconds : from 0% to 100% in 2 seconds",
+                 "10": "10% / second : from 0% to 100% in 10 seconds",
+                 "20": "20% / second : from 0% to 100% in 5 seconds",
+                 "33": "33% / second : from 0% to 100% in 3 seconds",
+                 "50": "50% / seconds : from 0% to 100% in 2 seconds",
                 "100": "100% / second : from 0% to 100% in 1 seconds",
             ],
             defaultValue: "20",
             required: true
         )
-        
-        // Inputs for capability.Brightness
         input(
             name: "turnOnBehavior",
             type: "enum",
             title: "Turn On behavior",
-            description: "<small>Select what happens when the device is turned On</small>",
+            description: "<small>Select what happens when the device is turned On.</small>",
             options: [
                 "RESTORE_PREVIOUS_LEVEL": "Restore previous brightness",
                 "FIXED_VALUE": "Always start with the same fixed brightness"
@@ -142,9 +141,9 @@ metadata {
                 name: "onLevelValue",
                 type: "number",
                 title: "Fixed brightness value",
-                description: "<small>Range 0~100</small>",
+                description: "<small>Range 1~100</small>",
                 defaultValue: 50,
-                range: "0..100",
+                range: "1..100",
                 required: true
             )
         }
@@ -152,16 +151,27 @@ metadata {
             name: "transitionTime",
             type: "enum",
             title: "On/Off transition time",
-            description: "<small>Time taken to move to/from the target brightness when device is turned On/Off</small>",
+            description: "<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>",
             options: [
-                "0" : "Instant",
-                "5" : "0.5 seconds",
+                 "0": "Instant",
+                 "5": "0.5 seconds",
                 "10": "1 second",
                 "15": "1.5 seconds",
                 "20": "2 seconds",
-                "50": "5 seconds"
+                "30": "3 seconds",
+                "40": "4 seconds",
+                "50": "5 seconds",
+               "100": "10 seconds"
             ],
             defaultValue: "5",
+            required: true
+        )
+        input(
+            name: "prestaging",
+            type: "bool",
+            title: "Pre-staging",
+            description: "<small>Set the brightness level without turning On the device (for later use).</small>",
+            defaultValue: false,
             required: true
         )
     }
@@ -180,6 +190,7 @@ def installed() {
 // Called when the "Save Preferences" button is clicked
 def updated(auto = false) {
     Log.info "Saving preferences${auto ? " (auto)" : ""} ..."
+    List<String> cmds = []
 
     unschedule()
 
@@ -196,7 +207,7 @@ def updated(auto = false) {
         device.updateSetting("powerOnBehavior", [value:powerOnBehavior, type:"enum"])
     }
     Log.info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-    Utils.sendZigbeeCommands zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
+    cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
     
     // Preferences for capability.Brightness
     if (levelStep == null) {
@@ -223,7 +234,7 @@ def updated(auto = false) {
         setOnLevel(lvl)
     } else {
         Log.debug "Disabling OnLevel (0xFF)"
-        Utils.sendZigbeeCommands zigbee.writeAttribute(0x0008, 0x0011, 0x20, 0xFF)
+        cmds += zigbee.writeAttribute(0x0008, 0x0011, 0x20, 0xFF)
     }
     
     if (transitionTime == null) {
@@ -231,10 +242,18 @@ def updated(auto = false) {
         device.updateSetting("transitionTime", [value:transitionTime, type:"enum"])
     }
     Log.info "🛠️ transitionTime = ${Integer.parseInt(transitionTime) / 10} second(s)"
-    Utils.sendZigbeeCommands(zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.parseInt(transitionTime)))
+    cmds += zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.parseInt(transitionTime))
+    
+    if (prestaging == null) {
+        prestaging = false
+        device.updateSetting("prestaging", [value:prestaging, type:"bool"])
+    }
+    Log.info "🛠️ prestaging = ${prestaging}"
     
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, "healthCheck"
+
+    Utils.sendZigbeeCommands cmds
 }
 
 // ===================================================================================================================
@@ -370,19 +389,18 @@ def levelDown() {
     String payload = "${zigbee.convertToHexString(0x01, 2)} ${zigbee.convertToHexString(stepSize, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
     Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114302 ${payload}}"])
 }
-
-// Implementation for capability.Brightness
 def setLevel(level, duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
     Log.debug "Setting brightness to ${newLevel}% during ${duration} seconds"
 
     // Device is On: use the Move To Level command
-    if (device.currentValue("switch", true) == "on") {
+    if (device.currentValue("switch", true) == "on" || prestaging == false) {
         Integer lvl = newLevel * 2.54
         Integer dur = (duration > 1800 ? 1800 : (duration < 0 ? 0 : duration)) * 10         // Max transition time = 30 min
 
+        String command = prestaging == false ? "04" : "00"
         String payload = "${zigbee.convertToHexString(lvl, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
-        return Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114300 ${payload}}"])
+        return Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {1143${command} ${payload}}"])
     }
 
     // Device is Off and onLevel is set to a fixed value: ignore command
@@ -391,7 +409,7 @@ def setLevel(level, duration = 0) {
     }
 
     // Device is Off: keep the device turned Off, use the OnLevel attribute
-    Log.debug("Device is turned Off so we prepare brightness for when the device will be turned On")
+    Log.debug("Device is turned Off so we pre-stage brightness level for when the device will be turned On")
     setOnLevel(newLevel)
     Utils.sendEvent(name:"level", value:newLevel, descriptionText:"Brightness is ${newLevel}%", type:"digital", isStateChange:true)
 }
@@ -401,11 +419,9 @@ def setOnLevel(level) {
     Integer lvl = newLevel * 2.54
     Utils.sendZigbeeCommands zigbee.writeAttribute(0x0008, 0x0011, 0x20, lvl)
 }
-def turnOnCallback(switchState) {
+private turnOnCallback(switchState) {
     // Device was just turned on: Read the value of the OnLevel attribute to sync/update its value
-    if (switchState == "on") {
-        Utils.sendZigbeeCommands zigbee.readAttribute(0x0008, 0x0011)
-    }
+    if (switchState == "on") Utils.sendZigbeeCommands zigbee.readAttribute(0x0008, 0x0011)
 }
 
 // Implementation for capability.HealthCheck
@@ -554,7 +570,7 @@ def parse(String description) {
         case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0000] }:
             Utils.processedZclMessage("Report/Read Attributes Response", "CurrentLevel=${msg.value}")
         
-            Integer newLevel = msg.value == "00" ? 0 : Integer.parseInt(msg.value, 16) * 100 / 254
+            Integer newLevel = msg.value == "00" ? 0 : Math.ceil(Integer.parseInt(msg.value, 16) * 100 / 254)
             if (device.currentValue("level", true) != newLevel) {
                 Utils.sendEvent name:"level", value:newLevel, descriptionText:"Brightness is ${newLevel}%", type:"digital"
             }
@@ -692,6 +708,7 @@ def parse(String description) {
 
 @Field def Utils = [
     sendZigbeeCommands: { List<String> cmds ->
+        if (cmds.isEmpty()) { return }
         List<String> send = delayBetween(cmds.findAll { !it.startsWith("delay") }, 1000)
         Log.debug "◀ Sending Zigbee messages: ${send}"
         state.lastTx = now()
