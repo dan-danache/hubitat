@@ -77,8 +77,8 @@ cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POW
 
 // Configuration for capability.Switch
 sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report On/Off status at least every 10 minutes
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
 cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
@@ -88,8 +88,8 @@ cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
 
 // Report Attributes: OnOff
 // Read Attributes Response: OnOff
-case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt: 0x0000] }:
-case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x0000] }:
+case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt:0x0000] }:
+case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
 
     // If we sent a Zigbee command in the last 3 seconds, we assume that this On/Off state change is a consequence of this driver
     // Therefore, we mark this event as "digital"
@@ -108,7 +108,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x0000] }:
 {{# params.powerOnBehavior }}
 
 // Read Attributes Response: powerOnBehavior
-case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x4003] }:
+case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
     String newValue = ""
     switch (Integer.parseInt(msg.value, 16)) {
         case 0x00: newValue = "TURN_POWER_OFF"; break
@@ -124,7 +124,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x4003] }:
 
 // Other events that we expect but are not usefull for capability.Switch behavior
 case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
-case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // ConfigureReportingResponse
+case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // Configure Reporting Response
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

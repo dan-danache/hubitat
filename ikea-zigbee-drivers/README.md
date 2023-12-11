@@ -9,6 +9,7 @@ Supported devices:
 * [Tradfri Shortcut Button (E1812)](#tradfri-shortcut-button-e1812)
 * [Askvader On/Off Switch (E1836)](#askvader-onoff-switch-e1836)
 * [Styrbar Remote Control N2 (E2002)](#styrbar-remote-control-n2-e2002)
+* [Starkvind Air Purifier (E2006)](#starkvind-air-purifier-e2006)
 * [Symfonisk Sound Remote Gen2 (E2123)](#symfonisk-sound-remote-gen2-e2123)
 * [Rodret Dimmer (E2201)](#rodret-dimmer-e2201)
 * [Tradfri LED Driver (ICPSHC24)](#tradfri-led-driver-icpshc24)
@@ -39,6 +40,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `304.883.63`｜`303.561.69` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1603.groovy` |
 | Tested firmwares | `2.0.0244`｜`2.3.089` |
+| Since version | `2.0.0` |
 
 ### Features
 * Commands: On, Off, Toggle, On with Timed Off
@@ -68,6 +70,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1743.groovy` |
 | Tested firmwares | `2.2.010`｜`24.4.6` |
+| Since version | `2.0.0` |
 
 ### Features
 * Button Push events for: both buttons
@@ -97,6 +100,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `704.299.13` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1745.groovy` |
 | Tested firmwares | `24.4.5` |
+| Since version | `2.3.0` |
 
 ### Features
 * Motion detection
@@ -131,6 +135,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1766.groovy` |
 | Tested firmwares | `24.4.6` |
+| Since version | `3.3.0` |
 
 ### Features
 * Button Push events for: both buttons
@@ -159,6 +164,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `304.431.24`｜`004.431.30` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1810.groovy` |
 | Tested firmwares | `24.4.5` |
+| Since version | `1.1.0` |
 
 ### Features
 * Button Push events for: all buttons
@@ -194,6 +200,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1812.groovy` |
 | Tested firmwares | `2.3.015`｜`24.4.6` |
+| Since version | `2.0.0` |
 
 ### Features
 * Button Push event
@@ -224,6 +231,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `504.638.80` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1836.groovy` |
 | Tested firmwares | `1.0.002` |
+| Since version | `3.1.0` |
 
 ### Features
 * Commands: On, Off, Toggle, On with Timed Off
@@ -253,6 +261,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `304.883.63` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2002.groovy` |
 | Tested firmwares | `1.0.024`｜`2.4.5` |
+| Since version | `2.0.0` |
 
 ### Features
 * Button Push events for: all buttons
@@ -277,6 +286,36 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 1. That's it, Have fun!
 
 
+## Starkvind Air Purifier (E2006)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="https://zigbee.blakadder.com/assets/images/devices/Ikea_E2006.webp" style="width: 200px"> |
+| Product Code | `194.442.19` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2006.groovy` |
+| Tested firmwares | `1.0.033`｜`1.1.001` |
+| Since version | `3.5.0` |
+
+### Features
+* Commands: On, Off, Toggle, On with Timed Off, Set/cycle fan speed
+* Particulate Matter < 2.5 microns (PM 2.5) sensor data
+* Filter usage (%) and Filter status (normal / replace) information
+* Configuration: Filter life time, Child lock, Panel lights
+* Health status (online / offline)
+* Refresh device state on demand
+* Report Zigbee Neighbors and Routing Tables (device acts as a Zigbee router)
+
+### Device Pairing
+1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt
+1. Plug the device in an outlet
+1. Open the round top lid and you should see the pair button next to the filter reset button (don't push it!)
+1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
+   Zigbee pairing"
+1. Press and hold the pair button **for at least 5 seconds** until the LED starts blinking
+1. Return to the pairing page and give your device a name and assign it to a room (optional)
+1. Put back the lid and fix it in place
+1. That's it, Have fun!
+
 ## Symfonisk Sound Remote Gen2 (E2123)
 
 | Parameter | Details |
@@ -285,6 +324,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `305.273.12` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2123.groovy` |
 | Tested firmwares | `1.0.012`｜`1.0.35` |
+| Since version | `1.0.0` |
 
 ### Features
 * Button Push events for: all buttons
@@ -315,6 +355,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Product Code | `205.281.28`｜`805.597.96` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2201.groovy` |
 | Tested firmwares | `1.0.47` |
+| Since version | `2.0.0` |
 
 ### Features
 * Button Push events for: both buttons
@@ -345,6 +386,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/ICPSHC24.groovy` |
 | Tested firmwares | 10EU-IL-1: `1.2.245` |
 || 30EU-IL-2: `1.0.002` |
+| Since version | `3.1.0` |
 
 ### Features
 1. Commands: On, Off, Toggle, On with Timed Off

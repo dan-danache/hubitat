@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri LED Driver (ICPSHC24)"
-@Field static final String DRIVER_VERSION = "3.4.3"
+@Field static final String DRIVER_VERSION = "3.5.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -39,11 +39,11 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC57", outClusters:"0019", model:"TRADFRI Driver 30W", manufacturer:"IKEA of Sweden"
         
         // Attributes for capability.HealthCheck
-        attribute "healthStatus", "ENUM", ["offline", "online", "unknown"]
+        attribute "healthStatus", "enum", ["offline", "online", "unknown"]
         
         // Attributes for capability.ZigbeeRouter
-        attribute "neighbors", "STRING"
-        attribute "routes", "STRING"
+        attribute "neighbors", "string"
+        attribute "routes", "string"
     }
     
     // Commands for capability.Switch
@@ -65,7 +65,7 @@ metadata {
             name: "logLevel",
             type: "enum",
             title: "Log verbosity",
-            description: "<small>Select what type of messages are added in the \"Logs\" section.</small>",
+            description: "<small>Choose the kind of messages that appear in the \"Logs\" section.</small>",
             options: [
                 "1": "Debug - log everything",
                 "2": "Info - log important events",
@@ -263,7 +263,7 @@ def updated(auto = false) {
 // Handler method for scheduled job to disable debug logging
 def logsOff() {
    Log.info '⏲️ Automatically reverting log level to "Info"'
-   device.updateSetting("logLevel",[ value:"2", type:"enum" ])
+   device.updateSetting("logLevel", [value:"2", type:"enum"])
 }
 
 // Helpers for capability.HealthCheck
@@ -307,8 +307,8 @@ def configure(auto = false) {
     
     // Configuration for capability.Switch
     sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report On/Off status at least every 10 minutes
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
     cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
     
     // Configuration for capability.Brightness
@@ -327,8 +327,10 @@ def configure(auto = false) {
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
-
     Utils.sendZigbeeCommands cmds
+
+    Log.info "Configuration done! Refreshing device current state in 10 seconds ..."
+    runIn(10, "tryToRefresh")
 }
 private autoConfigure() {
     configure(true)
@@ -511,6 +513,10 @@ def parse(String description) {
         Utils.sendEvent name:"healthStatus", value:"online", type:"digital", descriptionText:"Health status changed to online"
     }
 
+    // If we sent a Zigbee command in the last 3 seconds, we assume that this Zigbee event is a consequence of this driver doing something
+    // Therefore, we mark this event as "digital"
+    String type = state.containsKey("lastTx") && (now() - state.lastTx < 3000) ? "digital" : "physical"
+
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
@@ -527,8 +533,8 @@ def parse(String description) {
         
         // Report Attributes: OnOff
         // Read Attributes Response: OnOff
-        case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt: 0x0000] }:
-        case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x0000] }:
+        case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
         
             // If we sent a Zigbee command in the last 3 seconds, we assume that this On/Off state change is a consequence of this driver
             // Therefore, we mark this event as "digital"
@@ -544,7 +550,7 @@ def parse(String description) {
             return Utils.processedZclMessage("Report/Read Attributes Response", "OnOff=${newState}")
         
         // Read Attributes Response: powerOnBehavior
-        case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt: 0x4003] }:
+        case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
             String newValue = ""
             switch (Integer.parseInt(msg.value, 16)) {
                 case 0x00: newValue = "TURN_POWER_OFF"; break
@@ -559,7 +565,7 @@ def parse(String description) {
         
         // Other events that we expect but are not usefull for capability.Switch behavior
         case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
-        case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // ConfigureReportingResponse
+        case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // Configure Reporting Response
             return
         
         // Events for capability.Brightness
@@ -598,7 +604,7 @@ def parse(String description) {
         
         // Other events that we expect but are not usefull for capability.Brightness behavior
         case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
-        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // ConfigureReportingResponse
+        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // Configure Reporting Response
             return
         
         // Events for capability.HealthCheck
@@ -659,7 +665,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing current state in 3 seconds ..."
+            Log.info "Rejoined the Zigbee mesh! Refreshing device current state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)

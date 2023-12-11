@@ -6,8 +6,8 @@ capability "MotionSensor"
 {{# @attributes }}
 
 // Attributes for capability.MotionSensor
-attribute "requestedBrightness", "NUMBER"            // Syncs with the brightness option on device (◐/⭘)
-attribute "illumination", "ENUM", ["dim", "bright"]  // Works only in night mode 🌙
+attribute "requestedBrightness", "number"            // Syncs with the brightness option on device (◐/⭘)
+attribute "illumination", "enum", ["dim", "bright"]  // Works only in night mode 🌙
 {{/ @attributes }}
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}

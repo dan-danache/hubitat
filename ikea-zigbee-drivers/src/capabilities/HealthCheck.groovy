@@ -15,7 +15,7 @@ capability "HealthCheck"
 {{# @attributes }}
 
 // Attributes for capability.HealthCheck
-attribute "healthStatus", "ENUM", ["offline", "online", "unknown"]
+attribute "healthStatus", "enum", ["offline", "online", "unknown"]
 {{/ @attributes }}
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}

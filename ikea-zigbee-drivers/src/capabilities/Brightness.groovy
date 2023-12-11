@@ -259,7 +259,7 @@ case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
 
 // Other events that we expect but are not usefull for capability.Brightness behavior
 case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
-case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // ConfigureReportingResponse
+case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // Configure Reporting Response
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

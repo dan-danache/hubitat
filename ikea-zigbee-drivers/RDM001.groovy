@@ -8,7 +8,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "Philips Wall Switch Module (RDM001)"
-@Field static final String DRIVER_VERSION = "3.4.3"
+@Field static final String DRIVER_VERSION = "3.5.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -45,7 +45,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,FC00", outClusters:"0003,0004,0006,0008,0019", model:"RDM001", manufacturer:"Signify Netherlands B.V."
         
         // Attributes for capability.HealthCheck
-        attribute "healthStatus", "ENUM", ["offline", "online", "unknown"]
+        attribute "healthStatus", "enum", ["offline", "online", "unknown"]
     }
     
     // Commands for capability.FirmwareUpdate
@@ -56,7 +56,7 @@ metadata {
             name: "logLevel",
             type: "enum",
             title: "Log verbosity",
-            description: "<small>Select what type of messages are added in the \"Logs\" section.</small>",
+            description: "<small>Choose the kind of messages that appear in the \"Logs\" section.</small>",
             options: [
                 "1": "Debug - log everything",
                 "2": "Info - log important events",
@@ -129,7 +129,7 @@ def updated(auto = false) {
 // Handler method for scheduled job to disable debug logging
 def logsOff() {
    Log.info '⏲️ Automatically reverting log level to "Info"'
-   device.updateSetting("logLevel",[ value:"2", type:"enum" ])
+   device.updateSetting("logLevel", [value:"2", type:"enum"])
 }
 
 // Helpers for capability.HealthCheck
@@ -200,8 +200,10 @@ def configure(auto = false) {
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
-
     Utils.sendZigbeeCommands cmds
+
+    Log.info "Configuration done! Refreshing device current state in 10 seconds ..."
+    runIn(10, "tryToRefresh")
 }
 private autoConfigure() {
     configure(true)
@@ -304,6 +306,10 @@ def parse(String description) {
     if (device.currentValue("healthStatus", true) != "online") {
         Utils.sendEvent name:"healthStatus", value:"online", type:"digital", descriptionText:"Health status changed to online"
     }
+
+    // If we sent a Zigbee command in the last 3 seconds, we assume that this Zigbee event is a consequence of this driver doing something
+    // Therefore, we mark this event as "digital"
+    String type = state.containsKey("lastTx") && (now() - state.lastTx < 3000) ? "digital" : "physical"
 
     switch (msg) {
 
@@ -408,7 +414,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing current state in 3 seconds ..."
+            Log.info "Rejoined the Zigbee mesh! Refreshing device current state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)

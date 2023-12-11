@@ -6,8 +6,8 @@ capability "HealthCheck"
 {{# @attributes }}
 
 // Attributes for capability.ZigbeeRouter
-attribute "neighbors", "STRING"
-attribute "routes", "STRING"
+attribute "neighbors", "string"
+attribute "routes", "string"
 {{/ @attributes }}
 {{!--------------------------------------------------------------------------}}
 {{# @commands }}
