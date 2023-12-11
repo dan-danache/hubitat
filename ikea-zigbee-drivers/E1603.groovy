@@ -327,15 +327,9 @@ def parse(String description) {
         // Read Attributes Response: OnOff
         case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
-        
-            // If we sent a Zigbee command in the last 3 seconds, we assume that this On/Off state change is a consequence of this driver
-            // Therefore, we mark this event as "digital"
-            String type = state.containsKey("lastTx") && (now() - state.lastTx < 3000) ? "digital" : "physical"
-        
             String newState = msg.value == "00" ? "off" : "on"
-            if (device.currentValue("switch", true) != newState) {
-                Utils.sendEvent name:"switch", value:newState, descriptionText:"Was turned ${newState}", type:type
-            }
+            Utils.sendEvent name:"switch", value:newState, descriptionText:"Was turned ${newState}", type:type
+        
             return Utils.processedZclMessage("Report/Read Attributes Response", "OnOff=${newState}")
         
         // Read Attributes Response: powerOnBehavior
