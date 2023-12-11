@@ -13,98 +13,113 @@ import groovy.transform.Field
 
 metadata {
     definition(name:"Knockturn Alley", namespace:"dandanache", singleThreaded:true, author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/knockturn-alley-driver/knockturn-alley.groovy") {
+        capability "Actuator"
         attribute "documentation", "STRING"
+    }
         
-        command "a01Legilimens", [
-            [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
-        ]
-        command "a02Scourgify", [
-            [name: "Raw data", type: "ENUM", constraints: [
-                "1 - Remove raw data",
-                "2 - Keep raw data",
-            ]],
-        ]
-        command "a03Obliviate", [
-            [name: "What to forget", type: "ENUM", constraints: [
-                "1 - Our state variables (ka_*) - Restore previous driver state",
-                "2 - All state variables",
-                "3 - Device data",
-                "4 - Scheduled jobs configured by the previous driver",
-                "5 - Everything",
-            ]],
-        ]
+    command "a01Legilimens", [
+        [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
+    ]
+    command "a02Scourgify", [
+        [name: "Raw data", type: "ENUM", constraints: [
+            "1 - Remove raw data",
+            "2 - Keep raw data",
+        ]],
+    ]
+    command "a03Obliviate", [
+        [name: "What to forget", type: "ENUM", constraints: [
+            "1 - Our state variables (ka_*) - Restore previous driver state",
+            "2 - All state variables",
+            "3 - Device data",
+            "4 - Scheduled jobs configured by the previous driver",
+            "5 - Everything",
+        ]],
+    ]
 
-        command "b01Accio", [
-            [name: "What to retrieve", type: "ENUM", constraints: [
-                "1 - Get attribute current value",
-                "2 - Check attribute reporting",
-            ]],
-            [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
-            [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Attribute*", description: "Attribute ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
-        ]
-        command "b02EverteStatum", [
-            [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
-            [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Attribute*", description: "Attribute ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
-            [name: "Data Type*", description: "Attribute data type", type: "ENUM", constraints:
-                 ZCL_DATA_TYPES.keySet()
-                     .findAll { ZCL_DATA_TYPES[it].bytes != "0" && ZCL_DATA_TYPES[it].bytes != "var" }
-                     .sort()
-                     .collect { "0x${Utils.hex it, 2}: ${ZCL_DATA_TYPES[it].name} (${ZCL_DATA_TYPES[it].bytes} bytes)" }
-            ],
-            [name: "Value*", description: "Attribute value - hex format (e.g.: 0001 - for uint16)", type: "STRING"],
-        ]
-        command "b03Oppugno", [
-            [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
-            [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Attribute*", description: "Attribute ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
-            [name: "Data Type*", description: "Attribute data type", type: "ENUM", constraints:
-                 ZCL_DATA_TYPES.keySet()
-                     .findAll { ZCL_DATA_TYPES[it].bytes != "0" && ZCL_DATA_TYPES[it].bytes != "var" }
-                     .sort()
-                     .collect { "0x${Utils.hex it, 2}: ${ZCL_DATA_TYPES[it].name} (${ZCL_DATA_TYPES[it].bytes} bytes)" }
-            ],
-            [name: "Min Interval*", description: "Minimum reporting interval between issuing reports - in seconds [0..65534]", type: "NUMBER"],
-            [name: "Max Interval*", description: "Maximum reporting interval between issuing reports - in seconds [0..65534], 65535 -> disable reporting", type: "NUMBER"],
-            [name: "Reportable Change*", description: "Minimum change to the attribute that will trigger a report - hex format (e.g.: 0001 - for uint16)", type: "STRING"],
-        ]
-        command "c01Imperio", [
-            [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
-            [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Command*", description: "Command ID - hex format (e.g.: 0x01)", type: "STRING"],
-            [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
-            [name: "Payload", description: "Raw payload - sent as is, spaces are removed", type: "STRING"],
-        ]
-        command "c02Bombarda", [
-            [name: "Zigbee command", description: "Enter raw command to execute (e.g. for toggle on/off: he raw .addr 0x01 0x01 0x0006 {114302})", type: "STRING"]
-        ]
+    command "b01Accio", [
+        [name: "What to retrieve", type: "ENUM", constraints: [
+            "1 - Get attribute current value",
+            "2 - Check attribute reporting",
+        ]],
+        [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
+        [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Attribute*", description: "Attribute ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
+    ]
+    command "b02EverteStatum", [
+        [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
+        [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Attribute*", description: "Attribute ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
+        [name: "Data Type*", description: "Attribute data type", type: "ENUM", constraints:
+                ZCL_DATA_TYPES.keySet()
+                    .findAll { ZCL_DATA_TYPES[it].bytes != "0" && ZCL_DATA_TYPES[it].bytes != "var" }
+                    .sort()
+                    .collect { "0x${Utils.hex it, 2}: ${ZCL_DATA_TYPES[it].name} (${ZCL_DATA_TYPES[it].bytes} bytes)" }
+        ],
+        [name: "Value*", description: "Attribute value - hex format (e.g.: 0001 - for uint16)", type: "STRING"],
+    ]
+    command "b03Oppugno", [
+        [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
+        [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Attribute*", description: "Attribute ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
+        [name: "Data Type*", description: "Attribute data type", type: "ENUM", constraints:
+                ZCL_DATA_TYPES.keySet()
+                    .findAll { ZCL_DATA_TYPES[it].bytes != "0" && ZCL_DATA_TYPES[it].bytes != "var" }
+                    .sort()
+                    .collect { "0x${Utils.hex it, 2}: ${ZCL_DATA_TYPES[it].name} (${ZCL_DATA_TYPES[it].bytes} bytes)" }
+        ],
+        [name: "Min Interval*", description: "Minimum reporting interval between issuing reports - in seconds [0..65534]", type: "NUMBER"],
+        [name: "Max Interval*", description: "Maximum reporting interval between issuing reports - in seconds [0..65534], 65535 -> disable reporting", type: "NUMBER"],
+        [name: "Reportable Change*", description: "Minimum change to the attribute that will trigger a report - hex format (e.g.: 0001 - for uint16)", type: "STRING"],
+    ]
+    command "c01Imperio", [
+        [name: "Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
+        [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Command*", description: "Command ID - hex format (e.g.: 0x01)", type: "STRING"],
+        [name: "Manufacturer", description: "Manufacturer Code - hex format (e.g.: 0x117C)", type: "STRING"],
+        [name: "Payload", description: "Raw payload - sent as is, spaces are removed", type: "STRING"],
+    ]
+    command "c02Bombarda", [
+        [name: "Zigbee command", description: "Enter raw command to execute (e.g. for toggle on/off: he raw .addr 0x01 0x01 0x0006 {114302})", type: "STRING"]
+    ]
 
-        command "d01Revelio", [
-            [name: "What to reveal", type: "ENUM", constraints: [
-                "1 - Neighbors Table",
-                "2 - Routing Table",
-                "3 - Bindings Table",
-            ]],
-        ]
-        command "d02UnbreakableVow", [
-            [name: "What to do", type: "ENUM", constraints: [
-                "1 - Make the Unbreakable Vow",
-                "2 - Break the Unbreakable Vow",
-            ]],
-            [name: "Source Addr*", description: "The IEEE address for the source - 8 bytes", type: "STRING", default: "caca"],
-            [name: "Source Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
-            [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
-            [name: "Addr Mode*", description: "Addressing mode for Destination Address", type: "ENUM", constraints: [
-                "0x03 = 64-bit extended address",
-                "0x01 = 16-bit group address",
-            ]],
-            [name: "Destination Addr*", description: "The IEEE/group address for the destination - 8/2 bytes", type: "STRING"],
-            [name: "Destination Endpoint", description: "Endpoint ID - hex format (e.g.: 0x01), required when Addr Mode = 0x03", type: "STRING"],
-        ]
+    command "d01Revelio", [
+        [name: "What to reveal", type: "ENUM", constraints: [
+            "1 - Neighbors Table",
+            "2 - Routing Table",
+            "3 - Bindings Table",
+        ]],
+    ]
+    command "d02UnbreakableVow", [
+        [name: "What to do", type: "ENUM", constraints: [
+            "1 - Make the Unbreakable Vow",
+            "2 - Break the Unbreakable Vow",
+        ]],
+        [name: "Source Addr*", description: "The IEEE address for the source - 8 bytes", type: "STRING", default: "caca"],
+        [name: "Source Endpoint*", description: "Endpoint ID - hex format (e.g.: 0x01)", type: "STRING"],
+        [name: "Cluster*", description: "Cluster ID - hex format (e.g.: 0x0001)", type: "STRING"],
+        [name: "Addr Mode*", description: "Addressing mode for Destination Address", type: "ENUM", constraints: [
+            "0x03 = 64-bit extended address",
+            "0x01 = 16-bit group address",
+        ]],
+        [name: "Destination Addr*", description: "The IEEE/group address for the destination - 8/2 bytes", type: "STRING"],
+        [name: "Destination Endpoint", description: "Endpoint ID - hex format (e.g.: 0x01), required when Addr Mode = 0x03", type: "STRING"],
+    ]
+
+    preferences {
+        input(
+            name: "lang",
+            type: "enum",
+            title: "Language",
+            options: [
+                "hp-HP":"Harry Potter",
+                "en-US":"English",
+            ],
+            defaultValue: "hp-HP",
+            required: true
+        )
     }
 }
 
@@ -2319,8 +2334,22 @@ private boolean contains(Map msg, Map spec) {
     0x0202: [
         name: "Fan Control Cluster",
         attributes: [
-            0x0000: [ req:"req", acc:"rw-", name:"Fan Mode" ],
-            0x0001: [ req:"req", acc:"rw-", name:"Fan Mode Sequence" ]
+            0x0000: [ req:"req", acc:"rw-", name:"Fan Mode", constraints: [
+                0x00: "Off",
+                0x01: "Low",
+                0x02: "Medium",
+                0x03: "High",
+                0x04: "On",
+                0x05: "Auto (the fan speed is self-regulated)",
+                0x06: "Smart (when the heated/cooled space is occupied, the fan is always on)"
+            ]],
+            0x0001: [ req:"req", acc:"rw-", name:"Fan Mode Sequence", constraints: [
+                0x00: "Low/Med/High",
+                0x01: "Low/High",
+                0x02: "Low/Med/High/Auto",
+                0x03: "Low/High/Auto",
+                0x04: "On/Auto"
+            ]],
         ]
     ],
     0x0203: [
@@ -2759,6 +2788,20 @@ private boolean contains(Map msg, Map spec) {
             0x40: [ req:"opt", name:"Endpoint Information" ],
             0x41: [ req:"opt", name:"Get Group Identifiers" ],
             0x42: [ req:"opt", name:"Get Endpoint List" ]
+        ]
+    ],
+    0xFC7D: [
+        name: "IKEA Air Purifier - mfg: 0x117C",
+        attributes: [
+            0x0000: [ req:"req", acc:"r-p", name:"Filter Run Time" ],
+            0x0001: [ req:"req", acc:"r-p", name:"Replace Filter" ],
+            0x0002: [ req:"req", acc:"rwp", name:"Filter Life Time" ],
+            0x0003: [ req:"req", acc:"rwp", name:"Disable Panel Lights" ],
+            0x0004: [ req:"req", acc:"r-p", name:"PM 2.5 Measurement" ],
+            0x0005: [ req:"req", acc:"rwp", name:"Child Lock" ],
+            0x0006: [ req:"req", acc:"rwp", name:"Fan Mode" ],
+            0x0007: [ req:"req", acc:"r-p", name:"Fan Speed" ],
+            0x0008: [ req:"req", acc:"r-p", name:"Device Run Time" ]
         ]
     ]
 ]
