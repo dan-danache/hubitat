@@ -45,7 +45,7 @@ sendEvent name:"checkInterval", value:{{ params.checkInterval }}, unit:"second",
 
 // Implementation for capability.HealthCheck
 def ping() {
-    Log.info "ping ..."
+    Log.warn "ping ..."
     Utils.sendZigbeeCommands(zigbee.readAttribute(0x0000, 0x0000))
     Log.debug "Ping command sent to the device; we'll wait 5 seconds for a reply ..."
     runIn 5, "pingExecute"
@@ -82,6 +82,6 @@ if (device.currentValue("healthStatus", true) != "online") {
 
 // Events for capability.HealthCheck
 case { contains it, [clusterInt:0x0000, attrInt:0x0000] }:
-    return Log.info("... pong")
+    return Log.warn("... pong")
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

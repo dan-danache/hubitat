@@ -299,6 +299,7 @@ Follow the steps below if you don't know what "Hubitat Package Manager" is:
 ### Features
 * Commands: On, Off, Toggle, Set/Cycle fan speed
 * Particulate Matter < 2.5 microns (PM 2.5) sensor data
+* Calculate US AQI score based on PM 2.5 value
 * Filter usage (%) and Filter status (normal / replace) information
 * Configuration: Sensor report frequency, Filter life time, Child lock, LED status
 * Health status (online / offline)

@@ -60,8 +60,8 @@ metadata {
 
 // Called when the device is first added
 def installed() {
-    Log.info "Installing device ..."
-    Log.warn "[IMPORTANT] For battery-powered devices, make sure that you keep your device as close as you can to your Hubitat hub (or any other Zigbee router device) for at least 20 seconds. Otherwise it will successfully pair but it won't work properly!"
+    Log.warn "Installing device ..."
+    Log.warn "[IMPORTANT] For battery-powered devices, make sure that you keep your device as close as you can (less than 2inch / 5cm) to your Hubitat hub for at least 30 seconds. Otherwise the device will successfully pair but it won't work properly!"
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -104,7 +104,7 @@ def logsOff() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 def configure(auto = false) {
-    Log.info "Configuring device${auto ? " (auto)" : ""} ..."
+    Log.warn "Configuring device${auto ? " (auto)" : ""} ..."
     if (!auto && device.currentValue("powerSource", true) == "battery") {
         Log.warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -146,10 +146,11 @@ def configure(auto = false) {
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
     Utils.sendZigbeeCommands cmds
 
-    Log.info "Configuration done! Refreshing device current state in 10 seconds ..."
+    Log.info "Configuration done; refreshing device current state in 10 seconds ..."
     runIn(10, "tryToRefresh")
 }
 private autoConfigure() {
+    Log.warn "Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
     configure(true)
 }
 {{# device.capabilities }}
@@ -209,7 +210,7 @@ def parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            Log.info "Rejoined the Zigbee mesh! Refreshing device current state in 3 seconds ..."
+            Log.warn "Rejoined the Zigbee mesh; refreshing device state in 3 seconds ..."
             return runIn(3, "tryToRefresh")
 
         // Read Attributes Response (Basic cluster)
@@ -221,7 +222,7 @@ def parse(String description) {
 
         // Mgmt_Leave_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8034, commandInt:0x00] }:
-            return Log.info("Device is leaving the Zigbee mesh. See you later, Aligator!")
+            return Log.warn("Device is leaving the Zigbee mesh. See you later, Aligator!")
 
         // Ignore the following Zigbee messages
         case { contains it, [commandInt:0x0A] }:                                       // ZCL: Attribute report we don't care about (configured by other driver)
@@ -237,7 +238,7 @@ def parse(String description) {
         // Unexpected Zigbee message
         // ---------------------------------------------------------------------------------------------------------------
         default:
-            Log.warn "Sent unexpected Zigbee message: description=${description}, msg=${msg}"
+            Log.error "Sent unexpected Zigbee message: description=${description}, msg=${msg}"
     }
 }
 
