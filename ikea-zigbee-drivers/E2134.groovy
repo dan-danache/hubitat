@@ -1,15 +1,15 @@
 /**
- * IKEA Styrbar Remote Control N2 (E2002)
+ * IKEA Vallhorn Motion Sensor (E2134)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E2002.html
+ * @see https://zigbee.blakadder.com/Ikea_E2134.html
  * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
  * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = "IKEA Styrbar Remote Control N2 (E2002)"
+@Field static final String DRIVER_NAME = "IKEA Vallhorn Motion Sensor (E2134)"
 @Field static final String DRIVER_VERSION = "3.6.0"
 
 // Fields for capability.HealthCheck
@@ -18,30 +18,18 @@ import groovy.transform.Field
     "thereshold": "43200" // When checking, mark the device as offline if no Zigbee message was received in the last 43200 seconds
 ]
 
-// Fields for capability.PushableButton
-@Field static final Map<String, List<String>> BUTTONS = [
-    "PLUS": ["1", "🔆"],
-    "MINUS": ["2", "🔅"],
-    "NEXT": ["3", "Next"],
-    "PREV": ["4", "Prev"],
-]
-
 metadata {
-    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2002.groovy") {
+    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2134.groovy") {
         capability "Configuration"
+        capability "IlluminanceMeasurement"
+        capability "MotionSensor"
         capability "Battery"
         capability "HealthCheck"
-        capability "HoldableButton"
         capability "PowerSource"
-        capability "PushableButton"
         capability "Refresh"
-        capability "ReleasableButton"
 
-        // For firmware: 1.0.024
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57", outClusters:"0003,0006,0008,0019,1000", model:"Remote Control N2", manufacturer:"IKEA of Sweden"
-
-        // For firmware: 2.4.5 (117C-11CB-02040005)
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,1000,FC57,FC7C", outClusters:"0003,0005,0006,0008,0019,1000", model:"Remote Control N2", manufacturer:"IKEA of Sweden"
+        // For firmware: 1.0.57 (117C-1938-01000057)
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,0B05,1000,FC7C,FC81", outClusters:"0003,0004,0006,0019,1000", model:"VALLHORN Wireless Motion Sensor", manufacturer:"IKEA of Sweden"
         
         // Attributes for capability.HealthCheck
         attribute "healthStatus", "enum", ["offline", "online", "unknown"]
@@ -141,13 +129,21 @@ def configure(auto = false) {
 
     List<String> cmds = []
 
-    // Configure IKEA Styrbar Remote Control N2 (E2002) specific Zigbee reporting
+    // Configure IKEA Vallhorn Motion Sensor (E2134) specific Zigbee reporting
     // -- No reporting needed
 
-    // Add IKEA Styrbar Remote Control N2 (E2002) specific Zigbee binds
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0005 {${device.zigbeeId}} {}" // Scenes cluster
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
+    // Add IKEA Vallhorn Motion Sensor (E2134) specific Zigbee binds
+    // -- No binds needed
+    
+    // Configuration for capability.Illuminance
+    cmds += "he cr 0x${device.deviceNetworkId} 0x03 0x0400 0x0001 0x21 0x0000 0x4650 {05} {}" // Report MeasuredValue (uint16)
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0x0400 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
+    cmds += zigbee.readAttribute(0x0406, 0x0000)  // MeasuredValue
+    
+    // Configuration for capability.Occupancy
+    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0001 0x18 0x0000 0x4650 {00} {}" // Report Occupancy (map8)
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
+    cmds += zigbee.readAttribute(0x0406, 0x0000)  // Occupancy
     
     // Configuration for capability.Battery
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (min 1% change)
@@ -161,10 +157,6 @@ def configure(auto = false) {
     // Configuration for capability.PowerSource
     sendEvent name:"powerSource", value:"unknown", type:"digital", descriptionText:"Power source initialized to unknown"
     cmds += zigbee.readAttribute(0x0000, 0x0007) // PowerSource
-    
-    // Configuration for capability.PushableButton
-    Integer numberOfButtons = BUTTONS.count{_ -> true}
-    sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
@@ -204,20 +196,6 @@ def pingExecute() {
     Log.info "Will be marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
 }
 
-// Implementation for capability.HoldableButton
-def hold(buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) return Log.warn("Cannot hold button ${buttonNumber} because it is not defined")
-    Utils.sendEvent name:"held", value:buttonNumber, type:"digital", isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was held"
-}
-
-// Implementation for capability.PushableButton
-def push(buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) return Log.warn("Cannot push button ${buttonNumber} because it is not defined")
-    Utils.sendEvent name:"pushed", value:buttonNumber, type:"digital", isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was pressed"
-}
-
 // Implementation for capability.Refresh
 def refresh(buttonPress = true) {
     if (buttonPress) {
@@ -228,14 +206,9 @@ def refresh(buttonPress = true) {
     }
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
+    cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:"0x02"]) // Occupancy
+    cmds += zigbee.readAttribute(0x0400, 0x0000, [destEndpoint:"0x03"]) // MeasuredValue
     Utils.sendZigbeeCommands cmds
-}
-
-// Implementation for capability.ReleasableButton
-def release(buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) return Log.warn("Cannot release button ${buttonNumber} because it is not defined")
-    Utils.sendEvent name:"released", value:buttonNumber, type:"digital", isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was released"
 }
 
 // Implementation for capability.FirmwareUpdate
@@ -282,62 +255,39 @@ def parse(String description) {
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
-        // Handle IKEA Styrbar Remote Control N2 (E2002) specific Zigbee messages
+        // Handle IKEA Vallhorn Motion Sensor (E2134) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
 
-        // Plus/Minus button was pushed
-        case { contains it, [clusterInt:0x0006, commandInt:0x00] }:
-        case { contains it, [clusterInt:0x0006, commandInt:0x01] }:
-            def button = msg.commandInt == 0x00 ? BUTTONS.MINUS : BUTTONS.PLUS
-            return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
-        
-        // Plus/Minus button was held
-        case { contains it, [clusterInt:0x0008, commandInt:0x01] }:
-        case { contains it, [clusterInt:0x0008, commandInt:0x05] }:
-            def button = msg.commandInt == 0x01 ? BUTTONS.MINUS : BUTTONS.PLUS
-            return Utils.sendEvent(name:"held", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held")
-        
-        // Plus/Minus button was released
-        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
-        case { contains it, [clusterInt:0x0008, commandInt:0x03] }:
-            def button = device.currentValue("held", true) == 2 || msg.commandInt == 0x03 ? BUTTONS.MINUS : BUTTONS.PLUS
-            return Utils.sendEvent(name:"released", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released")
-        
-        // Next/Prev button was pushed
-        case { contains it, [clusterInt:0x0005, commandInt:0x07] }:
-            def button = msg.data[0] == "00" ? BUTTONS.NEXT : BUTTONS.PREV
-            return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
-        
-        /*
-        Holding the PREV and NEXT buttons works in a weird way:
-        
-        When PREV button is held, the following Zigbee messages are received:
-        #1. [12:55:35.429] description=[catchall: 0104 0005 01 01 0040 00 926B 01 01 117C 09 00 0000]
-        #2. [12:55:35.908] description=[catchall: 0104 0006 01 01 0040 00 926B 01 00 0000 01 00 ]             <-- button 1 (🔆) was pushed [physical]
-        #3. [12:55:36.422] description=[catchall: 0104 0005 01 01 0040 00 926B 01 00 0000 05 00 0000000000]
-        #4. [12:55:37.411] description=[catchall: 0104 0005 01 01 0040 00 926B 01 01 117C 08 00 010D00]
-        
-        When PREV button is released, the following Zigbee message is received:
-        #5. [on release]   description=[catchall: 0104 0005 01 01 0040 00 926B 01 01 117C 09 00 XXXX]
-        
-        When NEXT button is held, the following Zigbee messages are received:
-        #1. [12:56:59.463] description=[catchall: 0104 0005 01 01 0040 00 926B 01 01 117C 09 00 0000]
-        #2. [12:56:59.962] description=[catchall: 0104 0006 01 01 0040 00 926B 01 00 0000 01 00 ]             <-- button 1 (🔆) was pushed [physical]
-        #3. [12:57:00.480] description=[catchall: 0104 0005 01 01 0040 00 926B 01 00 0000 05 00 0000000000]
-        #4. [12:57:01.466] description=[catchall: 0104 0005 01 01 0040 00 926B 01 01 117C 08 00 000D00]
-        
-        When NEXT button is released, the following Zigbee message is received:
-        #5. [on release]   description=[catchall: 0104 0005 01 01 0040 00 926B 01 01 117C 09 00 XXXX]
-        
-        There is at least 2 seconds delay between the moment the device figured out that the button is held (not a click)
-        and the moment message #4 is received (the moment we can figure out what button was held (010D00 vs 000D00)).
-        
-        IMHO, this weird behavior makes the use of the hold actions on the PREV and NEXT button unusable.
-        */
+        // No specific events
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle capabilities Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
+        
+        // Events for capability.Illuminance
+        
+        // Report Attributes, Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0x0400, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0400, commandInt:0x01, attrInt:0x0000] }:
+            Integer illuminance = Integer.parseInt(msg.value, 16)
+            return Utils.sendEvent(name:"illuminance", value:illuminance, unit:"lx", type:"physical", descriptionText:"Illuminance is ${illuminance}")
+        
+        // Other events that we expect but are not usefull for capability.Illuminance behavior
+        case { contains it, [clusterInt:0x0406, commandInt:0x07] }:  // ConfigureReportingResponse
+            return
+        
+        // Events for capability.Occupancy
+        
+        // Report Attributes, Read Attributes Reponse: Occupancy
+        case { contains it, [clusterInt:0x0406, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
+            Integer value = Integer.parseInt(msg.value, 16)
+            String motion = (value % 2) > 0 ? "active" : "inactive"
+            return Utils.sendEvent(name:"motion", value:motion, type:"physical", descriptionText:"Is ${motion}")
+        
+        // Other events that we expect but are not usefull for capability.Occupancy behavior
+        case { contains it, [clusterInt:0x0406, commandInt:0x07] }:  // ConfigureReportingResponse
+            return
         
         // Events for capability.Battery
         

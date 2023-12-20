@@ -4,7 +4,6 @@ CLS
 IF [%1]==[clean] GOTO clean
 
 ECHO Generating driver files:
-SET devices=E1810 E2123
 
 for /D %%A in (src/devices/*) do (
     ECHO - %%A.groovy

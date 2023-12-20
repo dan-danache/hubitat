@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri LED Driver (ICPSHC24)"
-@Field static final String DRIVER_VERSION = "3.5.1"
+@Field static final String DRIVER_VERSION = "3.6.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -313,7 +313,7 @@ def configure(auto = false) {
     
     // Configuration for capability.Brightness
     sendEvent name:"level", value:"100", type:"digital", descriptionText:"Brightness initialized to 100%"
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel at least every 10 minutes
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
     cmds += zigbee.readAttribute(0x0008, 0x0000) // CurrentLevel
     

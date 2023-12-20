@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Starkvind Air Purifier (E2006)"
-@Field static final String DRIVER_VERSION = "3.5.1"
+@Field static final String DRIVER_VERSION = "3.6.0"
 
 // Fields for capability.PushableButton
 @Field static final List<String> SUPPORTED_FAN_SPEEDS = [
@@ -399,13 +399,13 @@ def refresh(buttonPress = true) {
         }
     }
     List<String> cmds = []
-    cmds += zigbee.readAttribute(0xFC7D, 0x0000, [mfgCode: "0x117C"]) // FilterRunTime
-    cmds += zigbee.readAttribute(0xFC7D, 0x0001, [mfgCode: "0x117C"]) // ReplaceFilter
-    cmds += zigbee.readAttribute(0xFC7D, 0x0002, [mfgCode: "0x117C"]) // FilterLifeTime
-    cmds += zigbee.readAttribute(0xFC7D, 0x0003, [mfgCode: "0x117C"]) // DisablePanelLights
-    cmds += zigbee.readAttribute(0xFC7D, 0x0004, [mfgCode: "0x117C"]) // PM25Measurement
-    cmds += zigbee.readAttribute(0xFC7D, 0x0005, [mfgCode: "0x117C"]) // ChildLock
-    cmds += zigbee.readAttribute(0xFC7D, 0x0006, [mfgCode: "0x117C"]) // FanMode
+    cmds += zigbee.readAttribute(0xFC7D, 0x0000, [mfgCode:"0x117C"]) // FilterRunTime
+    cmds += zigbee.readAttribute(0xFC7D, 0x0001, [mfgCode:"0x117C"]) // ReplaceFilter
+    cmds += zigbee.readAttribute(0xFC7D, 0x0002, [mfgCode:"0x117C"]) // FilterLifeTime
+    cmds += zigbee.readAttribute(0xFC7D, 0x0003, [mfgCode:"0x117C"]) // DisablePanelLights
+    cmds += zigbee.readAttribute(0xFC7D, 0x0004, [mfgCode:"0x117C"]) // PM25Measurement
+    cmds += zigbee.readAttribute(0xFC7D, 0x0005, [mfgCode:"0x117C"]) // ChildLock
+    cmds += zigbee.readAttribute(0xFC7D, 0x0006, [mfgCode:"0x117C"]) // FanMode
     Utils.sendZigbeeCommands cmds
 }
 

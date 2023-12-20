@@ -1,0 +1,36 @@
+device:
+  model: IKEA Vallhorn Motion Sensor (E2134)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2134.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Ikea_E2134.html
+  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+  - https://static.homesmart.ikea.com/releaseNotes/
+
+  capabilities:
+    - file: src/capabilities/Illuminance.groovy
+    - file: src/capabilities/Occupancy.groovy
+    - file: src/capabilities/Battery.groovy
+      params:
+        half: true
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage every 5 hours)
+    - file: src/capabilities/PowerSource.groovy
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
+        - { endpoint: '0x02', cluster: '0x0406', attr: '0x0000', description: 'Occupancy' }
+        - { endpoint: '0x03', cluster: '0x0400', attr: '0x0000', description: 'MeasuredValue' }
+    - file: src/capabilities/FirmwareUpdate.groovy
+
+zigbee:
+  fingerprints:
+  - firmwares: 1.0.57 (117C-1938-01000057)
+    value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,0B05,1000,FC7C,FC81", outClusters:"0003,0004,0006,0019,1000", model:"VALLHORN Wireless Motion Sensor", manufacturer:"IKEA of Sweden"
+
+  messages:
+  - file: src/devices/E2134/events.groovy
