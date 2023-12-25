@@ -270,6 +270,14 @@ def parse(String description) {
         case { contains it, [clusterInt:0x0400, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0400, commandInt:0x01, attrInt:0x0000] }:
             Integer illuminance = Integer.parseInt(msg.value, 16)
+        
+            // 0xFFFF represents an invalid illuminance value, so we just ignore it
+            if (illuminance == 0xFFFF) return Log.warn("Ignored invalid reported illuminance value: 0xFFFF")
+        
+            // Transform raw value to lux
+            if (illuminance != 0) {
+                illuminance = Math.pow(10, (illuminance - 1) / 10000)
+            }
             return Utils.sendEvent(name:"illuminance", value:illuminance, unit:"lx", type:"physical", descriptionText:"Illuminance is ${illuminance}")
         
         // Other events that we expect but are not usefull for capability.Illuminance behavior
@@ -296,10 +304,8 @@ def parse(String description) {
         case { contains it, [clusterInt:0x0001, commandInt:0x01, attrInt:0x0021] }:
             Integer percentage = Integer.parseInt(msg.value, 16)
         
-            // (0xFF) 255 is an invalid value for the battery percentage attribute, so we just ignore it
-            if (percentage == 255) {
-                return Log.warn("Ignored invalid reported battery percentage value: 0xFF (255)")
-            }
+            // 0xFF represents an invalid battery percentage value, so we just ignore it
+            if (percentage == 0xFF) return Log.warn("Ignored invalid reported battery percentage value: 0xFF")
         
             percentage =  percentage / 2
             Utils.sendEvent name:"battery", value:percentage, unit:"%", type:"physical", descriptionText:"Battery is ${percentage}% full"

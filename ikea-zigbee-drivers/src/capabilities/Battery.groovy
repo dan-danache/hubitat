@@ -20,10 +20,8 @@ case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
 case { contains it, [clusterInt:0x0001, commandInt:0x01, attrInt:0x0021] }:
     Integer percentage = Integer.parseInt(msg.value, 16)
 
-    // (0xFF) 255 is an invalid value for the battery percentage attribute, so we just ignore it
-    if (percentage == 255) {
-        return Log.warn("Ignored invalid reported battery percentage value: 0xFF (255)")
-    }
+    // 0xFF represents an invalid battery percentage value, so we just ignore it
+    if (percentage == 0xFF) return Log.warn("Ignored invalid reported battery percentage value: 0xFF")
 
     {{# params.half }}
     percentage =  percentage / 2
