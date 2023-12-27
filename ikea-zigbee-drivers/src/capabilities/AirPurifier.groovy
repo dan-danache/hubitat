@@ -4,6 +4,7 @@ capability "AirQuality"
 capability "FanControl"
 capability "FilterStatus"
 capability "Switch"
+capability "Sensor"
 {{/ @definition }}
 {{!--------------------------------------------------------------------------}}
 {{# @fields }}
@@ -240,7 +241,6 @@ case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0004] }:
     def aqi = pm25Aqi(pm25)
     Utils.sendEvent name:"airQualityIndex", value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
     Utils.sendEvent name:"airQuality", value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
-
     return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "PM25Measurement=${pm25} μg/m3")
 
 // Report/Read Attributes: FilterRunTime

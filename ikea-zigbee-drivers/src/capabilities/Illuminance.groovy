@@ -1,6 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @definition }}
 capability "IlluminanceMeasurement"
+capability "Sensor"
 {{/ @definition }}
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
@@ -15,7 +16,7 @@ cmds += zigbee.readAttribute(0x0406, 0x0000)  // MeasuredValue
 
 // Events for capability.Illuminance
 
-// Report Attributes, Read Attributes Reponse: MeasuredValue
+// Report/Read Attributes Reponse: MeasuredValue
 case { contains it, [clusterInt:0x0400, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0400, commandInt:0x01, attrInt:0x0000] }:
     Integer illuminance = Integer.parseInt(msg.value, 16)
@@ -27,10 +28,11 @@ case { contains it, [clusterInt:0x0400, commandInt:0x01, attrInt:0x0000] }:
     if (illuminance != 0) {
         illuminance = Math.pow(10, (illuminance - 1) / 10000)
     }
-    return Utils.sendEvent(name:"illuminance", value:illuminance, unit:"lx", type:"physical", descriptionText:"Illuminance is ${illuminance}")
+    Utils.sendEvent(name:"illuminance", value:illuminance, unit:"lx", type:"physical", descriptionText:"Illuminance is ${illuminance}")
+    return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Illuminance/MeasuredValue=${msg.value}")
 
 // Other events that we expect but are not usefull for capability.Illuminance behavior
-case { contains it, [clusterInt:0x0406, commandInt:0x07] }:  // ConfigureReportingResponse
+case { contains it, [clusterInt:0x0400, commandInt:0x07] }:  // ConfigureReportingResponse
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

@@ -86,8 +86,7 @@ cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
 
 // Events for capability.Switch
 
-// Report Attributes: OnOff
-// Read Attributes Response: OnOff
+// Report/Read Attributes: OnOff
 case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
     String newState = msg.value == "00" ? "off" : "on"
@@ -99,7 +98,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
         {{ params.callback }}(newState)
     }
     {{/ params.callback}}
-    return Utils.processedZclMessage("Report/Read Attributes Response", "OnOff=${newState}")
+    return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "OnOff=${newState}")
 {{# params.powerOnBehavior }}
 
 // Read Attributes Response: powerOnBehavior

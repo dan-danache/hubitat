@@ -15,12 +15,12 @@ cmds += zigbee.readAttribute(0x0406, 0x0000)  // Occupancy
 
 // Events for capability.Occupancy
 
-// Report Attributes, Read Attributes Reponse: Occupancy
+// Report/Read Attributes Reponse: Occupancy
 case { contains it, [clusterInt:0x0406, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
-    Integer value = Integer.parseInt(msg.value, 16)
-    String motion = (value % 2) > 0 ? "active" : "inactive"
-    return Utils.sendEvent(name:"motion", value:motion, type:"physical", descriptionText:"Is ${motion}")
+    String motion = msg.value == "01" ? "active" : "inactive"
+    Utils.sendEvent(name:"motion", value:motion, type:"physical", descriptionText:"Is ${motion}")
+    return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Occupancy=${msg.value}")
 
 // Other events that we expect but are not usefull for capability.Occupancy behavior
 case { contains it, [clusterInt:0x0406, commandInt:0x07] }:  // ConfigureReportingResponse

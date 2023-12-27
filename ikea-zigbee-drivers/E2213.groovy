@@ -53,10 +53,10 @@ metadata {
             title: "Log verbosity",
             description: "<small>Choose the kind of messages that appear in the \"Logs\" section.</small>",
             options: [
-                "1": "Debug - log everything",
-                "2": "Info - log important events",
-                "3": "Warning - log events that require attention",
-                "4": "Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
             defaultValue: "1",
             required: true
@@ -287,28 +287,28 @@ def parse(String description) {
         // Handle IKEA Somrig Shortcut Button (E2213) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
 
-        // Button was pushed
+        // IGNORED: We don't know yet if this will be a push, double-tap or hold
         case { contains it, [clusterInt:0xFC80, commandInt:0x01] }:
             def button = msg.endpointInt == 0x01 ? BUTTONS.DOT_1 : BUTTONS.DOT_2
-            return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+            return Log.debug("Button ${button[0]} (${button[1]}) was pressed-down (ignored as we don't know yet if this will be a push, double-tap or hold)")
         
         // Button was held
         case { contains it, [clusterInt:0xFC80, commandInt:0x02] }:
             def button = msg.endpointInt == 0x01 ? BUTTONS.DOT_1 : BUTTONS.DOT_2
             return Utils.sendEvent(name:"held", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held")
         
-        // IGNORED: Button was short-released
-        case { contains it, [clusterInt:0x0008, commandInt:0x03] }:
-            def button = device.currentValue("held", true) == 1 ? BUTTONS.ON : BUTTONS.OFF
-            return Log.debug("Button ${button[0]} (${button[1]}) was short-released (ignored)")
+        // Button was pushed
+        case { contains it, [clusterInt:0xFC80, commandInt:0x03] }:
+            def button = msg.endpointInt == 0x01 ? BUTTONS.DOT_1 : BUTTONS.DOT_2
+            return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
         
         // Button was released
-        case { contains it, [clusterInt:0x0008, commandInt:0x04] }:
+        case { contains it, [clusterInt:0xFC80, commandInt:0x04] }:
             def button = msg.endpointInt == 0x01 ? BUTTONS.DOT_1 : BUTTONS.DOT_2
             return Utils.sendEvent(name:"released", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released")
         
         // Button was double tapped
-        case { contains it, [clusterInt:0x0008, commandInt:0x06] }:
+        case { contains it, [clusterInt:0xFC80, commandInt:0x06] }:
             def button = msg.endpointInt == 0x01 ? BUTTONS.DOT_1 : BUTTONS.DOT_2
             return Utils.sendEvent(name:"doubleTapped", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was double tapped")
 
@@ -318,7 +318,7 @@ def parse(String description) {
         
         // Events for capability.Battery
         
-        // Report Attributes, Read Attributes Reponse: BatteryPercentage
+        // Report/Read Attributes Reponse: BatteryPercentage
         case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
         case { contains it, [clusterInt:0x0001, commandInt:0x01, attrInt:0x0021] }:
             Integer percentage = Integer.parseInt(msg.value, 16)
@@ -328,7 +328,7 @@ def parse(String description) {
         
             percentage =  percentage / 2
             Utils.sendEvent name:"battery", value:percentage, unit:"%", type:"physical", descriptionText:"Battery is ${percentage}% full"
-            return Utils.processedZclMessage("Report/Read Attributes Response", "BatteryPercentage=${percentage}%")
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "BatteryPercentage=${percentage}%")
         
         // Other events that we expect but are not usefull for capability.Battery behavior
         case { contains it, [clusterInt:0x0001, commandInt:0x07] }:  // ConfigureReportingResponse
@@ -403,10 +403,10 @@ def parse(String description) {
 // ===================================================================================================================
 
 @Field def Map Log = [
-    debug: { message -> if (logLevel == "1") log.debug "${device.displayName} ${message.uncapitalize()}" },
-    info:  { message -> if (logLevel <= "2") log.info  "${device.displayName} ${message.uncapitalize()}" },
-    warn:  { message -> if (logLevel <= "3") log.warn  "${device.displayName} ${message.uncapitalize()}" },
-    error: { message -> log.error "${device.displayName} ${message.uncapitalize()}" }
+    debug: { if (logLevel == "1") log.debug "${device.displayName} ${it.uncapitalize()}" },
+    info:  { if (logLevel <= "2") log.info  "${device.displayName} ${it.uncapitalize()}" },
+    warn:  { if (logLevel <= "3") log.warn  "${device.displayName} ${it.uncapitalize()}" },
+    error: { log.error "${device.displayName} ${it.uncapitalize()}" }
 ]
 
 // ===================================================================================================================
@@ -415,7 +415,7 @@ def parse(String description) {
 
 @Field def Utils = [
     sendZigbeeCommands: { List<String> cmds ->
-        if (cmds.isEmpty()) { return }
+        if (cmds.isEmpty()) return
         List<String> send = delayBetween(cmds.findAll { !it.startsWith("delay") }, 1000)
         Log.debug "◀ Sending Zigbee messages: ${send}"
         state.lastTx = now()

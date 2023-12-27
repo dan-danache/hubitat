@@ -497,6 +497,9 @@ More info about installing custom drivers is available in the [Official Document
 * Battery indicator (%)
 * Health status (online / offline)
 
+### Known Issues
+* Illuminance is reported only when motion is detected
+
 ### Device Pairing
 1. Open the back compartiment and you should see the small pair button (don't push it!)
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
@@ -504,7 +507,7 @@ More info about installing custom drivers is available in the [Official Document
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
    > 5 seconds**
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
+   > your Hubitat hub for **at least 30 seconds** (after the frint light stops blinking and turns off)
 1. Return to the pairing page and give your device a name and assign it to a room (optional)
 1. Close the device battery compartiment
 1. That's it, Have fun!

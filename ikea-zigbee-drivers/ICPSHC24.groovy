@@ -67,10 +67,10 @@ metadata {
             title: "Log verbosity",
             description: "<small>Choose the kind of messages that appear in the \"Logs\" section.</small>",
             options: [
-                "1": "Debug - log everything",
-                "2": "Info - log important events",
-                "3": "Warning - log events that require attention",
-                "4": "Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
             defaultValue: "1",
             required: true
@@ -532,8 +532,7 @@ def parse(String description) {
         
         // Events for capability.Switch
         
-        // Report Attributes: OnOff
-        // Read Attributes Response: OnOff
+        // Report/Read Attributes: OnOff
         case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
             String newState = msg.value == "00" ? "off" : "on"
@@ -543,7 +542,7 @@ def parse(String description) {
             if (device.currentValue("switch", true) != newState) {
                 turnOnCallback(newState)
             }
-            return Utils.processedZclMessage("Report/Read Attributes Response", "OnOff=${newState}")
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "OnOff=${newState}")
         
         // Read Attributes Response: powerOnBehavior
         case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
@@ -566,23 +565,19 @@ def parse(String description) {
         
         // Events for capability.Brightness
         
-        // Report Attributes: CurrentLevel
-        // Read Attributes Reponse: CurrentLevel
+        // Report/Read Attributes Reponse: CurrentLevel
         case { contains it, [clusterInt:0x0008, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0000] }:
-            Utils.processedZclMessage("Report/Read Attributes Response", "CurrentLevel=${msg.value}")
-        
             Integer newLevel = msg.value == "00" ? 0 : Math.ceil(Integer.parseInt(msg.value, 16) * 100 / 254)
             if (device.currentValue("level", true) != newLevel) {
                 Utils.sendEvent name:"level", value:newLevel, descriptionText:"Brightness is ${newLevel}%", type:"digital"
             }
-            return
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "CurrentLevel=${msg.value}")
         
         // Read Attributes Reponse: OnLevel
         // This value is read immediately after the device is turned On
         // @see turnOnCallback()
         case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
-            Utils.processedZclMessage("Read Attributes Response", "OnLevel=${msg.value}")
             Integer onLevel = msg.value == "00" ? 0 : Integer.parseInt(msg.value, 16) * 100 / 254
         
             // Clear OnLevel attribute value (if previously set)
@@ -596,7 +591,7 @@ def parse(String description) {
             if (turnOnBehavior == "FIXED_VALUE") {
                 setLevel(onLevel)
             }
-            return
+            return Utils.processedZclMessage("Read Attributes Response", "OnLevel=${msg.value}")
         
         // Other events that we expect but are not usefull for capability.Brightness behavior
         case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
@@ -698,10 +693,10 @@ def parse(String description) {
 // ===================================================================================================================
 
 @Field def Map Log = [
-    debug: { message -> if (logLevel == "1") log.debug "${device.displayName} ${message.uncapitalize()}" },
-    info:  { message -> if (logLevel <= "2") log.info  "${device.displayName} ${message.uncapitalize()}" },
-    warn:  { message -> if (logLevel <= "3") log.warn  "${device.displayName} ${message.uncapitalize()}" },
-    error: { message -> log.error "${device.displayName} ${message.uncapitalize()}" }
+    debug: { if (logLevel == "1") log.debug "${device.displayName} ${it.uncapitalize()}" },
+    info:  { if (logLevel <= "2") log.info  "${device.displayName} ${it.uncapitalize()}" },
+    warn:  { if (logLevel <= "3") log.warn  "${device.displayName} ${it.uncapitalize()}" },
+    error: { log.error "${device.displayName} ${it.uncapitalize()}" }
 ]
 
 // ===================================================================================================================
@@ -710,7 +705,7 @@ def parse(String description) {
 
 @Field def Utils = [
     sendZigbeeCommands: { List<String> cmds ->
-        if (cmds.isEmpty()) { return }
+        if (cmds.isEmpty()) return
         List<String> send = delayBetween(cmds.findAll { !it.startsWith("delay") }, 1000)
         Log.debug "◀ Sending Zigbee messages: ${send}"
         state.lastTx = now()

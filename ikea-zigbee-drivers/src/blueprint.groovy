@@ -40,10 +40,10 @@ metadata {
             title: "Log verbosity",
             description: "<small>Choose the kind of messages that appear in the \"Logs\" section.</small>",
             options: [
-                "1": "Debug - log everything",
-                "2": "Info - log important events",
-                "3": "Warning - log events that require attention",
-                "4": "Error - log errors"
+                "1" : "Debug - log everything",
+                "2" : "Info - log important events",
+                "3" : "Warning - log events that require attention",
+                "4" : "Error - log errors"
             ],
             defaultValue: "1",
             required: true
@@ -247,10 +247,10 @@ def parse(String description) {
 // ===================================================================================================================
 
 @Field def Map Log = [
-    debug: { message -> if (logLevel == "1") log.debug "${device.displayName} ${message.uncapitalize()}" },
-    info:  { message -> if (logLevel <= "2") log.info  "${device.displayName} ${message.uncapitalize()}" },
-    warn:  { message -> if (logLevel <= "3") log.warn  "${device.displayName} ${message.uncapitalize()}" },
-    error: { message -> log.error "${device.displayName} ${message.uncapitalize()}" }
+    debug: { if (logLevel == "1") log.debug "${device.displayName} ${it.uncapitalize()}" },
+    info:  { if (logLevel <= "2") log.info  "${device.displayName} ${it.uncapitalize()}" },
+    warn:  { if (logLevel <= "3") log.warn  "${device.displayName} ${it.uncapitalize()}" },
+    error: { log.error "${device.displayName} ${it.uncapitalize()}" }
 ]
 
 // ===================================================================================================================
@@ -259,7 +259,7 @@ def parse(String description) {
 
 @Field def Utils = [
     sendZigbeeCommands: { List<String> cmds ->
-        if (cmds.isEmpty()) { return }
+        if (cmds.isEmpty()) return
         List<String> send = delayBetween(cmds.findAll { !it.startsWith("delay") }, 1000)
         Log.debug "◀ Sending Zigbee messages: ${send}"
         state.lastTx = now()

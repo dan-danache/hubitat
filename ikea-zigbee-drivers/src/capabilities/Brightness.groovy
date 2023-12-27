@@ -225,23 +225,19 @@ cmds += zigbee.readAttribute(0x0008, 0x0000) // CurrentLevel
 
 // Events for capability.Brightness
 
-// Report Attributes: CurrentLevel
-// Read Attributes Reponse: CurrentLevel
+// Report/Read Attributes Reponse: CurrentLevel
 case { contains it, [clusterInt:0x0008, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0000] }:
-    Utils.processedZclMessage("Report/Read Attributes Response", "CurrentLevel=${msg.value}")
-
     Integer newLevel = msg.value == "00" ? 0 : Math.ceil(Integer.parseInt(msg.value, 16) * 100 / 254)
     if (device.currentValue("level", true) != newLevel) {
         Utils.sendEvent name:"level", value:newLevel, descriptionText:"Brightness is ${newLevel}%", type:"digital"
     }
-    return
+    return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "CurrentLevel=${msg.value}")
 
 // Read Attributes Reponse: OnLevel
 // This value is read immediately after the device is turned On
 // @see turnOnCallback()
 case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
-    Utils.processedZclMessage("Read Attributes Response", "OnLevel=${msg.value}")
     Integer onLevel = msg.value == "00" ? 0 : Integer.parseInt(msg.value, 16) * 100 / 254
 
     // Clear OnLevel attribute value (if previously set)
@@ -255,7 +251,7 @@ case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
     if (turnOnBehavior == "FIXED_VALUE") {
         setLevel(onLevel)
     }
-    return
+    return Utils.processedZclMessage("Read Attributes Response", "OnLevel=${msg.value}")
 
 // Other events that we expect but are not usefull for capability.Brightness behavior
 case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
