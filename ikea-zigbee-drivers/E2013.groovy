@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Parasoll Door/Window Sensor (E2013)"
-@Field static final String DRIVER_VERSION = "3.6.0"
+@Field static final String DRIVER_VERSION = "3.6.1"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [

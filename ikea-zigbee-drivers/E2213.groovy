@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Somrig Shortcut Button (E2213)"
-@Field static final String DRIVER_VERSION = "3.6.0"
+@Field static final String DRIVER_VERSION = "3.6.1"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -37,7 +37,7 @@ metadata {
         capability "ReleasableButton"
 
         // For firmware: 1.0.20 (117C-3B08-01000020)
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0004,0020,1000,FC7C,0xFC80", outClusters:"0003,0004,0006,0008,0019,1000,0xFC80", model:"SOMRIG shortcut button", manufacturer:"IKEA of Sweden"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0004,0020,1000,FC7C,FC80", outClusters:"0003,0004,0006,0008,0019,1000,FC80", model:"SOMRIG shortcut button", manufacturer:"IKEA of Sweden"
         
         // Attributes for capability.HealthCheck
         attribute "healthStatus", "enum", ["offline", "online", "unknown"]

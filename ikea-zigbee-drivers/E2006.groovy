@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Starkvind Air Purifier (E2006)"
-@Field static final String DRIVER_VERSION = "3.6.0"
+@Field static final String DRIVER_VERSION = "3.6.1"
 
 // Fields for capability.PushableButton
 @Field static final List<String> SUPPORTED_FAN_SPEEDS = [

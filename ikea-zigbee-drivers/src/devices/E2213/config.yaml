@@ -34,7 +34,7 @@ device:
 zigbee:
   fingerprints:
   - firmwares: 1.0.20 (117C-3B08-01000020)
-    value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0004,0020,1000,FC7C,0xFC80", outClusters:"0003,0004,0006,0008,0019,1000,0xFC80", model:"SOMRIG shortcut button", manufacturer:"IKEA of Sweden"
+    value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0004,0020,1000,FC7C,FC80", outClusters:"0003,0004,0006,0008,0019,1000,FC80", model:"SOMRIG shortcut button", manufacturer:"IKEA of Sweden"
 
   binds:
   - { endpoint: '0x01', cluster: '0xFC80', mfgCode: '0x117C', reason: IKEA Button cluster (ep 01) }

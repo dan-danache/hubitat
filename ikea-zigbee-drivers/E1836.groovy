@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Askvader On/Off Switch (E1836)"
-@Field static final String DRIVER_VERSION = "3.6.0"
+@Field static final String DRIVER_VERSION = "3.6.1"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
