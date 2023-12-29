@@ -22,7 +22,7 @@ device:
       params:
         readAttributes:
         - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
-        - { cluster: '0x0500', attr: '0x0002', description: 'ZoneStatus' }
+        - { endpoint: '0x02', cluster: '0x0500', attr: '0x0002', description: 'ZoneStatus' }
     - file: src/capabilities/FirmwareUpdate.groovy
 
 zigbee:

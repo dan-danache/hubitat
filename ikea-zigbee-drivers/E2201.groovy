@@ -251,7 +251,7 @@ def parse(String description) {
     // Auto-Configure device: configure() was not called for this driver version
     if (state.lastCx != DRIVER_VERSION) {
         state.lastCx = DRIVER_VERSION
-        return runInMillis(300, "autoConfigure")
+        runInMillis(1500, "autoConfigure")
     }
 
     // Extract msg

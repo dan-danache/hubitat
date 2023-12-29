@@ -56,14 +56,14 @@ More info about installing custom drivers is available in the [Official Document
 
 ### Device Pairing
 1. Find the small reset hole (between the On/Off button and the LED light) and make sure you have at hand a pin or
-   pencil that can fit the reset hole
-1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt
-1. Plug the device in an outlet
+   pencil that can fit the reset hole.
+1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt.
+1. Plug the device in an outlet.
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. Insert the pin into the reset hole and press it for at least 5 seconds; upon release, the LED light will start
-   blinking
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
+   blinking.
+1. Return to the pairing page and give your device a name and assign it to a room.
 1. That's it, Have fun!
 
 
@@ -78,21 +78,21 @@ More info about installing custom drivers is available in the [Official Document
 | Since version | `3.6.0` |
 
 ### Features
-* Open/Close attribute
+* Contact status attribute (open / close)
 * Health status (online / offline)
 * Battery indicator (%)
 * Health status (online / offline)
 
 ### Device Pairing
-1. Open the battery compartiment and you should see the small pair button (don't push it!)
+1. Remove device from its position using a small screwdriver and, on the back, you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Place the device back to its position by gently pressing it until you hear it clicking in place.
 1. That's it, Have fun!
 
 
@@ -114,15 +114,15 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Device Pairing
-1. Open the battery compartiment and you should see the small pair button (don't push it!)
+1. Open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -145,14 +145,14 @@ More info about installing custom drivers is available in the [Official Document
 
 ### Device Pairing
 1. Find the small reset hole on the side of the device and make sure you have at hand a pin that can fit the reset hole
-   (e.g.: a paper clip or SIM card eject pin)
-1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt
-1. Plug the device in an outlet
+   (e.g.: a paper clip or SIM card eject pin).
+1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt.
+1. Plug the device in an outlet.
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. Insert the pin into the reset hole and press it for at least 5 seconds; upon release, the LED light will start
-   blinking
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
+   blinking.
+1. Return to the pairing page and give your device a name and assign it to a room.
 1. That's it, Have fun!
 
 
@@ -178,18 +178,18 @@ More info about installing custom drivers is available in the [Official Document
 1. Report Zigbee Neighbors and Routing Tables (device acts as a Zigbee router)
 
 ### Known Issues
-* Smaller (10W) drivers do not honor the Power On Behavior
+* Smaller (10W) drivers do not honor the Power On Behavior.
 
 ### Device Pairing
-1. Have a light attached to the LED Driver device
+1. Have a light attached to the LED Driver device.
 1. Find the small reset hole on the device and make sure you have at hand a pin that can fit the reset hole (e.g.: a
-   paper clip or SIM card eject pin)
+   paper clip or SIM card eject pin).
 1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt
-1. Plug the device in an outlet
+1. Plug the device in an outlet.
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
-1. Insert the pin into the reset hole and press it for at least 5 seconds; the attached light will blink then stay on
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
+   Zigbee pairing".
+1. Insert the pin into the reset hole and press it for at least 5 seconds; the attached light will blink then stay on.
+1. Return to the pairing page and give your device a name and assign it to a room.
 1. That's it, Have fun!
 
 
@@ -204,7 +204,7 @@ More info about installing custom drivers is available in the [Official Document
 | Since version | `2.3.0` |
 
 ### Features
-* Motion detection
+* Motion detection (active / inactive) - 50 seconds cooldown
 * Illumination detection ("dim" or "bright")
 * Option to detect motion only when dark
 * Battery indicator (%)
@@ -212,19 +212,19 @@ More info about installing custom drivers is available in the [Official Document
 
 ### Known Issues
 * Old firmware versions (below 24.4.5) suppport binding to groups only and this functionality is not supported by the
-  Hubitat hub.
-* You can update the device to the latest version (24.4.5) using via Hubitat
+  Hubitat hub. You can update the device to the latest version (24.4.5) using Hubitat.
+* Illumination is reported only when motion is detected.
 
 ### Device Pairing
-1. Open the back compartiment and you should see the small pair button (don't push it!)
+1. Open the back compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -246,15 +246,15 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Device Pairing
-1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (don't push it!)
+1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -275,15 +275,15 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Device Pairing
-1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (don't push it!)
+1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -307,19 +307,18 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Known Issues
-* Old firmware versions suppport binding to groups only and this functionality is not supported by the Hubitat hub.
-  Please update the remote to the latest version.
+* Old firmware versions suppport binding to groups only and this functionality is not supported by the Hubitat hub. You can update the device to the latest version (24.4.5) using Hubitat.
 
 ### Device Pairing
-1. Open the battery compartiment and you should see the small pair button (don't push it!)
+1. Open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -342,15 +341,15 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Device Pairing
-1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (don't push it!)
+1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**; the red LED light can be seen from the back / battery side
+   > 5 seconds**; the red LED light can be seen from the back / battery side.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -373,15 +372,15 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Device Pairing
-1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (don't push it!)
+1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**; the red LED light can be seen from the back / battery side
+   > 5 seconds**; the red LED light can be seen from the back / battery side.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -406,14 +405,14 @@ More info about installing custom drivers is available in the [Official Document
 * Report Zigbee Neighbors and Routing Tables (device acts as a Zigbee router)
 
 ### Device Pairing
-1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt
-1. Plug the device in an outlet
-1. Open the round top lid and you should see the pair button next to the filter reset button (don't push it!)
+1. If the device is already plugged in, take it out for 20 seconds (power-cycle); do this before each pair attempt.
+1. Plug the device in an outlet.
+1. Open the round top lid and you should see the pair button (🔗) next to the filter reset button.
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
-1. Press and hold the pair button **for at least 5 seconds** until the LED starts blinking
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Put back the lid and fix it in place
+   Zigbee pairing".
+1. Press and hold the pair button **for at least 5 seconds** until the LED starts blinking.
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Put back the lid and fix it in place.
 1. That's it, Have fun!
 
 
@@ -435,18 +434,18 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Known Issues
-* The Hold / Release events don't work correctly on the Next and Prev buttons
+* The Hold / Release events don't work correctly on the Next and Prev buttons.
 
 ### Device Pairing
-1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (don't push it!)
+1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the LED stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -469,15 +468,15 @@ More info about installing custom drivers is available in the [Official Document
 * Health status (online / offline)
 
 ### Device Pairing
-1. Open the battery compartiment and you should see the small pair button - with two chain links on it (don't push it!)
+1. Open the battery compartiment and you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub until the LED stops blinking and turns off
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub until the LED stops blinking and turns off.
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Close the device battery compartiment.
 1. That's it, Have fun!
 
 
@@ -492,24 +491,21 @@ More info about installing custom drivers is available in the [Official Document
 | Since version | `3.6.0` |
 
 ### Features
-* Motion detection
-* Illumination reporting (lux)
+* Motion detection (active / inactive) - 20 seconds cooldown
+* Illumination lux reporting - 5 minutes cooldown
 * Battery indicator (%)
 * Health status (online / offline)
 
-### Known Issues
-* Illuminance is reported only when motion is detected
-
 ### Device Pairing
-1. Open the back compartiment and you should see the small pair button (don't push it!)
+1. Remove device from its position using a small screwdriver and, on the back, you should see the small pair button (🔗).
 1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start
-   Zigbee pairing"
+   Zigbee pairing".
 1. > IMPORTANT: Move close to your Hubitat hub, then click the pair button in the battery compartiment **4 times within
-   > 5 seconds**
+   > 5 seconds**.
 1. > IMPORTANT: Immediately after the device LED starts blinking red, keep the device **as close as you can** against
-   > your Hubitat hub for **at least 30 seconds** (after the frint light stops blinking and turns off)
-1. Return to the pairing page and give your device a name and assign it to a room (optional)
-1. Close the device battery compartiment
+   > your Hubitat hub for **at least 30 seconds** (after the front light stops blinking and turns off).
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Place the device back to its position by gently pressing it until you hear it clicking in place.
 1. That's it, Have fun!
 
 

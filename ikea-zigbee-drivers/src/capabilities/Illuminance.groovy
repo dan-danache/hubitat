@@ -7,9 +7,8 @@ capability "Sensor"
 {{# @configure }}
 
 // Configuration for capability.Illuminance
-cmds += "he cr 0x${device.deviceNetworkId} 0x03 0x0400 0x0001 0x21 0x0000 0x4650 {05} {}" // Report MeasuredValue (uint16)
+cmds += "he cr 0x${device.deviceNetworkId} 0x03 0x0400 0x0001 0x21 0x0000 0x4650 {00} {}" // Report MeasuredValue (uint16)
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0x0400 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
-cmds += zigbee.readAttribute(0x0406, 0x0000)  // MeasuredValue
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}

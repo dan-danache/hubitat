@@ -8,7 +8,6 @@ capability "MotionSensor"
 // Configuration for capability.Occupancy
 cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0001 0x18 0x0000 0x4650 {00} {}" // Report Occupancy (map8)
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
-cmds += zigbee.readAttribute(0x0406, 0x0000)  // Occupancy
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}

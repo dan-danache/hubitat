@@ -4,7 +4,7 @@
     "releaseNotes": "v3.6.0\n - Add driver for Vallhorn Motion Sensor (E2134)\n - Add driver for Somrig Shortcut Button (E2213)\n - Parasoll Door/Window Sensor (E2013)",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2023-12-24",
+    "dateReleased": "2023-12-29",
     "documentationLink": "https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",

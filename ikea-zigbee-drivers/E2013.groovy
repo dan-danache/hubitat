@@ -138,7 +138,6 @@ def configure(auto = false) {
     // Configuration for capability.ContactSensor
     cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0500 0x0002 0x19 0x0000 0x4650 {00} {}" // Report ZoneStatus (map16)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster (ep 02)
-    cmds += zigbee.readAttribute(0x0500, 0x0002)  // ZoneStatus
     
     // Configuration for capability.Battery
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (min 1% change)
@@ -201,7 +200,7 @@ def refresh(buttonPress = true) {
     }
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
-    cmds += zigbee.readAttribute(0x0500, 0x0002) // ZoneStatus
+    cmds += zigbee.readAttribute(0x0500, 0x0002, [destEndpoint:0x02]) // ZoneStatus
     Utils.sendZigbeeCommands cmds
 }
 
@@ -224,7 +223,7 @@ def parse(String description) {
     // Auto-Configure device: configure() was not called for this driver version
     if (state.lastCx != DRIVER_VERSION) {
         state.lastCx = DRIVER_VERSION
-        return runInMillis(300, "autoConfigure")
+        runInMillis(1500, "autoConfigure")
     }
 
     // Extract msg
@@ -263,10 +262,9 @@ def parse(String description) {
         // Report/Read Attributes Reponse: ZoneStatus
         case { contains it, [clusterInt:0x0500, commandInt:0x0A, attrInt:0x0002] }:
         case { contains it, [clusterInt:0x0500, commandInt:0x01, attrInt:0x0002] }:
-            Integer value = Integer.parseInt(msg.value, 16)
-            String contact = (zoneStatus & 1) > 0 ? "closed" : "open"
+            String contact = msg.value[-1] == "1" ? "open" : "closed"
             Utils.sendEvent(name:"contact", value:contact, type:"physical", descriptionText:"Is ${contact}")
-            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "ZoneStatus=${value}")
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "ZoneStatus=${msg.value}")
         
         // Other events that we expect but are not usefull for capability.ContactSensor behavior
         case { contains it, [clusterInt:0x0500, commandInt:0x07] }:  // ConfigureReportingResponse

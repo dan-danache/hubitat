@@ -137,14 +137,12 @@ def configure(auto = false) {
     // -- No binds needed
     
     // Configuration for capability.Illuminance
-    cmds += "he cr 0x${device.deviceNetworkId} 0x03 0x0400 0x0001 0x21 0x0000 0x4650 {05} {}" // Report MeasuredValue (uint16)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x03 0x0400 0x0001 0x21 0x0000 0x4650 {00} {}" // Report MeasuredValue (uint16)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0x0400 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
-    cmds += zigbee.readAttribute(0x0406, 0x0000)  // MeasuredValue
     
     // Configuration for capability.Occupancy
     cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0001 0x18 0x0000 0x4650 {00} {}" // Report Occupancy (map8)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
-    cmds += zigbee.readAttribute(0x0406, 0x0000)  // Occupancy
     
     // Configuration for capability.Battery
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (min 1% change)
@@ -231,7 +229,7 @@ def parse(String description) {
     // Auto-Configure device: configure() was not called for this driver version
     if (state.lastCx != DRIVER_VERSION) {
         state.lastCx = DRIVER_VERSION
-        return runInMillis(300, "autoConfigure")
+        runInMillis(1500, "autoConfigure")
     }
 
     // Extract msg
