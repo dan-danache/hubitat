@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri LED Driver (ICPSHC24)"
-@Field static final String DRIVER_VERSION = "3.6.1"
+@Field static final String DRIVER_VERSION = "3.7.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -56,6 +56,7 @@ metadata {
     
     // Commands for capability.ZigbeeRouter
     command "requestRoutingData"
+    command "startZigbeePairing", [[name:"Router device*", type:"STRING", description:"Enter the Device Network Id (0000 for Hubitat Hub)"]]
     
     // Commands for capability.FirmwareUpdate
     command "updateFirmware"
@@ -472,9 +473,18 @@ def refresh(buttonPress = true) {
 def requestRoutingData() {
     Log.info "Asking the device to send its Neighbors Table and the Routing Table data ..."
     Utils.sendZigbeeCommands([
-        "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0031 {00} {0x00}",
-        "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0032 {00} {0x00}"
+        "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0031 {40} {0x0000}",
+        "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0032 {41} {0x0000}"
     ])
+}
+def startZigbeePairing(deviceNetworkId) {
+    Log.info "Stopping Zigbee pairing on all devices. Please wait 5 seconds ..."
+    Utils.sendZigbeeCommands(["he raw 0xFFFC 0x00 0x00 0x0036 {42 0001} {0x0000}"])
+    runIn(5, "singleDeviceZigbeePairing", [data:deviceNetworkId])
+}
+private singleDeviceZigbeePairing(data) {
+    Log.warn "Starting Zigbee pairing on device ${data}. Now is the moment to put the device in pairing mode!"
+    Utils.sendZigbeeCommands(["he raw 0x${data} 0x00 0x00 0x0036 {43 5A01} {0x0000}"])
 }
 
 // Implementation for capability.FirmwareUpdate
@@ -649,6 +659,12 @@ def parse(String description) {
             String base64 = msg.data.join().decodeHex().encodeBase64().toString()
             sendEvent name:"routes", value:"${entriesCount} entries", type:"digital", descriptionText:base64
             return Utils.processedZdoMessage("Routing Table Response", "entries=${entriesCount}, data=${msg.data}")
+        
+        // Mgmt_Permit_Joining_rsp := { 08:Status }
+        case { contains it, [endpointInt:0x00, clusterInt:0x8036, commandInt:0x00] }:
+            if (msg.data[1] != "00") return Log.warn("Failed to Start Zigbee pairing for 90 seconds")
+            return Log.info("Started Zigbee Pairing: data=${msg.data}")
+        
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle common messages (e.g.: received during pairing when we query the device for information)

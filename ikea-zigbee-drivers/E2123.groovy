@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Symfonisk Sound Remote Gen2 (E2123)"
-@Field static final String DRIVER_VERSION = "3.6.1"
+@Field static final String DRIVER_VERSION = "3.7.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
