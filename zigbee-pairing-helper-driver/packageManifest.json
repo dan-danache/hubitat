@@ -1,0 +1,24 @@
+{
+    "packageName": "Zigbee Pairing Helper",
+    "version": "1.0.0",
+    "releaseNotes": "v1.0.0\n - Initial release",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2024-01-04",
+    "documentationLink": "https://dan-danache.github.io/hubitat/knockturn-alley-driver/",
+    "communityLink": "https://community.hubitat.com/t/dev-knockturn-alley/125167/3",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
+    "category": "Control",
+    "tags": [ "Zigbee" ],
+    "drivers" : [
+        {
+            "id" : "4eae9aee-83ca-4745-b946-b924ecc96090",
+            "name": "Zigbee Pairing Helper",
+            "description": "Allows you to pair a new Zigbee device through a specific existing Zigbee device from the mesh.",
+            "namespace": "dandanache",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/zigbee-pairing-helper-driver/zigbee-pairing-helper.groovy",
+            "required": true
+        }
+    ]
+}

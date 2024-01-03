@@ -26,6 +26,14 @@
             "category": "Control",
             "tags": [ "Zigbee", "Buttons", "Lights & Switches" ],
             "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/ikea-zigbee-drivers/packageManifest.json"
+        },
+        {
+            "id": "9d40a96e-8f53-48db-baff-6ab012ac4d73",
+            "name": "Zigbee Pairing Helper",
+            "description": "Allows you to pair a new Zigbee device through a specific existing Zigbee device from the mesh.",
+            "category": "Control",
+            "tags": [ "Zigbee" ],
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/zigbee-pairing-helper-driver/packageManifest.json"
         }
     ]
 }
