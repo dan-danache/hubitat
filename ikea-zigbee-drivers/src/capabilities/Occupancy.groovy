@@ -6,8 +6,8 @@ capability "MotionSensor"
 {{# @configure }}
 
 // Configuration for capability.Occupancy
-cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0001 0x18 0x0000 0x4650 {00} {}" // Report Occupancy (map8)
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
+cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0001 0x18 0x0000 0x4650 {00} {}" // Report Occupancy (map8) at least every 5 hours (Δ = 0)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
@@ -22,7 +22,7 @@ case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
     return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Occupancy=${msg.value}")
 
 // Other events that we expect but are not usefull for capability.Occupancy behavior
-case { contains it, [clusterInt:0x0406, commandInt:0x07] }:  // ConfigureReportingResponse
-    return
+case { contains it, [clusterInt:0x0406, commandInt:0x07] }:
+    return Utils.processedZclMessage("Configure Reporting Response", "attribute=motion, data=${msg.data}")
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

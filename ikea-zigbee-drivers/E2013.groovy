@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Parasoll Door/Window Sensor (E2013)"
-@Field static final String DRIVER_VERSION = "3.7.0"
+@Field static final String DRIVER_VERSION = "3.8.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -136,12 +136,12 @@ def configure(auto = false) {
     // -- No binds needed
     
     // Configuration for capability.ContactSensor
-    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0500 0x0002 0x19 0x0000 0x4650 {00} {}" // Report ZoneStatus (map16)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster (ep 02)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0500 0x0002 0x19 0x0000 0x4650 {00} {}" // Report ZoneStatus (map16)
     
     // Configuration for capability.Battery
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (min 1% change)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
     cmds += zigbee.readAttribute(0x0001, 0x0021)  // BatteryPercentage
     
     // Configuration for capability.HealthCheck
@@ -263,30 +263,30 @@ def parse(String description) {
         case { contains it, [clusterInt:0x0500, commandInt:0x0A, attrInt:0x0002] }:
         case { contains it, [clusterInt:0x0500, commandInt:0x01, attrInt:0x0002] }:
             String contact = msg.value[-1] == "1" ? "open" : "closed"
-            Utils.sendEvent(name:"contact", value:contact, type:"physical", descriptionText:"Is ${contact}")
+            Utils.sendEvent name:"contact", value:contact, descriptionText:"Is ${contact}", type:type
             return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "ZoneStatus=${msg.value}")
         
         // Other events that we expect but are not usefull for capability.ContactSensor behavior
-        case { contains it, [clusterInt:0x0500, commandInt:0x07] }:  // ConfigureReportingResponse
-            return
+        case { contains it, [clusterInt:0x0500, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=contact, data=${msg.data}")
         
         // Events for capability.Battery
         
         // Report/Read Attributes Reponse: BatteryPercentage
         case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
         case { contains it, [clusterInt:0x0001, commandInt:0x01, attrInt:0x0021] }:
+        
+            // The value 0xff indicates an invalid or unknown reading
+            if (msg.value == "FF") return Log.warn("Ignored invalid remaining battery percentage value: 0x${msg.value}")
+        
             Integer percentage = Integer.parseInt(msg.value, 16)
-        
-            // 0xFF represents an invalid battery percentage value, so we just ignore it
-            if (percentage == 0xFF) return Log.warn("Ignored invalid reported battery percentage value: 0xFF")
-        
             percentage =  percentage / 2
-            Utils.sendEvent name:"battery", value:percentage, unit:"%", type:"physical", descriptionText:"Battery is ${percentage}% full"
+            Utils.sendEvent name:"battery", value:percentage, unit:"%", descriptionText:"Battery is ${percentage}% full", type:type
             return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "BatteryPercentage=${percentage}%")
         
         // Other events that we expect but are not usefull for capability.Battery behavior
-        case { contains it, [clusterInt:0x0001, commandInt:0x07] }:  // ConfigureReportingResponse
-            return
+        case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=battery, data=${msg.data}")
         
         // Events for capability.HealthCheck
         case { contains it, [clusterInt:0x0000, attrInt:0x0000] }:

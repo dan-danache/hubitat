@@ -16,6 +16,7 @@ Supported devices:
 * [Tradfri Remote Control (E1810)](#tradfri-remote-control-e1810)
 * [Tradfri Shortcut Button (E1812)](#tradfri-shortcut-button-e1812)
 * [Vallhorn Motion Sensor (E2134)](#vallhorn-motion-sensor-e2134)
+* [Vindstyrka Air Quality Sensor (E2112)](#vindstyrka-air-quality-sensor-e2112)
 
 ## Driver Install
 ### Install using HPM (offers automatic updates)
@@ -511,6 +512,30 @@ More info about installing custom drivers is available in the [Official Document
 1. Place the device back to its position by gently pressing it until you hear it clicking in place.
 1. That's it, Have fun!
 
+
+## Vindstyrka Air Quality Sensor (E2112)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Ikea_E2112.webp" style="width: 200px"> |
+| Product Code | `404.982.34` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2112.groovy` |
+| Tested firmwares | `1.0.010` |
+| Since version | `3.8.0` |
+
+### Features
+* Particulate Matter < 2.5 microns (PM 2.5) sensor data
+* Calculate US AQI score based on PM 2.5 value
+* [Sensirion VOC Index](https://sensirion.com/media/documents/02232963/6294E043/Info_Note_VOC_Index.pdf) (1-500)
+* Temperature and Relative Humidity
+* Health status (online / offline)
+
+### Device Pairing
+1. In the Hubitat interface, go to "Devices", click "Add Device" in the top right, click "Zigbee", then click "Start Zigbee pairing".
+1. Click the pair button (🔗), located on the top of the device, 4 times in 5 seconds.
+1. Return to the pairing page and give your device a name and assign it to a room.
+1. Place the device back to its position by gently pressing it until you hear it clicking in place.
+1. That's it, Have fun!
 
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)

@@ -1,5 +1,6 @@
 {{!--------------------------------------------------------------------------}}
 {{# @definition }}
+capability "Actuator"
 capability "Switch"
 {{/ @definition }}
 {{!--------------------------------------------------------------------------}}
@@ -117,8 +118,9 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
 {{/ params.powerOnBehavior }}
 
 // Other events that we expect but are not usefull for capability.Switch behavior
+case { contains it, [clusterInt:0x0006, commandInt:0x07] }:
+    return Utils.processedZclMessage("Configure Reporting Response", "attribute=switch, data=${msg.data}")
 case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
-case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // Configure Reporting Response
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

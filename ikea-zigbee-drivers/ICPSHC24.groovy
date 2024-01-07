@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Tradfri LED Driver (ICPSHC24)"
-@Field static final String DRIVER_VERSION = "3.7.0"
+@Field static final String DRIVER_VERSION = "3.8.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -21,6 +21,7 @@ import groovy.transform.Field
 metadata {
     definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/ICPSHC24.groovy") {
         capability "Configuration"
+        capability "Actuator"
         capability "Switch"
         capability "ChangeLevel"
         capability "SwitchLevel"
@@ -314,8 +315,8 @@ def configure(auto = false) {
     
     // Configuration for capability.Brightness
     sendEvent name:"level", value:"100", type:"digital", descriptionText:"Brightness initialized to 100%"
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes (Δ = 1)
     cmds += zigbee.readAttribute(0x0008, 0x0000) // CurrentLevel
     
     // Configuration for capability.HealthCheck
@@ -569,8 +570,9 @@ def parse(String description) {
             return Utils.processedZclMessage("Read Attributes Response", "PowerOnBehavior=${newValue}")
         
         // Other events that we expect but are not usefull for capability.Switch behavior
+        case { contains it, [clusterInt:0x0006, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=switch, data=${msg.data}")
         case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
-        case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // Configure Reporting Response
             return
         
         // Events for capability.Brightness
@@ -604,8 +606,9 @@ def parse(String description) {
             return Utils.processedZclMessage("Read Attributes Response", "OnLevel=${msg.value}")
         
         // Other events that we expect but are not usefull for capability.Brightness behavior
+        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=level, data=${msg.data}")
         case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
-        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // Configure Reporting Response
             return
         
         // Events for capability.HealthCheck

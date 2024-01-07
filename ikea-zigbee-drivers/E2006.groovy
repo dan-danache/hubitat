@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Starkvind Air Purifier (E2006)"
-@Field static final String DRIVER_VERSION = "3.7.0"
+@Field static final String DRIVER_VERSION = "3.8.0"
 
 // Fields for capability.PushableButton
 @Field static final List<String> SUPPORTED_FAN_SPEEDS = [
@@ -26,6 +26,7 @@ import groovy.transform.Field
 metadata {
     definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2006.groovy") {
         capability "Configuration"
+        capability "Actuator"
         capability "AirQuality"
         capability "FanControl"
         capability "FilterStatus"
@@ -159,7 +160,7 @@ def updated(auto = false) {
         pm25ReportDelta = "03"
         device.updateSetting("pm25ReportDelta", [value:pm25ReportDelta, type:"enum"])
     }
-    Log.info "🛠️ pm25ReportDelta = +/- ${pm25ReportDelta}μg/m3"
+    Log.info "🛠️ pm25ReportDelta = +/- ${pm25ReportDelta} μg/m3"
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7D 0x0004 0x21 0x0000 0x0258 {${pm25ReportDelta}} {117C}"
     
     if (filterLifeTime == null) {
@@ -353,9 +354,7 @@ def cycleSpeed() {
 private Integer lerp(ylo, yhi, xlo, xhi, cur) {
   return Math.round(((cur - xlo) / (xhi - xlo)) * (yhi - ylo) + ylo);
 }
-
-// See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
-private pm25Aqi(pm25) {
+private pm25Aqi(pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
     if (pm25 <=  12.1) return [lerp(  0,  50,   0.0,  12.0, pm25), "good", "green"]
     if (pm25 <=  35.5) return [lerp( 51, 100,  12.1,  35.4, pm25), "moderate", "gold"]
     if (pm25 <=  55.5) return [lerp(101, 150,  35.5,  55.4, pm25), "unhealthy for sensitive groups", "darkorange"]
@@ -492,11 +491,11 @@ def parse(String description) {
             // Tried to read the PM 2.5 value when the device is Off
             if (pm25 == 0xFFFF) return
         
-            Utils.sendEvent name:"pm25", value:pm25, unit:"μg/m3", descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m3", type:type
+            Utils.sendEvent name:"pm25", value:pm25, unit:"μg/m³", descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m³", type:type
             def aqi = pm25Aqi(pm25)
             Utils.sendEvent name:"airQualityIndex", value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
             Utils.sendEvent name:"airQuality", value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
-            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "PM25Measurement=${pm25} μg/m3")
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "PM25Measurement=${pm25} μg/m³")
         
         // Report/Read Attributes: FilterRunTime
         case { contains it, [clusterInt:0xFC7D, commandInt:0x0A, attrInt:0x0000] }:

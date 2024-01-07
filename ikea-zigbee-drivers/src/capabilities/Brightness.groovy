@@ -216,8 +216,8 @@ Log.info "🛠️ prestaging = ${prestaging}"
 
 // Configuration for capability.Brightness
 sendEvent name:"level", value:"100", type:"digital", descriptionText:"Brightness initialized to 100%"
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes (Δ = 1)
 cmds += zigbee.readAttribute(0x0008, 0x0000) // CurrentLevel
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
@@ -254,8 +254,9 @@ case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
     return Utils.processedZclMessage("Read Attributes Response", "OnLevel=${msg.value}")
 
 // Other events that we expect but are not usefull for capability.Brightness behavior
+case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
+    return Utils.processedZclMessage("Configure Reporting Response", "attribute=level, data=${msg.data}")
 case { contains it, [clusterInt:0x0008, commandInt:0x04] }:  // Write Attribute Response (0x04)
-case { contains it, [clusterInt:0x0008, commandInt:0x07] }:  // Configure Reporting Response
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

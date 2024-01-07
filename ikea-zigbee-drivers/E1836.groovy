@@ -10,7 +10,7 @@ import groovy.time.TimeCategory
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = "IKEA Askvader On/Off Switch (E1836)"
-@Field static final String DRIVER_VERSION = "3.7.0"
+@Field static final String DRIVER_VERSION = "3.8.0"
 
 // Fields for capability.HealthCheck
 @Field static final Map<String, String> HEALTH_CHECK = [
@@ -21,6 +21,7 @@ import groovy.transform.Field
 metadata {
     definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1836.groovy") {
         capability "Configuration"
+        capability "Actuator"
         capability "Switch"
         capability "HealthCheck"
         capability "PowerSource"
@@ -354,8 +355,9 @@ def parse(String description) {
             return Utils.processedZclMessage("Read Attributes Response", "PowerOnBehavior=${newValue}")
         
         // Other events that we expect but are not usefull for capability.Switch behavior
+        case { contains it, [clusterInt:0x0006, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=switch, data=${msg.data}")
         case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
-        case { contains it, [clusterInt:0x0006, commandInt:0x07] }: // Configure Reporting Response
             return
         
         // Events for capability.HealthCheck

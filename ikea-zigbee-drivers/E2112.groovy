@@ -1,15 +1,15 @@
 /**
- * IKEA Tradfri Control Outlet (E1603)
+ * IKEA Vindstyrka Air Quality Sensor (E2112)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E1603.html
+ * @see https://zigbee.blakadder.com/Ikea_E2112.html
  * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
  * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = "IKEA Tradfri Control Outlet (E1603)"
+@Field static final String DRIVER_NAME = "IKEA Vindstyrka Air Quality Sensor (E2112)"
 @Field static final String DRIVER_VERSION = "3.8.0"
 
 // Fields for capability.HealthCheck
@@ -19,20 +19,25 @@ import groovy.transform.Field
 ]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1603.groovy") {
+    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2112.groovy") {
         capability "Configuration"
-        capability "Actuator"
-        capability "Switch"
+        capability "AirQuality"
+        capability "TemperatureMeasurement"
+        capability "RelativeHumidityMeasurement"
         capability "HealthCheck"
         capability "PowerSource"
         capability "Refresh"
         capability "HealthCheck"
 
-        // For firmware: 2.0.024
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC7C", outClusters:"0005,0019,0020,1000", model:"TRADFRI control outlet", manufacturer:"IKEA of Sweden"
-
-        // For firmware: 2.3.089 (117C-1101-23089631)
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC7C", outClusters:"0019,0020,1000", model:"TRADFRI control outlet", manufacturer:"IKEA of Sweden"
+        // For firmware: 1.0.010 (117C-110F-00010010)
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0402,0405,FC57,FC7C,042A,FC7E", outClusters:"0003,0019,0020,0202", model:"VINDSTYRKA", manufacturer:"IKEA of Sweden"
+        
+        // Attributes for capability.FineParticulateMatter
+        attribute "airQuality", "enum", ["good", "moderate", "unhealthy for sensitive groups", "unhealthy", "hazardous"]
+        attribute "pm25", "number"
+        
+        // Attributes for capability.VocIndex
+        attribute "vocIndex", "number"
         
         // Attributes for capability.HealthCheck
         attribute "healthStatus", "enum", ["offline", "online", "unknown"]
@@ -41,10 +46,6 @@ metadata {
         attribute "neighbors", "string"
         attribute "routes", "string"
     }
-    
-    // Commands for capability.Switch
-    command "toggle"
-    command "onWithTimedOff", [[name:"On time*", type:"NUMBER", description:"After how many seconds power will be turned Off [1..6500]"]]
     
     // Commands for capability.ZigbeeRouter
     command "requestRoutingData"
@@ -66,21 +67,6 @@ metadata {
                 "4" : "Error - log errors"
             ],
             defaultValue: "1",
-            required: true
-        )
-        
-        // Inputs for capability.Switch
-        input(
-            name: "powerOnBehavior",
-            type: "enum",
-            title: "Power On behaviour",
-            description: "<small>Select what happens after a power outage.</small>",
-            options: [
-                "TURN_POWER_ON": "Turn power On",
-                "TURN_POWER_OFF": "Turn power Off",
-                "RESTORE_PREVIOUS_STATE": "Restore previous state"
-            ],
-            defaultValue: "RESTORE_PREVIOUS_STATE",
             required: true
         )
     }
@@ -109,14 +95,6 @@ def updated(auto = false) {
     }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${logLevel}"
-    
-    // Preferences for capability.Switch
-    if (powerOnBehavior == null) {
-        powerOnBehavior = "RESTORE_PREVIOUS_STATE"
-        device.updateSetting("powerOnBehavior", [value:powerOnBehavior, type:"enum"])
-    }
-    Log.info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-    cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POWER_OFF" ? 0x00 : (powerOnBehavior == "TURN_POWER_ON" ? 0x01 : 0xFF))
     
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, "healthCheck"
@@ -167,17 +145,27 @@ def configure(auto = false) {
 
     List<String> cmds = []
 
-    // Configure IKEA Tradfri Control Outlet (E1603) specific Zigbee reporting
+    // Configure IKEA Vindstyrka Air Quality Sensor (E2112) specific Zigbee reporting
     // -- No reporting needed
 
-    // Add IKEA Tradfri Control Outlet (E1603) specific Zigbee binds
+    // Add IKEA Vindstyrka Air Quality Sensor (E2112) specific Zigbee binds
     // -- No binds needed
     
-    // Configuration for capability.Switch
-    sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
-    cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
+    // Configuration for capability.FineParticulateMatter
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x042A {${device.zigbeeId}} {}" // Particulate Matter 2.5 cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x042A 0x0000 0x39 0x0000 0x0258 {FFFF0000} {}" // Report MeasuredValue (single) at least every 10 minutes (Δ = ??)
+    
+    // Configuration for capability.VocIndex
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC7E {${device.zigbeeId}} {}" // VocIndex Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7E 0x0000 0x39 0x0000 0x0258 {FFFF0000} {117C}" // Report MeasuredValue (single) at least every 10 minutes (Δ = ??)
+    
+    // Configuration for capability.Temperature
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0402 0x0000 0x29 0x0000 0x0258 {6400} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 1°C)
+    
+    // Configuration for capability.RelativeHumidity
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0405 0x0000 0x21 0x0000 0x0258 {6400} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 1%)
     
     // Configuration for capability.HealthCheck
     sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
@@ -199,27 +187,19 @@ private autoConfigure() {
     configure(true)
 }
 
-// Implementation for capability.Switch
-def on() {
-    Log.debug "Sending On command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114301}"])
+// Implementation for capability.FineParticulateMatter
+private Integer lerp(ylo, yhi, xlo, xhi, cur) {
+  return Math.round(((cur - xlo) / (xhi - xlo)) * (yhi - ylo) + ylo);
 }
-def off() {
-    Log.debug "Sending Off command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114300}"])
-}
-
-def toggle() {
-    Log.debug "Sending Toggle command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114302}"])
-}
-
-def onWithTimedOff(onTime = 1) {
-    Integer delay = onTime < 1 ? 1 : (onTime > 6500 ? 6500 : onTime)
-    Log.debug "Sending OnWithTimedOff command"
-
-    String payload = "00 ${zigbee.swapOctets(zigbee.convertToHexString(delay * 10, 4))} 0000"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114342 ${payload}}"])
+private pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
+    if (pm25 <=  12.1) return [lerp(  0,  50,   0.0,  12.0, pm25), "good", "green"]
+    if (pm25 <=  35.5) return [lerp( 51, 100,  12.1,  35.4, pm25), "moderate", "gold"]
+    if (pm25 <=  55.5) return [lerp(101, 150,  35.5,  55.4, pm25), "unhealthy for sensitive groups", "darkorange"]
+    if (pm25 <= 150.5) return [lerp(151, 200,  55.5, 150.4, pm25), "unhealthy", "red"]
+    if (pm25 <= 250.5) return [lerp(201, 300, 150.5, 250.4, pm25), "very unhealthy", "purple"]
+    if (pm25 <= 350.5) return [lerp(301, 400, 250.5, 350.4, pm25), "hazardous", "maroon"]
+    if (pm25 <= 500.5) return [lerp(401, 500, 350.5, 500.4, pm25), "hazardous", "maroon"]
+    return [500, "hazardous", "maroon"]
 }
 
 // Implementation for capability.HealthCheck
@@ -257,8 +237,10 @@ def refresh(buttonPress = true) {
         }
     }
     List<String> cmds = []
-    cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
-    cmds += zigbee.readAttribute(0x0006, 0x4003) // PowerOnBehavior
+    cmds += zigbee.readAttribute(0x0402, 0x0000) // Temperature
+    cmds += zigbee.readAttribute(0x0405, 0x0000) // Relative Humidity
+    cmds += zigbee.readAttribute(0x042A, 0x0000) // Fine Particulate Matter (PM25)
+    cmds += zigbee.readAttribute(0xFC7E, 0x0000, [mfgCode:"0x117C"]) // VOC Index
     Utils.sendZigbeeCommands cmds
 }
 
@@ -324,7 +306,7 @@ def parse(String description) {
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
-        // Handle IKEA Tradfri Control Outlet (E1603) specific Zigbee messages
+        // Handle IKEA Vindstyrka Air Quality Sensor (E2112) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
 
         // No specific events
@@ -333,35 +315,76 @@ def parse(String description) {
         // Handle capabilities Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
         
-        // Events for capability.Switch
+        // Events for capability.FineParticulateMatter
         
-        // Report/Read Attributes: OnOff
-        case { contains it, [clusterInt:0x0006, commandInt:0x0A, attrInt:0x0000] }:
-        case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
-            String newState = msg.value == "00" ? "off" : "on"
-            Utils.sendEvent name:"switch", value:newState, descriptionText:"Was turned ${newState}", type:type
+        // Report/Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0x042A, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x042A, commandInt:0x01, attrInt:0x0000] }:
         
-            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "OnOff=${newState}")
+            // A MeasuredValue of 0xFFFFFFFF indicates that the measurement is invalid
+            if (msg.value == "FFFFFFFF") return Log.warn("Ignored invalid PM25 value: 0x${msg.value}")
         
-        // Read Attributes Response: powerOnBehavior
-        case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
-            String newValue = ""
-            switch (Integer.parseInt(msg.value, 16)) {
-                case 0x00: newValue = "TURN_POWER_OFF"; break
-                case 0x01: newValue = "TURN_POWER_ON"; break
-                case 0xFF: newValue = "RESTORE_PREVIOUS_STATE"; break
-                default: return Log.warn("Received attribute value: powerOnBehavior=${msg.value}")
-            }
-            powerOnBehavior = newValue
-            device.updateSetting("powerOnBehavior",[ value:newValue, type:"enum" ])
+            Integer pm25 = Math.round Float.intBitsToFloat(Integer.parseInt(msg.value, 16))
+            Utils.sendEvent name:"pm25", value:pm25, unit:"μg/m³", descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m³", type:type
+            def aqi = pm25Aqi(pm25)
+            Utils.sendEvent name:"airQualityIndex", value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
+            Utils.sendEvent name:"airQuality", value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "PM25Measurement=${pm25} μg/m³")
         
-            return Utils.processedZclMessage("Read Attributes Response", "PowerOnBehavior=${newValue}")
+        // Other events that we expect but are not usefull for capability.FineParticulateMatter behavior
+        case { contains it, [clusterInt:0x042A, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=pm25, data=${msg.data}")
         
-        // Other events that we expect but are not usefull for capability.Switch behavior
-        case { contains it, [clusterInt:0x0006, commandInt:0x07] }:
-            return Utils.processedZclMessage("Configure Reporting Response", "attribute=switch, data=${msg.data}")
-        case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response (0x04)
-            return
+        // Events for capability.VocIndex
+        
+        // Report/Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0xFC7E, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0xFC7E, commandInt:0x01, attrInt:0x0000] }:
+        
+            // A MeasuredValue of 0xFFFFFFFF indicates that the measurement is invalid
+            if (msg.value == "FFFFFFFF") return Log.warn("Ignored invalid VOC Index value: 0x${msg.value}")
+        
+            Integer vocIndex = Math.round Float.intBitsToFloat(Integer.parseInt(msg.value, 16))
+            Utils.sendEvent name:"vocIndex", value:vocIndex, descriptionText:"Voc index is ${vocIndex} / 500", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "VocIndex=${msg.value}")
+        
+        // Other events that we expect but are not usefull for capability.VocIndex behavior
+        case { contains it, [clusterInt:0xFC7E, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=vocIndex, data=${msg.data}")
+        
+        // Events for capability.Temperature
+        
+        // Report/Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0x0402, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0000] }:
+        
+            // A MeasuredValue of 0x8000 indicates that the temperature measurement is invalid
+            if (msg.value == "8000") return Log.warn("Ignored invalid temperature value: 0x${msg.value}")
+        
+            String temperature = convertTemperatureIfNeeded(Integer.parseInt(msg.value, 16) / 100, "C", 0)
+            Utils.sendEvent name:"temperature", value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature} °${location.temperatureScale}", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Temperature=${msg.value}")
+        
+        // Other events that we expect but are not usefull for capability.Temperature behavior
+        case { contains it, [clusterInt:0x0402, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=temperature, data=${msg.data}")
+        
+        // Events for capability.RelativeHumidity
+        
+        // Report/Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0x0405, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0000] }:
+        
+            // A MeasuredValue of 0xFFFF indicates that the measurement is invalid
+            if (msg.value == "FFFF") return Log.warn("Ignored invalid relative humidity value: 0x${msg.value}")
+        
+            Integer humidity = Math.round(Integer.parseInt(msg.value, 16) / 100)
+            Utils.sendEvent name:"humidity", value:humidity, unit:"%rh", descriptionText:"Relative humidity is ${humidity} %", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "RelativeHumidity=${msg.value}")
+        
+        // Other events that we expect but are not usefull for capability.RelativeHumidity behavior
+        case { contains it, [clusterInt:0x0405, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=humidity, data=${msg.data}")
         
         // Events for capability.HealthCheck
         case { contains it, [clusterInt:0x0000, attrInt:0x0000] }:
