@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Hubitat Zigbee Map - v1.4.0</title>
+    <title>Hubitat Zigbee Map - v1.5.0</title>
     <meta charset="utf-8">
     <meta name="keywords" content="hubitat, zigbee, map">
     <meta name="author" content="Agamemnon Dandanache">
@@ -591,6 +591,10 @@
                             Show duplex links
                         </li>
                         <li>
+                            <input type="checkbox" id="conf-lqi"><label for="conf-lqi">Show link colors</label>
+                            Show link colors
+                        </li>
+                        <li>
                             <input type="checkbox" id="conf-unknown"><label for="conf-unknown">Show "Unknown" devices</label>
                             Show <b style="color:var(--Violet)">Unknown</b> devices
                         </li>
@@ -757,7 +761,7 @@
         }
 
         async fetchDevicesList() {
-            console.log('Fetching devices list ...');
+            console.info('Fetching Zigbee devices list ...');
             return fetch(new Request('/hub/zigbee/getChildAndRouteInfoJson'), {cache: 'no-store'})
                 .then((response) => {
                     if (!response.ok) {
@@ -1177,8 +1181,13 @@
             this.createdAt = null;
             this.graphModel = new GraphModel();
             this.eventListeners = {};
+
             this.highlightLinks = new Set();
+            this.highlightNodes = new Set();
+            this.colorsCache = {};
+
             this.showUnknown = true;
+            this.drawLqi = true;
 
             // Add event handlers
             configuration.addEventListener('config', config => this.applyConfiguration(config));
@@ -1201,7 +1210,7 @@
                 .nodeCanvasObject((node, ctx) => this.#nodePaint(node, ctx))
                 .linkLabel(link => this.#translateDates(link.tooltip))
                 .linkColor(link => this.#linkColor(link))
-                .linkWidth(link => this.highlightLinks.has(link) ? 2 : 1)
+                .linkWidth(link => this.highlightLinks.has(link) ? 3 : 1)
                 .linkCurvature('curvature')
                 .linkDirectionalParticles(1)
                 .cooldownTime(5000)
@@ -1220,9 +1229,14 @@
                 })
                 .onNodeHover(node => {
                     this.highlightLinks.clear();
+                    this.highlightNodes.clear();
                     if (!node) return;
+                    this.highlightNodes.add(node.addr);
                     this.graphModel.links.forEach(link => {
-                        if (link.sourceAddr === node.addr) this.highlightLinks.add(link);
+                        if (link.sourceAddr === node.addr) {
+                            this.highlightLinks.add(link);
+                            this.highlightNodes.add(link.targetAddr);
+                        }
                     });
                 });
 
@@ -1286,8 +1300,13 @@
 
             const currentShowUnknown = this.showUnknown;
             this.showUnknown = configuration.unknown;
-            
             if (currentShowUnknown !== this.showUnknown) {
+                refreshGraph = true;
+            }
+
+            const currentDrawLqi = this.drawLqi;
+            this.drawLqi = configuration.lqi;
+            if (currentDrawLqi !== this.drawLqi) {
                 refreshGraph = true;
             }
 
@@ -1365,8 +1384,8 @@
             }
 
             // Circle
-            const colors = UI.colors();
-            ctx.fillStyle = this.#nodeColor(node);
+            const nodeColor = this.#nodeColor(node);
+            ctx.fillStyle = nodeColor;
             ctx.beginPath();
             ctx.arc(node.x, node.y, 3 + 2 * t, 0, 2 * Math.PI, false);
             ctx.fill();
@@ -1383,7 +1402,7 @@
             }
 
             // Text
-            ctx.fillStyle = colors.TextColor;
+            ctx.fillStyle = UI.colors().TextColor + (nodeColor.length === 7 ? '' : nodeColor.substring(7));
             ctx.font = '3px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -1392,26 +1411,51 @@
 
         #nodeColor(node) {
             const colors = UI.colors();
-            if (node.error !== undefined) return colors.Magenta;
+            const alpha = this.highlightLinks.size === 0 || this.highlightNodes.has(node.addr) ? '' : '44';
+
+            if (node.error !== undefined) return colors.Magenta + alpha;
             return {
-                'Zigbee Router': colors.Blue,
-                'Zigbee End Device': colors.Green,
-                'Zigbee Coordinator': colors.Orange
-            }[node.type] || colors.Violet;
+                'Zigbee Router': colors.Blue + alpha,
+                'Zigbee End Device': colors.Green + alpha,
+                'Zigbee Coordinator': colors.Orange + alpha
+            }[node.type] || colors.Violet + alpha;
         }
 
         #linkColor(link) {
             const colors = UI.colors();
-            if (this.highlightLinks.has(link)) return colors.Magenta;
-            if (link.lqi >= 220) return colors.Green;
-            if (link.lqi >= 200) return colors.Cyan;
-            if (link.lqi >= 150) return colors.Blue;
-            if (link.lqi >= 50) return colors.Yellow;
-            return colors.Red;
+            const alpha = this.highlightLinks.size === 0 || this.highlightLinks.has(link) ? '' : '44';
+
+            if (this.drawLqi === false) return colors.TextColorDarker + alpha;
+
+            if (link.lqi >= 220) return colors.Green + alpha;
+            if (link.lqi >= 200) return colors.Cyan + alpha;
+            if (link.lqi >= 150) return colors.Blue + alpha;
+            if (link.lqi >= 50) return colors.Yellow + alpha;
+            return colors.Red + alpha;
         }
 
         #adjustColor(color, amount) {
-            return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+
+            // This method is called pretty often, try to cache its results
+            const cacheKey = `_${color}-${amount}`;
+            if (this.colorsCache.hasOwnProperty(cacheKey)) return this.colorsCache[cacheKey];
+
+            if (color.startsWith('rgba(')) {
+                const newColor = 'rgba(' + color.substring(5, color.length - 1)
+                    .split(',')
+                    .map(val => val.trim())
+                    .map((val, idx) => {
+                        if (idx === 3) return val;
+                        return Math.min(255, parseInt(val) + amount);
+                    })
+                    .join(', ') + ')';
+                    this.colorsCache[cacheKey] = newColor;
+                    return newColor;
+            }
+
+            const newColor = '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+            this.colorsCache[cacheKey] = newColor;
+            return newColor;
         }
     }
 
@@ -1420,6 +1464,7 @@
             this.accessToken = undefined;
             this.dots = true;
             this.duplex = false;
+            this.lqi = true;
             this.unknown = true;
             this.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             this.charge = 0;
@@ -1453,6 +1498,11 @@
             // Duplex links
             const showDuplex = params.get('duplex');
             if (showDuplex != null) this.duplex = showDuplex === 'true';
+
+            // Draw LQI colors
+            const showLqi = params.get('lqi');
+            if (showLqi != null) this.lqi = showLqi !== 'false';
+
 
             // Hide "Unknown" devices
             const showUnknown = params.get('unknown');
@@ -1555,6 +1605,7 @@
         #repaintConfiguration(config) {
             document.getElementById('conf-dots').checked = config.dots;
             document.getElementById('conf-duplex').checked = config.duplex;
+            document.getElementById('conf-lqi').checked = config.lqi;
             document.getElementById('conf-unknown').checked = config.unknown;
             document.getElementById('conf-dark').checked = config.dark;
             document.getElementById('conf-charge').value = config.charge % 11;
@@ -1629,6 +1680,9 @@
 
             const duplex = document.getElementById('conf-duplex').checked;
             searchParams.set('duplex', duplex);
+
+            const lqi = document.getElementById('conf-lqi').checked;
+            searchParams.set('lqi', lqi);
 
             const unknown = document.getElementById('conf-unknown').checked;
             searchParams.set('unknown', unknown);

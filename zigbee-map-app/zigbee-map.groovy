@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.app.ChildDeviceWrapper
 
 @Field static final String APP_NAME = "Zigbee Map"
-@Field static final String APP_VERSION = "1.4.0"
+@Field static final String APP_VERSION = "1.5.0"
 @Field static final String FILE_NAME = "zigbee-map.html"
 @Field static final def HEXADECIMAL_PATTERN = ~/\p{XDigit}{4}/
 @Field static final def URL_PATTERN = ~/^https?:\/\/[^\/]+(.+)/
@@ -144,7 +144,12 @@ Map changelog() {
         uninstall: false
     ) {
 
-        section ("v1.4.0 - 2024-02-23", hideable: true, hidden: false) {
+        section ("v1.5.0 - 2024-02-23", hideable: true, hidden: false) {
+            paragraph "<li>Add config option to show/hide link colors" +
+            "<li>Make node hover effect (see neighbors) more visible - @WarlockWeary</li>"
+        }
+
+        section ("v1.4.0 - 2024-02-23", hideable: true, hidden: true) {
             paragraph "<li>Color links based on LQI/LQA value - @Horseflesh</li>" +
             "<li>Hide back <b>duplex</b> links by default to better see the link colors</li>" +
             "<li>Use <b>Esc</b> keyboard key to toggle the controls - @jshimota</li>"
