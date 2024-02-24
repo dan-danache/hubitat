@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0] - 2024-02-23
 ### Added
 - Add config option to show/hide link colors
+- Add graph for hub memory and processor usage history (since last reboot) - `@WarlockWeary`
 
 ### Changed
 - Make node hover effect (see neighbors) more visible - `@WarlockWeary`

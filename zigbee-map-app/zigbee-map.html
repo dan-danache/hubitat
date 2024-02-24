@@ -4,7 +4,7 @@
     <title>Hubitat Zigbee Map - v1.5.0</title>
     <meta charset="utf-8">
     <meta name="keywords" content="hubitat, zigbee, map">
-    <meta name="author" content="Agamemnon Dandanache">
+    <meta name="author" content="Dan Danache">
     <meta name="description" content="Visualize the topology and connectivity of your Zigbee network.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
@@ -1270,7 +1270,7 @@
             this.graph.zoomToFit(350, 10);
             setTimeout(() => {
                 this.graph.centerAt(node.x, node.y, 1500);
-                this.graph.zoom(8, 2000);
+                this.graph.zoom(12, 2000);
             }, 350);
         }
 
@@ -1372,7 +1372,7 @@
         #nodePaint(node, ctx) {
             const animateTime = 1000;
 
-            // Pulse chatty devices
+            // Pulse device under interview
             let t = 0;
             if (node.talking) {
                 t = ((+new Date() - this.createdAt) % animateTime) / animateTime;
@@ -1487,7 +1487,7 @@
         loadFromURL() {
             const params = new URLSearchParams(window.location.search);
 
-            // Maker API URL
+            // Access Token
             const accessToken = params.get('access_token');
             if (accessToken != null) this.accessToken = accessToken;
 

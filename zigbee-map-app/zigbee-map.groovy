@@ -10,7 +10,8 @@ import com.hubitat.app.ChildDeviceWrapper
 
 @Field static final String APP_NAME = "Zigbee Map"
 @Field static final String APP_VERSION = "1.5.0"
-@Field static final String FILE_NAME = "zigbee-map.html"
+@Field static final String MAP_FILE_NAME = "zigbee-map.html"
+@Field static final String MEMCPU_FILE_NAME = "mem-cpu-history.html"
 @Field static final def HEXADECIMAL_PATTERN = ~/\p{XDigit}{4}/
 @Field static final def URL_PATTERN = ~/^https?:\/\/[^\/]+(.+)/
 
@@ -90,7 +91,17 @@ Map zigbeemap() {
                     name: "localLink",
                     title: "View Zigbee map",
                     description: "Start building the Zigbee map",
-                    url: "${getLocalURL()}",
+                    url: "${getLocalURL(MAP_FILE_NAME)}",
+                    style: "embedded",
+                    state: "complete",
+                    required: false,
+                )
+
+                href (
+                    name: "memCpuHistoryLink",
+                    title: "View MEM & CPU history",
+                    description: "Graph hub memory and processor usage (since last reboot)",
+                    url: "${getLocalURL(MEMCPU_FILE_NAME)}",
                     style: "embedded",
                     state: "complete",
                     required: false,
@@ -180,13 +191,13 @@ Map changelog() {
     }
 }
 
-def getLocalURL() {
-    String fullURL = "${getFullLocalApiServerUrl()}/${FILE_NAME}?access_token=${state.accessToken}";
+def getLocalURL(String fileName) {
+    String fullURL = "${getFullLocalApiServerUrl()}/${fileName}?access_token=${state.accessToken}";
     return (fullURL =~ URL_PATTERN).findAll()[0][1]
 }
 
-def getCloudURL() {
-    return "${getApiServerUrl()}/${hubUID}/apps/${app.id}/${FILE_NAME}?access_token=${state.accessToken}"
+def getCloudURL(String fileName) {
+    return "${getApiServerUrl()}/${hubUID}/apps/${app.id}/${fileName}?access_token=${state.accessToken}"
 }
 
 // ===================================================================================================================
@@ -194,17 +205,27 @@ def getCloudURL() {
 // ===================================================================================================================
 
 mappings {
-    path("/${FILE_NAME}") {action: [GET: "loadZigbeeMapMapping"]}
+    path("/${MAP_FILE_NAME}") {action: [GET: "loadZigbeeMapMapping"]}
+    path("/${MEMCPU_FILE_NAME}") {action: [GET: "loadMemCpuHistoryMapping"]}
     path("/zigbee-map.webmanifest") {action: [GET: "loadManifestMapping"]}
     path("/poke/:addr/:startIndex") {action: [GET: "pokeMapping"]}
 }
 
 def loadZigbeeMapMapping() {
-    debug "Proxying ${FILE_NAME} to ${request.HOST} (${request.requestSource})"
+    debug "Proxying ${MAP_FILE_NAME} to ${request.HOST} (${request.requestSource})"
     return render(
         status: 200,
         contentType: "text/html",
-        data: new String(downloadHubFile(FILE_NAME), "UTF-8").replaceAll('\\$\\{access_token\\}', "${state.accessToken}")
+        data: new String(downloadHubFile(MAP_FILE_NAME), "UTF-8").replaceAll('\\$\\{access_token\\}', "${state.accessToken}")
+    )
+}
+
+def loadMemCpuHistoryMapping() {
+    debug "Proxying ${MEMCPU_FILE_NAME} to ${request.HOST} (${request.requestSource})"
+    return render(
+        status: 200,
+        contentType: "text/html",
+        data: new String(downloadHubFile(MEMCPU_FILE_NAME), "UTF-8").replaceAll('\\$\\{access_token\\}', "${state.accessToken}")
     )
 }
 
@@ -216,27 +237,28 @@ def loadManifestMapping() {
         data: """\
         {
             "id": "11ba8718-86f0-4461-ae21-8627001d3e8e",
-            "name": "Hubitat - Zigbee Map",
+            "name": "Hubitat Zigbee Map",
             "short_name": "Zigbee Map",
             "description": "Visualize the topology and connectivity of your Zigbee network.",
-            "start_url": "${getLocalURL()}",
+            "start_url": "${getLocalURL(MAP_FILE_NAME)}",
             "icons": [
                 {
-                    "src": "/ui2/images/android-chrome-192x192.png",
-                    "sizes": "192x192",
+                    "src": "/ui2/images/android-chrome-512x512.png",
+                    "sizes": "512x512",
                     "type": "image/png"
                 },
                 {
                     "src": "/ui2/images/android-chrome-512x512.png",
                     "sizes": "512x512",
-                    "type": "image/png"
+                    "type": "image/png",
+                    "purpose": "maskable"
                 }
             ],
             "categories": ["utilities"],
             "display": "standalone",
             "orientation": "portrait",
-            "theme_color": "#eee8d5",
-            "background_color": "#eee8d5"
+            "theme_color": "#002b36",
+            "background_color": "#002b36"
         }
         """
     )
