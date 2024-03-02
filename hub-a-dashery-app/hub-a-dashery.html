@@ -119,6 +119,7 @@
     .chart-container {
         height: 100%;
         position: relative;
+        background-color: var(--bg-color-darker);
     }
 
     .chart-container .chart-title {
@@ -182,11 +183,10 @@
 
     /* Grid stack */
     .grid-stack {
-        top: 0; right: 0; bottom: 0; bottom: 0;
-        background: var(--bg-color);
+        margin: 5px;
     }
+
     .grid-stack-item-content {
-        background-color: var(--bg-color-darker);
         color: var(--text-color);
         border: 1px var(--border-color) solid;
         border-radius: 5px;
@@ -196,6 +196,21 @@
     /* Mobile view */
     @media only screen and (max-width: 790px) {
 
+    }
+
+    /* Loaded inside an iframe */
+    body.embedded {
+        background-color: transparent;
+    }
+
+    body.embedded .grid-stack-item-content {
+        box-shadow: none;
+        border-radius: 10px;
+        border-color: transparent;
+    }
+
+    body.embedded .grid-stack {
+        margin: 0;
     }
     </style>
 </head>
@@ -207,34 +222,34 @@
     class HubitatConnection {
 
         constructor(configuration) {
-            this.accessToken = undefined;
+            this.accessToken = undefined
 
-            configuration.addEventListener('config', config => this.accessToken = config.accessToken);
+            configuration.addEventListener('config', config => this.accessToken = config.accessToken)
         }
 
         init() {
 
             // Check Access Token
             if (this.accessToken === undefined) {
-                throw new Error('HubitatConnection: Cannot find Access Token in URL');
+                throw new Error('HubitatConnection: Cannot find Access Token in URL')
             }
         }
 
         async getGridLayout() {
-            console.info('Fetching Grid layout ...');
+            console.info('Fetching Grid layout ...')
             return fetch(new Request(`./grid-layout.json?access_token=${this.accessToken}`), {cache: 'no-store'})
                 .then((response) => {
                     if (!response.ok) {
-                        console.error('HubitatConnection.getGridLayout() - Bad response (not 200 OK)', response);
-                        throw new Error(`HubitatConnection.getGridLayout() - HTTP error, status = ${response.status}`);
+                        console.error('HubitatConnection.getGridLayout() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.getGridLayout() - HTTP error, status = ${response.status}`)
                     }
-                    return response.text();
+                    return response.text()
                 })
-                .then(text => JSON.parse(text));
+                .then(text => JSON.parse(text))
         }
 
         async saveGridLayout(layout) {
-            console.info('Saving Grid layout ...');
+            console.info('Saving Grid layout ...')
             return fetch(new Request(`./grid-layout.json?access_token=${this.accessToken}`), {
                 method: 'PUT',
                 body: JSON.stringify(layout),
@@ -242,93 +257,93 @@
             })
                 .then((response) => {
                     if (!response.ok) {
-                        console.error('HubitatConnection.saveGridLayout() - Bad response (not 200 OK)', response);
-                        throw new Error(`HubitatConnection.saveGridLayout() - HTTP error, status = ${response.status}`);
+                        console.error('HubitatConnection.saveGridLayout() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.saveGridLayout() - HTTP error, status = ${response.status}`)
                     }
-                    return response.text();
+                    return response.text()
                 })
                 .then(text => JSON.parse(text))
                 .then(json => {
                     if (json.status !== true) {
-                        console.error('HubitatConnection#saveGridLayout() - Bad status attribute (not true)', json);
-                        throw new Error(`HubitatConnection#saveGridLayout() - JSON error, status = ${json.status}`);
+                        console.error('HubitatConnection#saveGridLayout() - Bad status attribute (not true)', json)
+                        throw new Error(`HubitatConnection#saveGridLayout() - JSON error, status = ${json.status}`)
                     }
-                    return json;
-                });
+                    return json
+                })
         }
 
         async fetchMemCpuHistory() {
-            console.info('Fetching MEM/CPU history ...');
+            console.info('Fetching MEM/CPU history ...')
             return fetch(new Request('/hub/advanced/freeOSMemoryHistory'), {cache: 'no-store'})
             //return fetch(new Request('/local/freeOSMemoryHistory.txt'), {cache: 'no-store'})
                 .then((response) => {
                     if (!response.ok) {
-                        console.error('HubitatConnection.fetchMemCpuHistory() - Bad response (not 200 OK)', response);
-                        throw new Error(`HubitatConnection.fetchMemCpuHistory() - HTTP error, status = ${response.status}`);
+                        console.error('HubitatConnection.fetchMemCpuHistory() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.fetchMemCpuHistory() - HTTP error, status = ${response.status}`)
                     }
-                    return response.text();
+                    return response.text()
                 })
                 .then(text => {
-                    const lines = text.split("\n").filter(line => line !== '');
-                    lines.shift();
+                    const lines = text.split("\n").filter(line => line !== '')
+                    lines.shift()
 
                     // Count year resets
-                    let yearResets = 0;
-                    let prevLine = lines[0];
+                    let yearResets = 0
+                    let prevLine = lines[0]
                     lines.forEach(line => {
-                        if (line < prevLine) yearResets++;
-                        prevLine = line;
-                    });
+                        if (line < prevLine) yearResets++
+                        prevLine = line
+                    })
 
-                    const currYear = new Date().getFullYear();
-                    prevLine = lines[0];
+                    const currYear = new Date().getFullYear()
+                    prevLine = lines[0]
                     return lines.map(line => { // 02-24 00:35:14,611576,0.94
-                        if (line < prevLine) yearResets--;
-                        prevLine = line;
+                        if (line < prevLine) yearResets--
+                        prevLine = line
 
-                        const bits = line.split(',');
+                        const bits = line.split(',')
                         return {
                             date: luxon.DateTime.fromFormat(`${bits[0].substring(0, 5)}-${currYear - yearResets} ${bits[0].substring(6, bits[0].length)}`, 'MM-dd-yyyy TT').ts,
                             mem: Math.round(parseInt(bits[1]) / 1024),
                             cpu: parseFloat(bits[2])
                         }
-                    });
+                    })
                 })
                 .catch((ex) => {
-                    console.error('HubitatConnection.fetchMemCpuHistory() - Failed to fetch data', ex);
-                    alert(`HubitatConnection.fetchMemCpuHistory() - Failed to fetch data: ${ex.message}`);
-                });
+                    console.error('HubitatConnection.fetchMemCpuHistory() - Failed to fetch data', ex)
+                    alert(`HubitatConnection.fetchMemCpuHistory() - Failed to fetch data: ${ex.message}`)
+                })
         }
 
         async fetchMemCpuLast() {
-            console.info('Fetching MEM/CPU ...');
+            console.info('Fetching MEM/CPU ...')
             return fetch(new Request('/hub/advanced/freeOSMemoryLast'), {cache: 'no-store'})
                 .then((response) => {
                     if (!response.ok) {
-                        console.error('HubitatConnection.fetchMemCpuLast() - Bad response (not 200 OK)', response);
-                        throw new Error(`HubitatConnection.fetchMemCpuLast() - HTTP error, status = ${response.status}`);
+                        console.error('HubitatConnection.fetchMemCpuLast() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.fetchMemCpuLast() - HTTP error, status = ${response.status}`)
                     }
-                    return response.text();
+                    return response.text()
                 })
                 .then(text => {
-                    const bits = text.split("\n")[1].split(',');
+                    const bits = text.split("\n")[1].split(',')
                     return {
                         time: bits[0].split(' ')[1],
                         mem: Math.round(parseInt(bits[1]) / 1024),
                         cpu: Math.round(parseFloat(bits[2]) / 4 * 10000) / 100
-                    };
-                });
+                    }
+                })
         }
 
         async fetchHubMetrics() {
-            console.info('Fetching Hub metrics ...');
+            console.info('Fetching Hub metrics ...')
             return fetch(new Request(`./hub-metrics.json?access_token=${this.accessToken}`), {cache: 'no-store'})
                 .then((response) => {
                     if (!response.ok) {
-                        console.error('HubitatConnection.fetchHubMetrics() - Bad response (not 200 OK)', response);
-                        throw new Error(`HubitatConnection.fetchHubMetrics() - HTTP error, status = ${response.status}`);
+                        console.error('HubitatConnection.fetchHubMetrics() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.fetchHubMetrics() - HTTP error, status = ${response.status}`)
                     }
-                    return response.text();
+                    return response.text()
                 })
                 .then(text => JSON.parse(text))
                 .then(json => {
@@ -338,45 +353,45 @@
                         return DeepMerge.merge(hub, {
                             alive: lastRestart.toRelative({ round: false }).replace(' ago', ''),
                             reboot: lastRestart.toLocaleString(dt.DATETIME_SHORT)
-                        });
-                    });
-                });
+                        })
+                    })
+                })
         }
     }
 
     class Configuration {
         constructor() {
-            this.accessToken = undefined;
-            this.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            this.accessToken = undefined
+            this.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 
             // Event listeners
-            this.eventListeners = {};
+            this.eventListeners = {}
         }
 
         addEventListener(eventName, callback) {
-            if (!Array.isArray(this.eventListeners[eventName])) this.eventListeners[eventName] = [];
-            this.eventListeners[eventName].push(callback);
+            if (!Array.isArray(this.eventListeners[eventName])) this.eventListeners[eventName] = []
+            this.eventListeners[eventName].push(callback)
         }
 
         init() {
-            const params = new URLSearchParams(window.location.search);
+            const params = new URLSearchParams(window.location.search)
 
             // Access Token
-            const accessToken = params.get('access_token');
-            if (accessToken != null) this.accessToken = accessToken;
+            const accessToken = params.get('access_token')
+            if (accessToken != null) this.accessToken = accessToken
 
             // Dark mode
-            const darkTheme = params.get('dark');
-            if (darkTheme != null) this.dark = darkTheme === 'true';
+            const darkTheme = params.get('dark')
+            if (darkTheme != null) this.dark = darkTheme === 'true'
 
             // Notify outside world of the changes
-            this.#onConfigChange();
+            this.#onConfigChange()
         }
 
         #onConfigChange() {
-            const eventName = 'config';
-            if (!Array.isArray(this.eventListeners[eventName])) return;
-            this.eventListeners[eventName].forEach(eventListener => eventListener(this));
+            const eventName = 'config'
+            if (!Array.isArray(this.eventListeners[eventName])) return
+            this.eventListeners[eventName].forEach(eventListener => eventListener(this))
         }
     }
 
@@ -384,12 +399,12 @@
         static merge(current, update) {
             Object.keys(update).forEach(key => {
                 if (current.hasOwnProperty(key) && typeof current[key] === 'object' && !(current[key] instanceof Array)) {
-                    DeepMerge.merge(current[key], update[key]);
+                    DeepMerge.merge(current[key], update[key])
                 } else {
-                    current[key] = update[key];
+                    current[key] = update[key]
                 }
-            });
-            return current;
+            })
+            return current
         }
     }
 
@@ -417,40 +432,40 @@
                     chart.draw()
                 },
                 beforeDatasetsDraw: (chart, args, opts) => {
-                    const {ctx} = chart;
-                    const {top, bottom, left, right} = chart.chartArea;
-                    const {x, y, draw} = chart.crosshair;
-                    if (!draw) return;
+                    const {ctx} = chart
+                    const {top, bottom, left, right} = chart.chartArea
+                    const {x, y, draw} = chart.crosshair
+                    if (!draw) return
 
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.lineWidth = opts.width;
-                    ctx.strokeStyle = opts.color;
-                    ctx.setLineDash(opts.dash);
-                    ctx.moveTo(x, bottom);
-                    ctx.lineTo(x, top);
+                    ctx.save()
+                    ctx.beginPath()
+                    ctx.lineWidth = opts.width
+                    ctx.strokeStyle = opts.color
+                    ctx.setLineDash(opts.dash)
+                    ctx.moveTo(x, bottom)
+                    ctx.lineTo(x, top)
                     //ctx.moveTo(left, y)
                     //ctx.lineTo(right, y)
-                    ctx.stroke();
-                    ctx.restore();
+                    ctx.stroke()
+                    ctx.restore()
                 }
-            };
+            }
         }
 
         // Show/hide individual points depending on how many points are in view
         static updatePointStyle(chart) {
-            if (chart.scales.x === undefined) return;
-            const currentPointStyle = chart.data.datasets[0].pointStyle;
-            const viewableInterval = chart.scales.x.ticks.slice(-1).pop().value - chart.scales.x.ticks[0].value;
-            const newPointStyle = viewableInterval / chart.width > 30000 ? false : 'circle';
+            if (chart.scales.x === undefined) return
+            const currentPointStyle = chart.data.datasets[0].pointStyle
+            const viewableInterval = chart.scales.x.ticks.slice(-1).pop().value - chart.scales.x.ticks[0].value
+            const newPointStyle = viewableInterval / chart.width > 30000 ? false : 'circle'
             if (newPointStyle !== currentPointStyle) {
-                chart.data.datasets[0].pointStyle = newPointStyle;
-                chart.update();
+                chart.data.datasets[0].pointStyle = newPointStyle
+                chart.update()
             }
         }
 
         static lineChartDefaults() {
-            const colors = UI.colors();
+            const colors = UI.colors()
             return {
                 type: 'line',
                 options: {
@@ -459,6 +474,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     onResize: chart => ChartHelper.updatePointStyle(chart),
+                    animation: { onComplete: ({initial, chart}) => initial ? ChartHelper.updatePointStyle(chart) : undefined },
                     layout: {
                         padding: {
                             top: 20,
@@ -544,7 +560,7 @@
         }
 
         static gaugeChartDefaults() {
-            const colors = UI.colors();
+            const colors = UI.colors()
             return {
                 type: 'gauge',
                 options: {
@@ -555,7 +571,7 @@
                         }
                     },
                     needle: {
-                        radius: '8%',
+                        radius: '9%',
                         width: '10%',
                         length: '90%',
                         color: colors.TextColor
@@ -574,46 +590,46 @@
                         offsetY: '-22%'
                     }
                 }
-            };
+            }
         }
 
         static createLineChart(elementId, config) {
-            const element = document.getElementById(elementId);
-            if (element === null) throw new Error(`Cannot find HTML chart canvas element "${elementId}"`);
+            const element = document.getElementById(elementId)
+            if (element === null) throw new Error(`Cannot find HTML chart canvas element "${elementId}"`)
 
-            const chart = new Chart(element, DeepMerge.merge(ChartHelper.lineChartDefaults(), config));
-            element.addEventListener('dblclick', evt => chart.resetZoom());
-            //element.addEventListener('click', evt => { chart.options.plugins.decimation.enabled = !(chart.options.plugins.decimation.enabled); chart.update();});
-            //chart.canvas.style.touchAction = "pan-y";
-            return chart;
+            const chart = new Chart(element, DeepMerge.merge(ChartHelper.lineChartDefaults(), config))
+            element.addEventListener('dblclick', evt => chart.resetZoom())
+            //element.addEventListener('click', evt => { chart.options.plugins.decimation.enabled = !(chart.options.plugins.decimation.enabled); chart.update();})
+            //chart.canvas.style.touchAction = "pan-y"
+            return chart
         }
 
         static createGaugeChart(elementId, config) {
-            const element = document.getElementById(elementId);
-            if (element === null) throw new Error(`Cannot find HTML chart canvas element "${elementId}"`);
+            const element = document.getElementById(elementId)
+            if (element === null) throw new Error(`Cannot find HTML chart canvas element "${elementId}"`)
 
-            const chart = new Chart(element, DeepMerge.merge(ChartHelper.gaugeChartDefaults(), config));
-            return chart;
+            const chart = new Chart(element, DeepMerge.merge(ChartHelper.gaugeChartDefaults(), config))
+            return chart
         }
     }
 
     class MemCpuHistoryChart {
         constructor(connection) {
-            this.connection = connection;
+            this.connection = connection
 
-            this.memChart = undefined;
-            this.cpuChart = undefined;
+            this.memChart = undefined
+            this.cpuChart = undefined
         }
 
         async metadata() {
             return Promise.resolve({
                 'mem-history': { w: 6, h: 1, title: 'Free OS Memory' },
                 'cpu-history': { w: 6, h: 1, title: 'CPU Load Average' }
-            });
+            })
         }
 
         async load() {
-            const colors = UI.colors();
+            const colors = UI.colors()
             return this.connection.fetchMemCpuHistory().then(history => {
                 this.memChart = ChartHelper.createLineChart('mem-history', {
                     data: {
@@ -661,7 +677,7 @@
                             }
                         }
                     }
-                });
+                })
 
                 this.cpuChart = ChartHelper.createLineChart('cpu-history', {
                     data: {
@@ -700,33 +716,33 @@
                             }
                         }
                     }
-                });
-            });
+                })
+            })
         }
     }
 
     class MemCpuLastChart {
         constructor(connection) {
-            this.connection = connection;
+            this.connection = connection
 
-            this.memChart = undefined;
-            this.cpuChart = undefined;
-            this.memTitleElement = undefined;
-            this.cpuTitleElement = undefined;
-            this.refreshInterval = undefined;
+            this.memChart = undefined
+            this.cpuChart = undefined
+            this.memTitleElement = undefined
+            this.cpuTitleElement = undefined
+            this.refreshInterval = undefined
         }
 
         async metadata() {
             return Promise.resolve({
                 'mem-last': { w: 2, h: 1, title: 'Free OS Memory' },
                 'cpu-last': { w: 2, h: 1, title: 'CPU Load' }
-            });
+            })
         }
 
         async load() {
-            const colors = UI.colors();
-            this.memTitleElement = document.getElementById('mem-last-title');
-            this.cpuTitleElement = document.getElementById('cpu-last-title');
+            const colors = UI.colors()
+            this.memTitleElement = document.getElementById('mem-last-title')
+            this.cpuTitleElement = document.getElementById('cpu-last-title')
 
             return this.connection.fetchMemCpuLast().then(data => {
                 this.memChart = ChartHelper.createGaugeChart('mem-last', {
@@ -746,7 +762,7 @@
                             }
                         }
                     }
-                });
+                })
 
                 this.cpuChart = ChartHelper.createGaugeChart('cpu-last', {
                     data: {
@@ -765,56 +781,56 @@
                             }
                         }
                     }
-                });
+                })
 
-                this.#updateTitle(data.time);
+                this.#updateTitle(data.time)
 
                 // Set auto-refresh every 1 minute
-                this.refreshInterval = setInterval(() => this.refresh(), 1 * 60 * 1000);
-            });
+                this.refreshInterval = setInterval(() => this.refresh(), 1 * 60 * 1000)
+            })
         }
 
         async refresh() {
-            const data = await this.connection.fetchMemCpuLast();
+            const data = await this.connection.fetchMemCpuLast()
             
-            this.memChart.data.datasets[0].value = data.mem;
-            this.cpuChart.data.datasets[0].value = data.cpu;
+            this.memChart.data.datasets[0].value = data.mem
+            this.cpuChart.data.datasets[0].value = data.cpu
 
-            this.memChart.update();
-            this.cpuChart.update();
-            this.#updateTitle(data.time);
+            this.memChart.update()
+            this.cpuChart.update()
+            this.#updateTitle(data.time)
         }
 
         async #updateTitle(time) {
-            const metadata = await this.metadata();
-            this.memTitleElement.innerText = `${metadata['mem-last'].title} @ ${time}`;
-            this.cpuTitleElement.innerText = `${metadata['cpu-last'].title} @ ${time}`;
+            const metadata = await this.metadata()
+            this.memTitleElement.innerText = `${metadata['mem-last'].title} @ ${time}`
+            this.cpuTitleElement.innerText = `${metadata['cpu-last'].title} @ ${time}`
         }
     }
 
     class TableChart {
         constructor(connection) {
-            this.connection = connection;
+            this.connection = connection
 
-            this.table = undefined;
-            this.hubMetrics = undefined;
+            this.table = undefined
+            this.hubMetrics = undefined
         }
 
         async metadata() {
             if (this.hubMetrics === undefined) {
-                this.hubMetrics = await this.connection.fetchHubMetrics();
+                this.hubMetrics = await this.connection.fetchHubMetrics()
             }
 
-            const retVal = {};
+            const retVal = {}
             this.hubMetrics.forEach(hub => {
                 retVal[hub.name] = { w: 2, h: 1, title: hub.name }
-            });
-            return Promise.resolve(retVal);
+            })
+            return Promise.resolve(retVal)
         }
 
         async load() {
             this.hubMetrics.forEach(hub => {
-                const id = hub.name;
+                const id = hub.name
                 const canvas = document.getElementById(id)
                 const parentElement = canvas.parentElement
                 parentElement.removeChild(canvas)
@@ -830,22 +846,22 @@
                 tblBody.appendChild(this.#buildRow('FW Ver', hub.fw))
                 tblBody.appendChild(this.#buildRow('Uptime', hub.alive))
                 tblBody.appendChild(this.#buildRow('Reboot', hub.reboot))
-            });
+            })
 
             // Set auto-refresh every 5 minutes
-            this.refreshInterval = setInterval(() => this.refresh(), 5 * 60 * 1000);
+            this.refreshInterval = setInterval(() => this.refresh(), 5 * 60 * 1000)
         }
 
         async refresh() {
-            this.hubMetrics = await this.connection.fetchHubMetrics();
+            this.hubMetrics = await this.connection.fetchHubMetrics()
             this.hubMetrics.forEach(hub => {
-                const tbl = document.getElementById(hub.name);
+                const tbl = document.getElementById(hub.name)
                 if (tbl === null) return console.log('I do not know this hub, it is no friend of mine:', hub.name)
                 tbl.rows[1].cells[1].innerText = hub.ip
                 tbl.rows[2].cells[1].innerText = hub.fw
                 tbl.rows[3].cells[1].innerText = hub.alive
                 tbl.rows[4].cells[1].innerText = hub.reboot
-            });
+            })
         }
 
         #buildRow(label, value) {
@@ -871,20 +887,21 @@
 
     class Grid {
         constructor(connection) {
-            this.connection = connection;
+            this.connection = connection
 
-            this.layout = undefined;
-            this.grid = undefined;
+            this.layout = undefined
+            this.grid = undefined
         }
 
         async init() {
-            this.layout = await this.connection.getGridLayout();
-            if (this.layout.widgets === undefined) this.layout.widgets = {};
-            console.log('gridLayout', this.layout);
+            this.layout = await this.connection.getGridLayout()
+            if (this.layout.widgets === undefined) this.layout.widgets = {}
+            console.log('gridLayout', this.layout)
 
             // Init grid
             this.grid = GridStack.init({
                 sizeToContent: false,
+                margin: 5,
                 float: true,
 
                 // Non-configurable options
@@ -900,40 +917,40 @@
                 },
                 float: true,
                 handle: '.chart-title'
-            });
+            })
 
             // Save grid changes to the Hub
-            //this.grid.on('change', () => this.saveLayout());
+            //this.grid.on('change', () => this.saveLayout())
         }
 
         async addChart(chart) {
             Object.entries(await chart.metadata()).forEach(([chartId, chartDefaults]) => {
-                const chartLayout = this.layout.widgets[chartId];
+                const chartLayout = this.layout.widgets[chartId]
                 this.grid.addWidget(DeepMerge.merge(chartDefaults, {
                     content: `<div id="${chartId}-container" class="chart-container"><div id="${chartId}-title" class="chart-title">${chartDefaults.title}</div><canvas id="${chartId}"></canvas></div>`,
                     id: chartId,
                     ...chartLayout
-                }));
-            });
+                }))
+            })
         }
 
         async saveLayout() {
-            console.info('Saving layout', this.grid);
-            const newLayout = { widgets: {} };
+            console.info('Saving layout', this.grid)
+            const newLayout = { widgets: {} }
             this.grid.engine.nodes.forEach(node => {
                 newLayout.widgets[node.id] = {
                     x: node.x, y: node.y, w: node.w, h: node.h
                 }
-            });
+            })
 
-            this.layout = newLayout;
-            return this.connection.saveGridLayout(newLayout);
+            this.layout = newLayout
+            return this.connection.saveGridLayout(newLayout)
         }
     }
 
     class UI {
         static colors() {
-            const css = getComputedStyle(document.documentElement);
+            const css = getComputedStyle(document.documentElement)
             return {
                 BgColor: css.getPropertyValue('--bg-color'),
                 BgColorDarker: css.getPropertyValue('--bg-color-darker'),
@@ -949,33 +966,42 @@
                 Cyan: css.getPropertyValue('--Cyan'),
                 Green: css.getPropertyValue('--Green'),
                 Gray: css.getPropertyValue('--Gray')
-            };
+            }
         }
 
         static locale() {
-            return Intl.NumberFormat().resolvedOptions().locale;
+            return Intl.NumberFormat().resolvedOptions().locale
         }
 
         constructor(configuration) {
 
             // Setup event handlers
-            configuration.addEventListener('config', config => this.#repaintConfiguration(config));
+            configuration.addEventListener('config', config => this.#repaintConfiguration(config))
+
+            // Embeddable
+            window.addEventListener('load', () => {
+                console.log(window.top, window.self)
+                if (window.top !== window.self) {
+                    console.log('in iframe!')
+                    document.body.classList.add('embedded')
+                }
+            })
         }
 
         applyConfiguration() {
-            var searchParams = new URLSearchParams();
+            var searchParams = new URLSearchParams()
 
-            const params = new URLSearchParams(window.location.search);
-            const accessToken = params.get('access_token');
-            if (accessToken) searchParams.set('access_token', accessToken);
+            const params = new URLSearchParams(window.location.search)
+            const accessToken = params.get('access_token')
+            if (accessToken) searchParams.set('access_token', accessToken)
 
-            var goto = window.location.pathname + '?' + searchParams.toString();
-            history.pushState(null, '', goto);
+            var goto = window.location.pathname + '?' + searchParams.toString()
+            history.pushState(null, '', goto)
         }
 
         #repaintConfiguration(config) {
-            document.documentElement.setAttribute('data-theme', config.dark ? 'dark' : 'light');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content',  UI.colors().BgColorDarker);
+            document.documentElement.setAttribute('data-theme', config.dark ? 'dark' : 'light')
+            document.querySelector('meta[name="theme-color"]').setAttribute('content',  UI.colors().BgColorDarker)
         }
     }
 
@@ -984,41 +1010,40 @@
     /////////////////////////////////////////////////////////////////
 
     // Init instances
-    const configuration = new Configuration();
-    const hubitatConnection = new HubitatConnection(configuration);
-    const ui = new UI(configuration);
-    const grid = new Grid(hubitatConnection);
+    const configuration = new Configuration()
+    const hubitatConnection = new HubitatConnection(configuration)
+    const ui = new UI(configuration)
+    const grid = new Grid(hubitatConnection)
 
     // Init charts
-    const memCpuHistoryChart = new MemCpuHistoryChart(hubitatConnection);
+    const memCpuHistoryChart = new MemCpuHistoryChart(hubitatConnection)
     const memCpuLastChart = new MemCpuLastChart(hubitatConnection)
     const tableChart = new TableChart(hubitatConnection)
 
     // Run application on page load
-    window.addEventListener('load', () => run());
+    window.addEventListener('load', () => run())
 
     // Helper functions
     async function saveGrid() {
-        await grid.saveLayout();
-        alert('Grid layout saved to Hub!');
+        await grid.saveLayout()
+        alert('Grid layout saved to Hub!')
     }
 
     async function run() {
         try {
-            configuration.init();
-            hubitatConnection.init();
+            configuration.init()
+            hubitatConnection.init()
         } catch (ex) {
-            alert(ex.message);
-            return;
+            return alert(ex.message)
         }
 
         // Init grid (async as it loads its config from the Hub)
-        await grid.init();
+        await grid.init()
 
         // Place charts into the grid
-        await grid.addChart(memCpuHistoryChart);
-        await grid.addChart(memCpuLastChart);
-        await grid.addChart(tableChart);
+        await grid.addChart(memCpuHistoryChart)
+        await grid.addChart(memCpuLastChart)
+        await grid.addChart(tableChart)
 
         // Render charts
         await memCpuHistoryChart.load()
@@ -1028,10 +1053,10 @@
         // Setup Ctrl + S keyboard binding
         document.addEventListener('keydown', event => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                saveGrid();
+                event.preventDefault()
+                saveGrid()
             }
-        });
+        })
     }
     </script>
 </body>

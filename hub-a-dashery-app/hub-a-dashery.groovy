@@ -207,6 +207,7 @@ def getAppManifestMapping() {
 
 def getGridLayoutMapping() {
     debug "Returning grid layout"
+    String hubVersion = getHubVersion()
     return render(
         status: 200,
         contentType: "application/json",
