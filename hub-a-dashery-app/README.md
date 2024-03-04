@@ -48,7 +48,7 @@ You can use the zoom and pan functionality for charts that display multiple data
 - To **zoom in**, use the mouse wheel (scroll up) or perform a pinch gesture on mobile devices. This action magnifies the chart, allowing you to focus on specific data points or intervals.
 - Conversely, to **zoom out**, scroll the mouse wheel down or reverse the pinch gesture. Zooming out provides a broader view of the chart, encompassing a larger time range or dataset.
 
-#### Panning (Horizontal Movement):
+#### Panning (Horizontal Movement)
 Panning allows you to explore different time periods within the same chart. Here’s how it works:
 
 - **Left Panning**: Drag the chart to the left (by clicking and holding while moving the cursor left). This exposes later data points or shifts the view to the future.
@@ -59,11 +59,33 @@ These interactive features enhance your ability to analyze data dynamically. Fee
 
 ![Zoom and Pan](img/zoom-and-pan.png "Zoom and Pan")
 
+### Progressive Web App Support
+Hub-a-Dashery can be easily installed as a Progressive Web App (PWA). PWAs offer a seamless experience by allowing users to install web apps directly on their devices. Let’s walk through the installation steps:
+
+#### For Desktop/Laptop and Android users:
+1. Open your preferred browser (such as Chrome or Edge). Most modern browsers, including Google Chrome, Microsoft Edge, and Samsung Internet, are compatible with PWAs.
+1. Navigate to the Hub-a-Dashery HTML app, starting from the Hubitat Hub interface.
+1. Once on the Hub-a-Dashery HTML app, tap the **Install** button. This action prompts the browser to recognize Hub-a-Dashery as a PWA.
+1. Follow the on-screen instructions to complete the installation process.
+1. Hub-a-Dashery will now appear as an app icon on your device, alongside other platform-specific apps.
+
+#### For iOS users:
+1. Open Safari on your iOS device.
+1. Navigate to the Hub-a-Dashery HTML app, starting from the Hubitat Hub interface.
+1. Once on the Hub-a-Dashery HTML app, tap the Share button (usually represented by a square with an arrow pointing upward).
+1. Select **Add to Home Screen** from the options.
+1. Customize the app name (if desired) and tap Add.
+1. Hub-a-Dashery will now be accessible from your home screen like any other app.
+
+Once installed, you can launch Hub-a-Dashery directly from your device and it will behave like a native app, providing a seamless experience.
+
+![Progressive Web App](img/pwa.png "PWA")
+
 ## Dashboard Widgets
 
 The app provides various widgets to monitor the Hub's performance and status. Currently, the following dashboards widgets are available:
 
-### Memory and CPU information
+### Memory and CPU Information
 
 These 4 widgets show the OS free memory (RAM) and the processor [load average](https://phoenixnap.com/kb/linux-average-load) of the Hub over time and in the last 15 minutes.
 
@@ -75,16 +97,23 @@ You can access the data source at:
 
 **Note**: The history data is reset after each Hub reboot and this data is not available for the first 15 minutes.
 
-![Memory and CPU information](img/charts/mem-cpu.png "Memory and CPU widgets")
+![Memory and CPU Information](img/charts/mem-cpu.png "Memory and CPU widgets")
 
-### Hub information
+### Hub Information
 
 This simple table widget shows information about your Hubitat hub.
 
 Refresh time: 5 min
 
-![Hub information](img/charts/hub-info.png "Hub info widget")
+![Hub Information](img/charts/hub-info.png "Hub Info widget")
 
+### Internal Temperature
+
+This widget shows the current internal temperature of the Hub. Temperature is shown in Celsius or Fahrenheit according to your Hub settings.
+
+Refresh time: 1 min
+
+![Internal Temperature](img/charts/int-temp.png "Internal Temperature widget")
 
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)

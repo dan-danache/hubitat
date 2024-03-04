@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Hub-a-Dashery - v1.2.1</title>
+    <title>Hub-a-Dashery - v1.3.0</title>
     <meta charset="utf-8">
     <meta name="keywords" content="hubitat, memory, cpu">
     <meta name="author" content="Dan Danache">
@@ -18,6 +18,7 @@
     <meta name="x5-page-mode" content="app">
     <meta name="screen-orientation" content="portrait">
     <meta name="browsermode" content="application">
+    <meta name="color-scheme" content="dark light">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/ui2/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/ui2/images/favicon-32x32.png">
@@ -224,6 +225,7 @@
         constructor(configuration) {
             this.accessToken = undefined
 
+            this.hubInfoCache = undefined;
             configuration.addEventListener('config', config => this.accessToken = config.accessToken)
         }
 
@@ -335,27 +337,43 @@
                 })
         }
 
-        async fetchHubMetrics() {
-            console.info('Fetching Hub metrics ...')
-            return fetch(new Request(`./hub-metrics.json?access_token=${this.accessToken}`), {cache: 'no-store'})
+        async fetchHubInfo(useCache = true) {
+
+            // Cache hit
+            if (useCache === true && this.hubInfoCache !== undefined) return Promise.resolve(this.hubInfoCache)
+
+            console.info('Fetching Hub information ...')
+            return fetch(new Request(`./hub-info.json?access_token=${this.accessToken}`), {cache: 'no-store'})
                 .then((response) => {
                     if (!response.ok) {
-                        console.error('HubitatConnection.fetchHubMetrics() - Bad response (not 200 OK)', response)
-                        throw new Error(`HubitatConnection.fetchHubMetrics() - HTTP error, status = ${response.status}`)
+                        console.error('HubitatConnection.fetchHubInfo() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.fetchHubInfo() - HTTP error, status = ${response.status}`)
                     }
                     return response.text()
                 })
                 .then(text => JSON.parse(text))
                 .then(json => {
-                    return json.map(hub => {
-                        const dt = luxon.DateTime
-                        const lastRestart = dt.now().minus({ seconds: hub.uptime }).setLocale(UI.locale())
-                        return DeepMerge.merge(hub, {
-                            alive: lastRestart.toRelative({ round: false }).replace(' ago', ''),
-                            reboot: lastRestart.toLocaleString(dt.DATETIME_SHORT)
-                        })
+                    const dt = luxon.DateTime
+                    const lastRestart = dt.now().minus({ seconds: json.uptime }).setLocale(UI.locale())
+                    this.hubInfoCache = DeepMerge.merge(json, {
+                        alive: lastRestart.toRelative({ round: false, unit:['days', 'hours', 'minutes'] }).replace(' ago', ''),
+                        reboot: lastRestart.toLocaleString(dt.DATETIME_SHORT)
                     })
+                    return this.hubInfoCache
                 })
+        }
+
+        async fetchInternalTemperature() {
+            console.info('Fetching Hub internal temperature ...')
+            return fetch(new Request('/hub/advanced/internalTempCelsius'), {cache: 'no-store'})
+                .then((response) => {
+                    if (!response.ok) {
+                        console.error('HubitatConnection.fetchInternalTemperature() - Bad response (not 200 OK)', response)
+                        throw new Error(`HubitatConnection.fetchInternalTemperature() - HTTP error, status = ${response.status}`)
+                    }
+                    return response.text()
+                })
+                .then(text => parseFloat(text))
         }
     }
 
@@ -363,6 +381,7 @@
         constructor() {
             this.accessToken = undefined
             this.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            this.hide = []
 
             // Event listeners
             this.eventListeners = {}
@@ -381,8 +400,12 @@
             if (accessToken != null) this.accessToken = accessToken
 
             // Dark mode
-            const darkTheme = params.get('dark')
-            if (darkTheme != null) this.dark = darkTheme === 'true'
+            const dark = params.get('dark')
+            if (dark != null) this.dark = dark === 'true'
+
+            // Hide widgets
+            const hide = params.get('hide')
+            if (hide != null) this.hide = hide.split(',')
 
             // Notify outside world of the changes
             this.#onConfigChange()
@@ -455,10 +478,13 @@
         // Show/hide individual points depending on how many points are in view
         static updatePointStyle(chart) {
             if (chart.scales.x === undefined) return
-            const currentPointStyle = chart.data.datasets[0].pointStyle
-            const viewableInterval = chart.scales.x.ticks.slice(-1).pop().value - chart.scales.x.ticks[0].value
-            const newPointStyle = viewableInterval / chart.width > 30000 ? false : 'circle'
-            if (newPointStyle !== currentPointStyle) {
+
+            const min = chart.scales.x.min
+            const max = chart.scales.x.max
+            const visibleDatapoints = chart.config.data.datasets[0].data.filter(point => point.x >= min && point.x <= max)
+
+            const newPointStyle = chart.width / visibleDatapoints.length < 10 ? false : 'circle'
+            if (newPointStyle !== chart.data.datasets[0].pointStyle) {
                 chart.data.datasets[0].pointStyle = newPointStyle
                 chart.update()
             }
@@ -593,9 +619,7 @@
             }
         }
 
-        static createLineChart(elementId, config) {
-            const element = document.getElementById(elementId)
-            if (element === null) throw new Error(`Cannot find HTML chart canvas element "${elementId}"`)
+        static createLineChart(element, config) {
 
             const chart = new Chart(element, DeepMerge.merge(ChartHelper.lineChartDefaults(), config))
             element.addEventListener('dblclick', evt => chart.resetZoom())
@@ -604,12 +628,8 @@
             return chart
         }
 
-        static createGaugeChart(elementId, config) {
-            const element = document.getElementById(elementId)
-            if (element === null) throw new Error(`Cannot find HTML chart canvas element "${elementId}"`)
-
-            const chart = new Chart(element, DeepMerge.merge(ChartHelper.gaugeChartDefaults(), config))
-            return chart
+        static createGaugeChart(element, config) {
+            return new Chart(element, DeepMerge.merge(ChartHelper.gaugeChartDefaults(), config))
         }
     }
 
@@ -628,95 +648,108 @@
             })
         }
 
-        async load() {
-            const colors = UI.colors()
-            return this.connection.fetchMemCpuHistory().then(history => {
-                this.memChart = ChartHelper.createLineChart('mem-history', {
-                    data: {
-                        datasets: [{
-                            label: 'Free memory',
-                            data: history.map(record => { return {'x': record.date, 'y': record.mem } }),
-                            pointStyle: false,
-                            backgroundColor: colors.Green + '44',
-                            borderColor: colors.Green,
-                            borderWidth: 1.2,
-                            tension: 0.5,
-                            fill: 'start'
-                        }]
-                    },
-                    options: {
-                        pointStyle: false,
-                        scales: {
-                            y: {
-                                title: {
-                                    text: 'Memory'
-                                },
-                                ticks: {
-                                    callback: label => `${(label).toLocaleString(UI.locale(), { style: 'unit', unit: 'megabyte'}) }`
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: t => `${t.dataset.label}: ${(t.parsed.y).toLocaleString(UI.locale(), { style: 'unit', unit: 'megabyte'}) }`
-                                }
-                            },
-                            annotation: {
-                                annotations: {
-                                    lowMemoryWarning: {
-                                        type: 'line',
-                                        yMin: 80,
-                                        yMax: 80,
-                                        borderColor: colors.Red,
-                                        borderWidth: 1,
-                                        borderDash: [2, 2]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
+        async render() {
+            const memCpuHistory = await this.connection.fetchMemCpuHistory()
+            await this.#renderMem(memCpuHistory)
+            await this.#renderCpu(memCpuHistory)
+        }
 
-                this.cpuChart = ChartHelper.createLineChart('cpu-history', {
-                    data: {
-                        datasets: [{
-                            fill: 'start',
-                            label: 'Load average',
-                            data: history.map(record => { return {'x': record.date, 'y': record.cpu } }),
-                            pointStyle: false,
-                            backgroundColor: colors.Blue + '44',
-                            borderColor: colors.Blue,
-                            borderWidth: 1.2,
-                            tension: 0.5,
-                            fill: 'start'
-                        }]
+        async #renderMem(memCpuHistory) {
+            const element = document.getElementById('mem-history')
+            if (element === null) return
+
+            const colors = UI.colors()
+            this.memChart = ChartHelper.createLineChart(element, {
+                data: {
+                    datasets: [{
+                        label: 'Free memory',
+                        data: memCpuHistory.map(record => { return {'x': record.date, 'y': record.mem } }),
+                        pointStyle: false,
+                        backgroundColor: colors.Green + '44',
+                        borderColor: colors.Green,
+                        borderWidth: 1.2,
+                        tension: 0.5,
+                        fill: 'start'
+                    }]
+                },
+                options: {
+                    pointStyle: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: 'Memory'
+                            },
+                            ticks: {
+                                callback: label => `${(label).toLocaleString(UI.locale(), { style: 'unit', unit: 'megabyte'}) }`
+                            }
+                        }
                     },
-                    options: {
-                        scales: {
-                            y: {
-                                title: {
-                                    text: 'CPU'
-                                }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: t => `${t.dataset.label}: ${(t.parsed.y).toLocaleString(UI.locale(), { style: 'unit', unit: 'megabyte'}) }`
                             }
                         },
-                        plugins: {
-                            annotation: {
-                                annotations: {
-                                    highLoad: {
-                                        type: 'line',
-                                        yMin: 1,
-                                        yMax: 1,
-                                        borderColor: colors.Red,
-                                        borderWidth: 1,
-                                        borderDash: [2, 2]
-                                    }
+                        annotation: {
+                            annotations: {
+                                lowMemoryWarning: {
+                                    type: 'line',
+                                    yMin: 80,
+                                    yMax: 80,
+                                    borderColor: colors.Red,
+                                    borderWidth: 1,
+                                    borderDash: [2, 2]
                                 }
                             }
                         }
                     }
-                })
+                }
+            })
+        }
+
+        async #renderCpu(memCpuHistory) {
+            const element = document.getElementById('cpu-history')
+            if (element === null) return
+
+            const colors = UI.colors()
+            this.cpuChart = ChartHelper.createLineChart(element, {
+                data: {
+                    datasets: [{
+                        fill: 'start',
+                        label: 'Load average',
+                        data: memCpuHistory.map(record => { return {'x': record.date, 'y': record.cpu } }),
+                        pointStyle: false,
+                        backgroundColor: colors.Blue + '44',
+                        borderColor: colors.Blue,
+                        borderWidth: 1.2,
+                        tension: 0.5,
+                        fill: 'start'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            title: {
+                                text: 'CPU'
+                            }
+                        }
+                    },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                highLoad: {
+                                    type: 'line',
+                                    yMin: 1,
+                                    yMax: 1,
+                                    borderColor: colors.Red,
+                                    borderWidth: 1,
+                                    borderDash: [2, 2]
+                                }
+                            }
+                        }
+                    }
+                }
             })
         }
     }
@@ -739,66 +772,156 @@
             })
         }
 
-        async load() {
-            const colors = UI.colors()
+        async render() {
+            const memCpuLast = await this.connection.fetchMemCpuLast()
+            await this.#renderMem(memCpuLast)
+            await this.#renderCpu(memCpuLast)
+
+            this.#updateTitle(memCpuLast.time)
+
+            // Set auto-refresh every 1 minute
+            this.refreshInterval = setInterval(() => this.#refresh(), 1 * 60 * 1000)
+        }
+
+        async #renderMem(memCpuLast) {
+            const element = document.getElementById('mem-last')
+            if (element === null) return
+
             this.memTitleElement = document.getElementById('mem-last-title')
-            this.cpuTitleElement = document.getElementById('cpu-last-title')
 
-            return this.connection.fetchMemCpuLast().then(data => {
-                this.memChart = ChartHelper.createGaugeChart('mem-last', {
-                    data: {
-                        datasets: [{
-                            value: data.mem,
-                            minValue: 0,
-                            data: [80, 200, 1024],
-                            backgroundColor: [colors.Orange, colors.Yellow, colors.Green],
-                            borderColor: 'transparent',
-                        }]
-                    },
-                    options: {
-                        valueLabel: {
-                            formatter: (value) => {
-                                return `${(value).toLocaleString(UI.locale(), { style: 'unit', unit: 'megabyte'}) }`
-                            }
+            const hubInfo = await this.connection.fetchHubInfo()
+            const maxMem = hubInfo.model.includes('Pro') ? 2048 : 1024
+
+            const colors = UI.colors()
+            this.memChart = ChartHelper.createGaugeChart(element, {
+                data: {
+                    datasets: [{
+                        value: memCpuLast.mem,
+                        minValue: 0,
+                        data: [80, 200, maxMem],
+                        backgroundColor: [colors.Orange, colors.Yellow, colors.Green],
+                        borderColor: 'transparent',
+                    }]
+                },
+                options: {
+                    valueLabel: {
+                        formatter: (value) => {
+                            return `${(value).toLocaleString(UI.locale(), { style: 'unit', unit: 'megabyte'}) }`
                         }
                     }
-                })
-
-                this.cpuChart = ChartHelper.createGaugeChart('cpu-last', {
-                    data: {
-                        datasets: [{
-                            value: data.cpu,
-                            minValue: 0,
-                            data: [75, 90, 100],
-                            backgroundColor: [colors.Green, colors.Yellow, colors.Orange],
-                            borderColor: 'transparent',
-                        }]
-                    },
-                    options: {
-                        valueLabel: {
-                            formatter: (value) => {
-                                return `${(value.toFixed(2))}%`
-                            }
-                        }
-                    }
-                })
-
-                this.#updateTitle(data.time)
-
-                // Set auto-refresh every 1 minute
-                this.refreshInterval = setInterval(() => this.refresh(), 1 * 60 * 1000)
+                }
             })
         }
 
+        async #renderCpu(memCpuLast) {
+            const element = document.getElementById('cpu-last')
+            if (element === null) return
+
+            this.cpuTitleElement = document.getElementById('cpu-last-title')
+
+            const colors = UI.colors()
+            this.cpuChart = ChartHelper.createGaugeChart(element, {
+                data: {
+                    datasets: [{
+                        value: memCpuLast.cpu,
+                        minValue: 0,
+                        data: [75, 90, 100],
+                        backgroundColor: [colors.Green, colors.Yellow, colors.Orange],
+                        borderColor: 'transparent',
+                    }]
+                },
+                options: {
+                    valueLabel: {
+                        formatter: (value) => {
+                            return `${(value.toFixed(2))}%`
+                        }
+                    }
+                }
+            })
+        }
+
+        async #updateTitle(time) {
+            const metadata = await this.metadata()
+            if (this.memTitleElement !== undefined) this.memTitleElement.innerText = `${metadata['mem-last'].title} @ ${time}`
+            if (this.cpuTitleElement !== undefined) this.cpuTitleElement.innerText = `${metadata['cpu-last'].title} @ ${time}`
+        }
+
+        async #refresh() {
+            const memCpuLast = await this.connection.fetchMemCpuLast()
+
+            if (this.memChart !== undefined) {
+                this.memChart.data.datasets[0].value = memCpuLast.mem
+                this.memChart.update()
+            }
+
+            if (this.cpuChart !== undefined) {
+                this.cpuChart.data.datasets[0].value = memCpuLast.cpu
+                this.cpuChart.update()
+            }
+
+            this.#updateTitle(memCpuLast.time)
+        }
+    }
+
+    class InternalTemperatureChart {
+        constructor(connection) {
+            this.connection = connection
+
+            this.chart = undefined
+            this.refreshInterval = undefined
+            this.convert = val => val;
+        }
+
+        async metadata() {
+            return Promise.resolve({
+                'int-temp': { w: 2, h: 1, title: 'Internal Temperature' }
+            })
+        }
+
+        async render() {
+            const colors = UI.colors()
+
+            const hubInfo = await this.connection.fetchHubInfo()
+            if (hubInfo.tscale === 'F') {
+                this.convert = val => val * 9 / 5 + 32;
+            }
+
+            const negative = 20
+            const intTemp = await this.connection.fetchInternalTemperature() + negative
+
+            const element = document.getElementById('int-temp')
+            this.memChart = ChartHelper.createGaugeChart(element, {
+                data: {
+                    datasets: [{
+                        value: intTemp,
+                        minValue: 0,
+                        data: [0 + negative, 20 + negative, 50 + negative, 70 + negative, 90 + negative],
+                        backgroundColor: [colors.Orange, colors.Yellow, colors.Green, colors.Yellow, colors.Orange],
+                        borderColor: 'transparent',
+                    }]
+                },
+                options: {
+                    valueLabel: {
+                        formatter: (value) => {
+                            return `${(this.convert(value - 20)).toLocaleString(UI.locale(), { style: 'unit', unit: hubInfo.tscale === 'C' ? 'celsius' :'fahrenheit'}) }`
+                        }
+                    }
+                }
+            })
+
+            // Set auto-refresh every 1 minute
+            this.refreshInterval = setInterval(() => this.refresh(), 1 * 60 * 1000)
+        }
+
         async refresh() {
-            const data = await this.connection.fetchMemCpuLast()
+            const memCpuLast = await this.connection.fetchMemCpuLast()
             
-            this.memChart.data.datasets[0].value = data.mem
-            this.cpuChart.data.datasets[0].value = data.cpu
+            this.memChart.data.datasets[0].value = memCpuLast.mem
+            this.cpuChart.data.datasets[0].value = memCpuLast.cpu
 
             this.memChart.update()
             this.cpuChart.update()
-            this.#updateTitle(data.time)
+            this.#updateTitle(memCpuLast.time)
         }
 
         async #updateTitle(time) {
@@ -813,55 +936,50 @@
             this.connection = connection
 
             this.table = undefined
-            this.hubMetrics = undefined
+            this.titleElement = undefined
         }
 
         async metadata() {
-            if (this.hubMetrics === undefined) {
-                this.hubMetrics = await this.connection.fetchHubMetrics()
-            }
-
-            const retVal = {}
-            this.hubMetrics.forEach(hub => {
-                retVal[hub.name] = { w: 2, h: 1, title: hub.name }
-            })
-            return Promise.resolve(retVal)
+            return Promise.resolve({
+                'hub-info': { w: 2, h: 1, title: 'Hub Information' }
+            });
         }
 
-        async load() {
-            this.hubMetrics.forEach(hub => {
-                const id = hub.name
-                const canvas = document.getElementById(id)
-                const parentElement = canvas.parentElement
-                parentElement.removeChild(canvas)
-                
-                const tbl = document.createElement('table')
-                tbl.setAttribute('id', id)
-                const tblBody = document.createElement('tbody')
-                tbl.appendChild(tblBody)
-                parentElement.appendChild(tbl)
+        async render() {
+            const hubInfo = await this.connection.fetchHubInfo()
 
-                tblBody.appendChild(this.#buildRow())
-                tblBody.appendChild(this.#buildRow('IP Address', hub.ip))
-                tblBody.appendChild(this.#buildRow('FW Ver', hub.fw))
-                tblBody.appendChild(this.#buildRow('Uptime', hub.alive))
-                tblBody.appendChild(this.#buildRow('Reboot', hub.reboot))
-            })
+            const canvas = document.getElementById('hub-info')
+            const parentElement = canvas.parentElement
+            parentElement.removeChild(canvas)
+            
+            this.table = document.createElement('table')
+            this.table.setAttribute('id', 'hub-info')
+            const tblBody = document.createElement('tbody')
+            this.table.appendChild(tblBody)
+            parentElement.appendChild(this.table)
+
+            tblBody.appendChild(this.#buildRow())
+            tblBody.appendChild(this.#buildRow('IP Address', hubInfo.ip))
+            tblBody.appendChild(this.#buildRow('FW Ver', hubInfo.fw))
+            tblBody.appendChild(this.#buildRow('Model', hubInfo.model))
+            tblBody.appendChild(this.#buildRow('Uptime', hubInfo.alive))
+            tblBody.appendChild(this.#buildRow('Reboot', hubInfo.reboot))
+
+            this.memTitleElement = document.getElementById('hub-info-title')
+            this.memTitleElement.innerText = hubInfo.name
 
             // Set auto-refresh every 5 minutes
             this.refreshInterval = setInterval(() => this.refresh(), 5 * 60 * 1000)
         }
 
         async refresh() {
-            this.hubMetrics = await this.connection.fetchHubMetrics()
-            this.hubMetrics.forEach(hub => {
-                const tbl = document.getElementById(hub.name)
-                if (tbl === null) return console.log('I do not know this hub, it is no friend of mine:', hub.name)
-                tbl.rows[1].cells[1].innerText = hub.ip
-                tbl.rows[2].cells[1].innerText = hub.fw
-                tbl.rows[3].cells[1].innerText = hub.alive
-                tbl.rows[4].cells[1].innerText = hub.reboot
-            })
+            const hubInfo = await this.connection.fetchHubInfo(false)
+            this.table.rows[1].cells[1].innerText = hubInfo.ip
+            this.table.rows[2].cells[1].innerText = hubInfo.fw
+            this.table.rows[3].cells[1].innerText = hubInfo.model
+            this.table.rows[4].cells[1].innerText = hubInfo.alive
+            this.table.rows[5].cells[1].innerText = hubInfo.reboot
+            this.memTitleElement.innerText = hubInfo.name
         }
 
         #buildRow(label, value) {
@@ -886,11 +1004,13 @@
     }
 
     class Grid {
-        constructor(connection) {
+        constructor(configuration, connection) {
+            this.configuration = configuration
             this.connection = connection
 
             this.layout = undefined
             this.grid = undefined
+            this.charts = new Set()
         }
 
         async init() {
@@ -926,12 +1046,20 @@
         async addChart(chart) {
             Object.entries(await chart.metadata()).forEach(([chartId, chartDefaults]) => {
                 const chartLayout = this.layout.widgets[chartId]
+                if (this.configuration.hide.includes(chartId)) return;
                 this.grid.addWidget(DeepMerge.merge(chartDefaults, {
                     content: `<div id="${chartId}-container" class="chart-container"><div id="${chartId}-title" class="chart-title">${chartDefaults.title}</div><canvas id="${chartId}"></canvas></div>`,
                     id: chartId,
                     ...chartLayout
                 }))
+
+                // This might be called multiple times, but it's OK as it is adding to Set
+                this.charts.add(chart);
             })
+        }
+
+        async renderCharts() {
+            this.charts.forEach(async chart => await chart.render())
         }
 
         async saveLayout() {
@@ -1001,7 +1129,7 @@
 
         #repaintConfiguration(config) {
             document.documentElement.setAttribute('data-theme', config.dark ? 'dark' : 'light')
-            document.querySelector('meta[name="theme-color"]').setAttribute('content',  UI.colors().BgColorDarker)
+            document.querySelector('meta[name="theme-color"]').setAttribute('content',  UI.colors().BgColor)
         }
     }
 
@@ -1013,12 +1141,13 @@
     const configuration = new Configuration()
     const hubitatConnection = new HubitatConnection(configuration)
     const ui = new UI(configuration)
-    const grid = new Grid(hubitatConnection)
+    const grid = new Grid(configuration, hubitatConnection)
 
     // Init charts
     const memCpuHistoryChart = new MemCpuHistoryChart(hubitatConnection)
     const memCpuLastChart = new MemCpuLastChart(hubitatConnection)
     const tableChart = new TableChart(hubitatConnection)
+    const intTemp = new InternalTemperatureChart(hubitatConnection);
 
     // Run application on page load
     window.addEventListener('load', () => run())
@@ -1044,11 +1173,10 @@
         await grid.addChart(memCpuHistoryChart)
         await grid.addChart(memCpuLastChart)
         await grid.addChart(tableChart)
+        await grid.addChart(intTemp)
 
         // Render charts
-        await memCpuHistoryChart.load()
-        await memCpuLastChart.load()
-        await tableChart.load()
+        await grid.renderCharts()
 
         // Setup Ctrl + S keyboard binding
         document.addEventListener('keydown', event => {
