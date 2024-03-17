@@ -9,7 +9,7 @@ import hubitat.zigbee.clusters.iaszone.ZoneStatus
 
 // Configuration for capability.IAS
 String ep_0500 = "{{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}"
-cmds += "he wattr 0x${device.deviceNetworkId} ${ep_0500} 0x0500 0x0010 0xF0 {${"${location.hub.zigbeeEui}".split("(?<=\\G.{2})").reverse().join("")}}"
+cmds += "he wattr 0x${device.deviceNetworkId} ${ep_0500} 0x0500 0x0010 0xF0 {${Utils.payload "${location.hub.zigbeeEui}"}}"
 cmds += "he raw 0x${device.deviceNetworkId} 0x01 ${ep_0500} 0x0500 {01 23 00 00 00}" // Zone Enroll Response (0x00): status=Success, zoneId=0x00
 cmds += "zdo bind 0x${device.deviceNetworkId} ${ep_0500} 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster
 cmds += "he cr 0x${device.deviceNetworkId} ${ep_0500} 0x0500 0x0002 0x19 0x0000 0x4650 {00} {}" // Report ZoneStatus (map16) at least every 5 hours (Δ = 0)

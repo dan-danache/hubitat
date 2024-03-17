@@ -143,6 +143,14 @@ def configure(auto = false) {
     {{^ zigbee.binds }}
     // -- No binds needed
     {{/ zigbee.binds }}
+
+    // Remove {{ device.model }} specific Zigbee binds
+    {{# zigbee.unbinds }}
+    cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${Utils.payload "${device.zigbeeId}"} ${Utils.payload "{{ endpoint }}"} ${Utils.payload "{{ cluster }}"} 03 ${Utils.payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // {{ reason }}
+    {{/ zigbee.unbinds }}
+    {{^ zigbee.unbinds }}
+    // -- No unbinds needed
+    {{/ zigbee.unbinds }}
     {{# device.capabilities }}
     {{> file@configure }}
     {{/ device.capabilities }}
@@ -242,6 +250,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return
 
@@ -309,6 +318,10 @@ def parse(String description) {
 
     processedZdoMessage: { String type, String details ->
         Log.debug "▶ Processed ZDO message: type=${type}, status=SUCCESS, ${details}"
+    },
+
+    payload: { String value ->
+        return value.replace("0x", "").split("(?<=\\G.{2})").reverse().join("")
     }
 ]
 

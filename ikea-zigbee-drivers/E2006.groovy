@@ -230,6 +230,9 @@ def configure(auto = false) {
 
     // Add IKEA Starkvind Air Purifier (E2006) specific Zigbee binds
     // -- No binds needed
+
+    // Remove IKEA Starkvind Air Purifier (E2006) specific Zigbee binds
+    // -- No unbinds needed
     
     // Configuration for E2006.AirPurifier
     sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
@@ -617,6 +620,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return
 
@@ -684,6 +688,10 @@ def parse(String description) {
 
     processedZdoMessage: { String type, String details ->
         Log.debug "▶ Processed ZDO message: type=${type}, status=SUCCESS, ${details}"
+    },
+
+    payload: { String value ->
+        return value.replace("0x", "").split("(?<=\\G.{2})").reverse().join("")
     }
 ]
 

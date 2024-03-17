@@ -143,10 +143,13 @@ def configure(auto = false) {
     // Add IKEA Somrig Shortcut Button (E2213) specific Zigbee binds
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 01)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 02)
+
+    // Remove IKEA Somrig Shortcut Button (E2213) specific Zigbee binds
+    // -- No unbinds needed
     
     // Configuration for capability.Battery
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
     
     // Configuration for capability.HealthCheck
     sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
@@ -398,6 +401,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return
 
@@ -465,6 +469,10 @@ def parse(String description) {
 
     processedZdoMessage: { String type, String details ->
         Log.debug "▶ Processed ZDO message: type=${type}, status=SUCCESS, ${details}"
+    },
+
+    payload: { String value ->
+        return value.replace("0x", "").split("(?<=\\G.{2})").reverse().join("")
     }
 ]
 

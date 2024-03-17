@@ -163,11 +163,14 @@ def configure(auto = false) {
 
     // Add IKEA Tradfri Control Outlet (E1603) specific Zigbee binds
     // -- No binds needed
+
+    // Remove IKEA Tradfri Control Outlet (E1603) specific Zigbee binds
+    // -- No unbinds needed
     
     // Configuration for capability.Switch
     sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
     
     // Configuration for capability.HealthCheck
     sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
@@ -192,16 +195,16 @@ private autoConfigure() {
 // Implementation for capability.Switch
 def on() {
     Log.debug "Sending On command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114301}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114301}"])
 }
 def off() {
     Log.debug "Sending Off command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114300}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114300}"])
 }
 
 def toggle() {
     Log.debug "Sending Toggle command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114302}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114302}"])
 }
 
 def onWithTimedOff(onTime = 1) {
@@ -209,7 +212,7 @@ def onWithTimedOff(onTime = 1) {
     Log.debug "Sending OnWithTimedOff command"
 
     String payload = "00 ${zigbee.swapOctets(zigbee.convertToHexString(delay * 10, 4))} 0000"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114342 ${payload}}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])
 }
 
 // Implementation for capability.HealthCheck
@@ -393,6 +396,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return
 
@@ -460,6 +464,10 @@ def parse(String description) {
 
     processedZdoMessage: { String type, String details ->
         Log.debug "▶ Processed ZDO message: type=${type}, status=SUCCESS, ${details}"
+    },
+
+    payload: { String value ->
+        return value.replace("0x", "").split("(?<=\\G.{2})").reverse().join("")
     }
 ]
 

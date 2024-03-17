@@ -141,6 +141,9 @@ def configure(auto = false) {
 
     // Add IKEA Vindstyrka Air Quality Sensor (E2112) specific Zigbee binds
     // -- No binds needed
+
+    // Remove IKEA Vindstyrka Air Quality Sensor (E2112) specific Zigbee binds
+    // -- No unbinds needed
     
     // Configuration for E2112.FineParticulateMatter
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x042A {${device.zigbeeId}} {}" // Particulate Matter 2.5 cluster
@@ -151,12 +154,12 @@ def configure(auto = false) {
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7E 0x0000 0x39 0x000A 0x0258 {40000000} {117C}" // Report MeasuredValue (single) at least every 10 minutes (Δ = ??)
     
     // Configuration for capability.Temperature
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0402 0x0000 0x29 0x0000 0x0258 {6400} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 1°C)
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0000 0x0258 {6400} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 1°C)
     
     // Configuration for capability.RelativeHumidity
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0405 0x0000 0x21 0x0000 0x0258 {6400} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 1%)
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0000 0x0258 {6400} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 1%)
     
     // Configuration for capability.HealthCheck
     sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
@@ -417,6 +420,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return
 
@@ -484,6 +488,10 @@ def parse(String description) {
 
     processedZdoMessage: { String type, String details ->
         Log.debug "▶ Processed ZDO message: type=${type}, status=SUCCESS, ${details}"
+    },
+
+    payload: { String value ->
+        return value.replace("0x", "").split("(?<=\\G.{2})").reverse().join("")
     }
 ]
 

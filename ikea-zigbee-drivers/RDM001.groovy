@@ -1,5 +1,5 @@
 /**
- * Philips Wall Switch Module (RDM001)
+ * Philips Hue Wall Switch Module (RDM001)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  * @see https://zigbee.blakadder.com/Philips_RDM001.html
@@ -7,7 +7,7 @@
 import groovy.time.TimeCategory
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = "Philips Wall Switch Module (RDM001)"
+@Field static final String DRIVER_NAME = "Philips Hue Wall Switch Module (RDM001)"
 @Field static final String DRIVER_VERSION = "3.9.0"
 
 // Fields for capability.HealthCheck
@@ -165,15 +165,18 @@ def configure(auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
 
-    // Configure Philips Wall Switch Module (RDM001) specific Zigbee reporting
+    // Configure Philips Hue Wall Switch Module (RDM001) specific Zigbee reporting
     // -- No reporting needed
 
-    // Add Philips Wall Switch Module (RDM001) specific Zigbee binds
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Button
+    // Add Philips Hue Wall Switch Module (RDM001) specific Zigbee binds
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Specific cluster
+
+    // Remove Philips Hue Wall Switch Module (RDM001) specific Zigbee binds
+    // -- No unbinds needed
     
     // Configuration for capability.Battery
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
     
     // Configuration for capability.HealthCheck
     sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
@@ -319,7 +322,7 @@ def parse(String description) {
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
-        // Handle Philips Wall Switch Module (RDM001) specific Zigbee messages
+        // Handle Philips Hue Wall Switch Module (RDM001) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
 
         // Button was pressed := { 16:Button, 08:EventType, 08:NextValueType, 08:Action, 08:NextValueType, 16:DurationRotation}
@@ -342,7 +345,10 @@ def parse(String description) {
                 case "03": return Utils.sendEvent(name:"released", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released")
             }
             return
-
+        
+        // Other events that we expect but are not usefull
+        case { contains it, [clusterInt:0x0000, commandInt:0x04, isClusterSpecific:false] }:
+            return Utils.processedZclMessage("Write Attribute Response", "attribute=Philips magic attribute")
         // ---------------------------------------------------------------------------------------------------------------
         // Handle capabilities Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
@@ -445,6 +451,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x8005, commandInt:0x00] }:  // ZDP: Active_EP_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return
 
@@ -512,6 +519,10 @@ def parse(String description) {
 
     processedZdoMessage: { String type, String details ->
         Log.debug "▶ Processed ZDO message: type=${type}, status=SUCCESS, ${details}"
+    },
+
+    payload: { String value ->
+        return value.replace("0x", "").split("(?<=\\G.{2})").reverse().join("")
     }
 ]
 

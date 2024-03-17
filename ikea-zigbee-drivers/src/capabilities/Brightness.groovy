@@ -108,11 +108,11 @@ def startLevelChange(direction) {
     Integer rate = Integer.parseInt(startLevelChangeRate) * 2.54
 
     String payload = "${zigbee.convertToHexString(mode, 2)} ${zigbee.convertToHexString(rate, 2)}"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114301 ${payload}}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114301 ${payload}}"])
 }
 def stopLevelChange() {
     Log.debug "Stopping brightness change"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114303}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114303}"])
 }
 def levelUp() {
     Log.debug "Moving brightness up by ${levelStep}%"
@@ -121,7 +121,7 @@ def levelUp() {
     Integer dur = 0
 
     String payload = "${zigbee.convertToHexString(0x00, 2)} ${zigbee.convertToHexString(stepSize, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114302 ${payload}}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114302 ${payload}}"])
 }
 def levelDown() {
     Log.debug "Moving brightness down by ${levelStep}%"
@@ -130,7 +130,7 @@ def levelDown() {
     Integer dur = 0
 
     String payload = "${zigbee.convertToHexString(0x01, 2)} ${zigbee.convertToHexString(stepSize, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {114302 ${payload}}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114302 ${payload}}"])
 }
 def setLevel(level, duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
@@ -143,7 +143,7 @@ def setLevel(level, duration = 0) {
 
         String command = prestaging == false ? "04" : "00"
         String payload = "${zigbee.convertToHexString(lvl, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
-        return Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {1143${command} ${payload}}"])
+        return Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {1143${command} ${payload}}"])
     }
 
     // Device is Off and onLevel is set to a fixed value: ignore command
@@ -216,8 +216,8 @@ Log.info "🛠️ prestaging = ${prestaging}"
 
 // Configuration for capability.Brightness
 sendEvent name:"level", value:"100", type:"digital", descriptionText:"Brightness initialized to 100%"
-cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes (Δ = 1)
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
+cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0008 0x0000 0x20 0x0000 0x0258 {01} {}" // Report CurrentLevel (uint8) at least every 10 minutes (Δ = 1)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}

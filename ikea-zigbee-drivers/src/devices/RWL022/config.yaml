@@ -40,5 +40,10 @@ zigbee:
   binds:
   - { endpoint: '0x01', cluster: '0xFC00', reason: Hue Specific cluster }
 
+  unbinds:
+  - { endpoint: '0x01', cluster: '0x0005', reason: Scenes cluster }
+  - { endpoint: '0x01', cluster: '0x0006', reason: On/Off cluster }
+  - { endpoint: '0x01', cluster: '0x0008', reason: Level Control cluster }
+
   messages:
   - file: src/devices/RWL022/events.groovy

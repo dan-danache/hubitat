@@ -38,16 +38,16 @@ command "onWithTimedOff", [[name:"On time*", type:"NUMBER", description:"After h
 // Implementation for capability.Switch
 def on() {
     Log.debug "Sending On command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114301}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114301}"])
 }
 def off() {
     Log.debug "Sending Off command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114300}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114300}"])
 }
 
 def toggle() {
     Log.debug "Sending Toggle command"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114302}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114302}"])
 }
 {{# params.onWithTimedOff }}
 
@@ -56,7 +56,7 @@ def onWithTimedOff(onTime = 1) {
     Log.debug "Sending OnWithTimedOff command"
 
     String payload = "00 ${zigbee.swapOctets(zigbee.convertToHexString(delay * 10, 4))} 0000"
-    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {114342 ${payload}}"])
+    Utils.sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])
 }
 {{/ params.onWithTimedOff }}
 {{/ @implementation }}
@@ -78,8 +78,8 @@ cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == "TURN_POW
 
 // Configuration for capability.Switch
 sendEvent name:"switch", value:"on", type:"digital", descriptionText:"Switch initialized to on"
-cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0006 0x0000 0x10 0x0000 0x0258 {01} {}" // Report OnOff (bool) at least every 10 minutes
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
