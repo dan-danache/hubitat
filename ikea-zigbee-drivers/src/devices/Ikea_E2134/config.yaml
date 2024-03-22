@@ -8,9 +8,9 @@ device:
   - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
+    - name: Sensor
     - name: MotionSensor
     - name: IlluminanceMeasurement
-    - name: Sensor
     - file: src/capabilities/Battery.groovy
       params:
         half: true

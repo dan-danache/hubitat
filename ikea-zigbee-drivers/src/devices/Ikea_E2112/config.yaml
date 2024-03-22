@@ -8,6 +8,7 @@ device:
   - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
+    - name: Sensor
     - file: src/devices/Ikea_E2112/FineParticulateMatter.groovy
     - file: src/devicesIkea_/E2112/VocIndex.groovy
     - file: src/capabilities/Temperature.groovy

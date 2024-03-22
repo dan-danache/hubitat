@@ -8,6 +8,8 @@ device:
   - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
+    - name: Sensor
+    - name: Actuator
     - file: src/devices/Ikea_E2006/AirPurifier.groovy
     - file: src/capabilities/HealthCheck.groovy
       params:

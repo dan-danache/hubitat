@@ -29,6 +29,9 @@ device:
         - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
     - file: src/capabilities/ReleasableButton.groovy
     - file: src/capabilities/FirmwareUpdate.groovy
+    - file: src/capabilities/ZigbeeBindings.groovy
+      params:
+        clusters: ['0x0102']
 
 zigbee:
   fingerprints:

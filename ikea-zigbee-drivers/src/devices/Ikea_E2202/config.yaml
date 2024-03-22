@@ -8,8 +8,8 @@ device:
   - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
-    - name: WaterSensor
     - name: Sensor
+    - name: WaterSensor
     - file: src/capabilities/IAS.groovy
     - file: src/capabilities/Battery.groovy
       params:

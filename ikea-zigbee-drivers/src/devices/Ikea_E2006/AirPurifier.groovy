@@ -1,11 +1,9 @@
 {{!--------------------------------------------------------------------------}}
 {{# @definition }}
-capability "Actuator"
 capability "AirQuality"
 capability "FanControl"
 capability "FilterStatus"
 capability "Switch"
-capability "Sensor"
 {{/ @definition }}
 {{!--------------------------------------------------------------------------}}
 {{# @fields }}

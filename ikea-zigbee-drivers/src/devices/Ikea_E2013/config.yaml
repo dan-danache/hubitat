@@ -8,8 +8,8 @@ device:
   - https://static.homesmart.ikea.com/releaseNotes/
 
   capabilities:
-    - name: ContactSensor
     - name: Sensor
+    - name: ContactSensor
     - file: src/capabilities/IAS.groovy
       params:
         endpoint: '0x02'

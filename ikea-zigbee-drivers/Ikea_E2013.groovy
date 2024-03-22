@@ -29,8 +29,8 @@ import hubitat.zigbee.clusters.iaszone.ZoneStatus
 metadata {
     definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2013.groovy") {
         capability "Configuration"
-        capability "ContactSensor"
         capability "Sensor"
+        capability "ContactSensor"
         capability "Battery"
         capability "HealthCheck"
         capability "PowerSource"
@@ -558,6 +558,7 @@ def parse(String description) {
         case { contains it, [endpointInt:0x00, clusterInt:0x0006, commandInt:0x00] }:  // ZDP: MatchDescriptorRequest
         case { contains it, [endpointInt:0x00, clusterInt:0x8021, commandInt:0x00] }:  // ZDP: Mgmt_Bind_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8022, commandInt:0x00] }:  // ZDP: Mgmt_Unbind_rsp
+        case { contains it, [endpointInt:0x00, clusterInt:0x8032, commandInt:0x00] }:  // ZDP: Mgmt_Rtg_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8038, commandInt:0x00] }:  // ZDP: Mgmt_NWK_Update_notify
             return Utils.processedZdpMessage("Ignored", "cluster=0x${msg.clusterId}, command=0x${msg.command}, data=${msg.data}")
 

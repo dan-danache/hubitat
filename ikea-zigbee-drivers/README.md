@@ -327,6 +327,7 @@ Below you can find the details of each device, including the features and pairin
 * Configure what happens after a power outage (Power On, Power Off, Restore previous state)
 * Health status: online / offline
 * Refresh switch state on demand
+* Can be member of Zigbee groups
 
 #### Pairing Instructions
 1. Find the small reset hole on the side of the device and make sure you have at hand a pin that can fit the reset hole
@@ -416,6 +417,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Release events: both buttons
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: Window Covering
 
 #### Pairing Instructions
 1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).

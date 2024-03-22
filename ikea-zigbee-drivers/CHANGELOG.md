@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add driver for Philips Hue Dimmer Switch (RWL022)
 - Add driver for Swann One Key Fob (SWO-KEF1PA)
 
+### Fixed
+- Ignore "Mgmt_Rtg_rsp" messages that are generated when the Hub restarts - `@a.mcdear`
+
 ## [3.9.0] - 2024-03-14
 
 ### Added
