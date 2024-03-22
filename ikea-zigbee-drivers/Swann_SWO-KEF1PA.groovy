@@ -1,42 +1,39 @@
 /**
- * {{ device.model }}
+ * Swann One Key Fob (SWO-KEF1PA)
  *
-{{# device.links }}
- * @see {{ . }}
-{{/ device.links }}
+ * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+ * @see https://zigbee.blakadder.com/Swann_SWO-KEF1PA.html
  */
 import groovy.time.TimeCategory
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = "{{ device.model }}"
-@Field static final String DRIVER_VERSION = "{{ driver.version }}"
-{{# device.capabilities }}
-{{> file@fields }}
-{{/ device.capabilities }}
+@Field static final String DRIVER_NAME = "Swann One Key Fob (SWO-KEF1PA)"
+@Field static final String DRIVER_VERSION = "4.0.0"
+
+// Fields for capability.IAS
+import hubitat.zigbee.clusters.iaszone.ZoneStatus
+
+// Fields for capability.PushableButton
+@Field static final Map<String, List<String>> BUTTONS = [
+    "PANIC": ["1", "Panic"],
+    "HOME": ["2", "Home"],
+    "AWAY": ["3", "Away"],
+    "NIGHT": ["4", "Night"],
+]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:"{{ driver.namespace }}", author:"{{ driver.author }}", importUrl:"{{ device.importUrl }}") {
+    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Swann_SWO-KEF1PA.groovy") {
         capability "Configuration"
-        {{# device.capabilities }}
-        {{#name}}
-        capability "{{ name }}"
-        {{/name}}
-        {{# file }}
-        {{> file@definition }}
-        {{/ file }}
-        {{/ device.capabilities }}
-        {{# zigbee.fingerprints }}
+        capability "Battery"
+        capability "PushableButton"
+        capability "Refresh"
 
-        // For firmware: {{ firmwares }}
-        {{{ value }}}
-        {{/ zigbee.fingerprints }}
-        {{# device.capabilities }}
-        {{> file@attributes }}
-        {{/ device.capabilities }}
+        // For firmware: TBD
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0001,0500,0000", outClusters:"0003,0501", model:"SWO-KEF1PA", manufacturer:"SwannONe"
+        
+        // Attributes for capability.IAS
+        attribute "ias", "enum", ["enrolled", "not enrolled"]
     }
-    {{# device.capabilities }}
-    {{> file@commands }}
-    {{/ device.capabilities }}
 
     preferences {
         input(
@@ -53,9 +50,6 @@ metadata {
             defaultValue: "1",
             required: true
         )
-        {{# device.capabilities }}
-        {{> file@inputs }}
-        {{/ device.capabilities }}
     }
 }
 
@@ -82,9 +76,6 @@ def updated(auto = false) {
     }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${["1":"Debug", "2":"Info", "3":"Warning", "4":"Error"].get(logLevel)}"
-    {{# device.capabilities }}
-    {{> file@updated }}
-    {{/ device.capabilities }}
 
     if (auto) return cmds
     Utils.sendZigbeeCommands cmds
@@ -99,9 +90,6 @@ def logsOff() {
    Log.info '⏲️ Automatically reverting log level to "Info"'
    device.updateSetting("logLevel", [value:"2", type:"enum"])
 }
-{{# device.capabilities }}
-{{> file@helpers }}
-{{/ device.capabilities }}
 
 // ===================================================================================================================
 // Implement Hubitat Capabilities
@@ -128,32 +116,29 @@ def configure(auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
 
-    // Configure {{ device.model }} specific Zigbee reporting
-    {{# zigbee.reporting }}
-    cmds += "he cr 0x${device.deviceNetworkId} {{ endpoint }} {{ cluster }} {{ attr }} {{ type }} {{ min }} {{ max }} {00} {}" // {{ reason }}
-    {{/ zigbee.reporting }}
-    {{^ zigbee.reporting }}
+    // Configure Swann One Key Fob (SWO-KEF1PA) specific Zigbee reporting
     // -- No reporting needed
-    {{/ zigbee.reporting }}
 
-    // Add {{ device.model }} specific Zigbee binds
-    {{# zigbee.binds }}
-    cmds += "zdo bind 0x${device.deviceNetworkId} {{ endpoint }} 0x01 {{ cluster }} {${device.zigbeeId}} {}" // {{ reason }}
-    {{/ zigbee.binds }}
-    {{^ zigbee.binds }}
-    // -- No binds needed
-    {{/ zigbee.binds }}
+    // Add Swann One Key Fob (SWO-KEF1PA) specific Zigbee binds
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0501 {${device.zigbeeId}} {}" // IAS Ancillary Control Equipment cluster
 
-    // Remove {{ device.model }} specific Zigbee binds
-    {{# zigbee.unbinds }}
-    cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${Utils.payload "${device.zigbeeId}"} ${Utils.payload "{{ endpoint }}"} ${Utils.payload "{{ cluster }}"} 03 ${Utils.payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // {{ reason }}
-    {{/ zigbee.unbinds }}
-    {{^ zigbee.unbinds }}
+    // Remove Swann One Key Fob (SWO-KEF1PA) specific Zigbee binds
     // -- No unbinds needed
-    {{/ zigbee.unbinds }}
-    {{# device.capabilities }}
-    {{> file@configure }}
-    {{/ device.capabilities }}
+    
+    // Configuration for capability.IAS
+    String ep_0500 = "0x01"
+    cmds += "he wattr 0x${device.deviceNetworkId} ${ep_0500} 0x0500 0x0010 0xF0 {${Utils.payload "${location.hub.zigbeeEui}"}}"
+    cmds += "he raw 0x${device.deviceNetworkId} 0x01 ${ep_0500} 0x0500 {01 23 00 00 00}" // Zone Enroll Response (0x00): status=Success, zoneId=0x00
+    cmds += "zdo bind 0x${device.deviceNetworkId} ${ep_0500} 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster
+    cmds += "he cr 0x${device.deviceNetworkId} ${ep_0500} 0x0500 0x0002 0x19 0x0000 0x4650 {00} {}" // Report ZoneStatus (map16) at least every 5 hours (Δ = 0)
+    
+    // Configuration for capability.Battery
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
+    
+    // Configuration for capability.PushableButton
+    Integer numberOfButtons = BUTTONS.count{_ -> true}
+    sendEvent name:"numberOfButtons", value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
@@ -166,9 +151,30 @@ private autoConfigure() {
     Log.warn "Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
     configure true
 }
-{{# device.capabilities }}
-{{> file@implementation }}
-{{/ device.capabilities }}
+
+// Implementation for capability.PushableButton
+def push(buttonNumber) {
+    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
+    if (buttonName == null) return Log.warn("Cannot push button ${buttonNumber} because it is not defined")
+    Utils.sendEvent name:"pushed", value:buttonNumber, type:"digital", isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was pressed"
+}
+
+// Implementation for capability.Refresh
+def refresh(buttonPress = true) {
+    if (buttonPress) {
+        Log.warn "Refreshing device current state ..."
+        if (device.currentValue("powerSource", true) == "battery") {
+            Log.warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
+        }
+    }
+
+    List<String> cmds = []
+    cmds += zigbee.readAttribute(0x0001, 0x0021, [:]) // BatteryPercentage
+    cmds += zigbee.readAttribute(0x0500, 0x0000, [:]) // IAS ZoneState
+    cmds += zigbee.readAttribute(0x0500, 0x0001, [:]) // IAS ZoneType
+    cmds += zigbee.readAttribute(0x0500, 0x0002, [:]) // IAS ZoneStatus
+    Utils.sendZigbeeCommands cmds
+}
 
 // ===================================================================================================================
 // Handle incoming Zigbee messages
@@ -196,9 +202,6 @@ def parse(String description) {
     Log.debug "msg=[${msg}]"
 
     state.lastRx = now()
-    {{# device.capabilities }}
-    {{> file@parse }}
-    {{/ device.capabilities }}
 
     // If we sent a Zigbee command in the last 3 seconds, we assume that this Zigbee event is a consequence of this driver doing something
     // Therefore, we mark this event as "digital"
@@ -207,19 +210,106 @@ def parse(String description) {
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
-        // Handle {{ device.model }} specific Zigbee messages
+        // Handle Swann One Key Fob (SWO-KEF1PA) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
-        {{# zigbee.messages }}
 
-        {{ > file }}
-        {{/ zigbee.messages }}
+        // Arm := { 16:Button, 08:ArmMode, ??:ArmDisarmCode, 08:ZoneId}
+        // ArmMode := { 0x00:Disarm, 0x01:Arm Day/Home Zones Only, 0x02:Arm Night/Sleep Zones Only, 0x03:Arm All Zones }
+        // [00, 00, 00, 00, 00, 00, 00, 00, 00, 00] -> Home button
+        // [02, 00, 00, 00, 00, 00, 00, 00, 00, 00] -> Night button
+        // [03, 00, 00, 00, 00, 00, 00, 00, 00, 00] -> Away button
+        case { contains it, [clusterInt:0x0501, commandInt:0x00, isClusterSpecific:true] }:
+           switch (msg.data[0]) {
+                case "00":
+                    def button = BUTTONS.HOME
+                    return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+        
+                case "02":
+                    def button = BUTTONS.NIGHT
+                    return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+        
+                case "03":
+                    def button = BUTTONS.AWAY
+                    return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+            }
+        
+            return Log.error("Sent unexpected Zigbee message: description=${description}, msg=${msg}")
+        
+        // Panic
+        case { contains it, [clusterInt:0x0501, commandInt:0x04, isClusterSpecific:true] }:
+            def button = BUTTONS.PANIC
+            return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+        
+        // Read Attributes: ZoneStatus
+        case { contains it, [clusterInt:0x0500, commandInt:0x01, attrInt:0x0002] }:
+            return Utils.processedZclMessage("Read Attributes Response", "ZoneStatus=${msg.value}")
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle capabilities Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
-        {{# device.capabilities }}
-        {{> file@events }}
-        {{/ device.capabilities }}
+        
+        // Events for capability.IAS
+        
+        // Zone Status Change Notification
+        case { contains it, [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true] }:
+            ZoneStatus zs = zigbee.parseZoneStatus(description)
+            boolean alarm1             = zs.alarm1Set
+            boolean alarm2             = zs.alarm2Set
+            boolean tamper             = zs.tamperSet
+            boolean lowBattery         = zs.batterySet
+            boolean supervisionReports = zs.supervisionReportsSet
+            boolean restoreReports     = zs.restoreReportsSet
+            boolean trouble            = zs.troubleSet
+            boolean mainsFault         = zs.acSet
+            boolean testMode           = zs.testSet
+            boolean batteryDefect      = zs.batteryDefectSet
+            return Utils.processedZclMessage("Zone Status Change Notification", "alarm1=${alarm1} alarm2=${alarm2} tamper=${tamper} lowBattery=${lowBattery} supervisionReports=${supervisionReports} restoreReports=${restoreReports} trouble=${trouble} mainsFault=${mainsFault} testMode=${testMode} batteryDefect=${batteryDefect}")
+        
+        // Enroll Request
+        case { contains it, [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true] }:
+            String ep_0500 = "0x01"
+            Utils.sendZigbeeCommands([
+                "he raw 0x${device.deviceNetworkId} 0x01 ${ep_0500} 0x0500 {01 23 00 00 00}",  // Zone Enroll Response (0x00): status=Success, zoneId=0x00
+                "he raw 0x${device.deviceNetworkId} 0x01 ${ep_0500} 0x0500 {01 23 01}",        // Initiate Normal Operation Mode (0x01): no_payload
+            ])
+            return Utils.processedZclMessage("Enroll Request", "description=${description}")
+        
+        // Read Attributes: ZoneState
+        case { contains it, [clusterInt:0x0500, commandInt:0x01, attrInt:0x0000] }:
+            String status = msg.value == "01" ? "enrolled" : "not enrolled"
+            Utils.sendEvent name:"ias", value:status, descriptionText:"Device IAS status is ${status}", type:"digital"
+            return Utils.processedZclMessage("Read Attributes Response", "ZoneState=${msg.value == "01" ? "enrolled" : "not_enrolled"}")
+        
+        // Read Attributes: ZoneType
+        case { contains it, [clusterInt:0x0500, commandInt:0x01, attrInt:0x0001] }:
+            return Utils.processedZclMessage("Read Attributes Response", "ZoneType=${msg.value}")
+        
+        // Other events that we expect but are not usefull for capability.IAS behavior
+        case { contains it, [clusterInt:0x0500, commandInt:0x04, isClusterSpecific:false] }:
+            return Utils.processedZclMessage("Write Attribute Response", "attribute=IAS_CIE_Address, ZoneType=${msg.data}")
+        
+        // Events for capability.Battery
+        
+        // Report/Read Attributes Reponse: BatteryPercentage
+        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
+        case { contains it, [clusterInt:0x0001, commandInt:0x01] }:
+        
+            // Hubitat fails to parse some Read Attributes Responses
+            if (msg.value == null && msg.data != null && msg.data[0] == "21" && msg.data[1] == "00") {
+                msg.value = msg.data[2]
+            }
+        
+            // The value 0xff indicates an invalid or unknown reading
+            if (msg.value == "FF") return Log.warn("Ignored invalid remaining battery percentage value: 0x${msg.value}")
+        
+            Integer percentage = Integer.parseInt(msg.value, 16)
+            percentage =  percentage / 2
+            Utils.sendEvent name:"battery", value:percentage, unit:"%", descriptionText:"Battery is ${percentage}% full", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "BatteryPercentage=${percentage}%")
+        
+        // Other events that we expect but are not usefull for capability.Battery behavior
+        case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=battery, data=${msg.data}")
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle common messages (e.g.: received during pairing when we query the device for information)

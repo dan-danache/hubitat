@@ -54,7 +54,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1836.webp" style="width: 200px"> |
 | Product Code | `504.638.80` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1836.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1836.groovy` |
 | Tested firmwares | `1.0.002` |
 | Since version | `3.1.0` |
 
@@ -63,6 +63,7 @@ Below you can find the details of each device, including the features and pairin
 * Configure what happens after a power outage (Power On, Power Off, Restore previous state)
 * Health status: online / offline
 * Refresh switch state on demand
+* Can be member of Zigbee groups
 
 #### Pairing Instructions
 1. Locate the small reset hole (located between the On/Off button and the LED light) and have a pin or pencil ready to fit the hole.
@@ -80,7 +81,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2202.webp" style="width: 200px"> |
 | Product Code | `605.043.52` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2202.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2202.groovy` |
 | Tested firmwares | `1.0.7` |
 | Since version | `3.9.0` |
 
@@ -104,20 +105,21 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_ICPSHC24.webp" style="width: 200px"> |
 | Product Code | `603.426.56`｜`503.561.87`｜`104.747.72` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/ICPSHC24.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_ICPSHC24.groovy` |
 | Tested firmwares | 10EU-IL-1: `1.2.245` (10W) |
 || 30EU-IL-2: `1.0.002` (30W) |
 || 30-IL44-1: `1.0.021` (Silverglans, 30W) |
 | Since version | `3.1.0` |
 
 #### Features
-1. Commands: On, Off, Toggle, On with Timed Off
-1. Configure what happens after a power outage (Power On, Power Off, Restore previous state)
-1. Brightness control: Set brightness level, Start/Stop level change, Level up/down
-1. Configure brightness level when turned on (Always the same value, Restore last level)
-1. Can set the brightness level when the lights are off (and they stay off). When the lights are turned on, they will start at the specified level.
-1. Health status: online / offline
-1. Refresh switch state on demand
+* Commands: On, Off, Toggle, On with Timed Off
+* Configure what happens after a power outage (Power On, Power Off, Restore previous state)
+* Brightness control: Set brightness level, Start/Stop level change, Level up/down
+* Configure brightness level when turned on (Always the same value, Restore last level)
+* Can set the brightness level when the lights are off (and they stay off). When the lights are turned on, they will start at the specified level.
+* Health status: online / offline
+* Refresh switch state on demand
+* Can be member of Zigbee groups
 
 #### Known Issues
 * Smaller (10W) drivers do not honor the Power On Behavior.
@@ -139,7 +141,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2013.webp" style="width: 200px"> |
 | Product Code | `805.043.08` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2013.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2013.groovy` |
 | Tested firmwares | `1.0.19` |
 | Since version | `3.6.0` |
 
@@ -147,6 +149,8 @@ Below you can find the details of each device, including the features and pairin
 * Contact status: open / close
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off
+* Directly control Zigbee groups: On/Off
 
 #### Pairing Instructions
 1. Remove device from its position using a small screwdriver and, on the back, you should see the small pair button (🔗).
@@ -164,7 +168,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2201.webp" style="width: 200px"> |
 | Product Code | `205.281.28`｜`805.597.96` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2201.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2201.groovy` |
 | Tested firmwares | `1.0.47` |
 | Since version | `2.0.0` |
 
@@ -174,6 +178,9 @@ Below you can find the details of each device, including the features and pairin
 * Button Release events: both buttons
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off and Brightness
+* Directly control Zigbee groups: On/Off and Brightness
+
 
 #### Pairing Instructions
 1. Open the battery compartiment and you should see the small pair button (🔗).
@@ -191,7 +198,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2213.webp" style="width: 200px"> |
 | Product Code | `305.603.54` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2213.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2213.groovy` |
 | Tested firmwares | `1.0.20` |
 | Since version | `3.6.0` |
 
@@ -219,7 +226,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2006.webp" style="width: 200px"> |
 | Product Code | `194.442.19` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2006.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2006.groovy` |
 | Tested firmwares | `1.0.033`｜`1.1.001` |
 | Since version | `3.5.0` |
 
@@ -249,7 +256,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2002.webp" style="width: 200px"> |
 | Product Code | `304.883.63` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2002.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2002.groovy` |
 | Tested firmwares | `1.0.024`｜`2.4.5` |
 | Since version | `2.0.0` |
 
@@ -259,6 +266,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Release events for: Button 1 (🔆), Button 2 (🔅)
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off and Brightness
 
 #### Known Issues
 * The Hold / Release events don't work correctly on the Next and Prev buttons.
@@ -280,7 +288,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2123.webp" style="width: 200px"> |
 | Product Code | `305.273.12` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2123.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2123.groovy` |
 | Tested firmwares | `1.0.012`｜`1.0.35` |
 | Since version | `1.0.0` |
 
@@ -291,6 +299,8 @@ Below you can find the details of each device, including the features and pairin
 * Button Double-Tap events: Button 6 (•) and Button 7 (••)
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off
+* Directly control Zigbee groups: On/Off
 
 #### Pairing Instructions
 1. Open the battery compartiment and you should see the small pair button (🔗).
@@ -308,7 +318,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1603.webp" style="width: 200px"> |
 | Product Code | `304.883.63`｜`303.561.69` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1603.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1603.groovy` |
 | Tested firmwares | `2.0.0244`｜`2.3.089` |
 | Since version | `2.0.0` |
 
@@ -336,7 +346,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1745.webp" style="width: 200px"> |
 | Product Code | `704.299.13` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1745.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1745.groovy` |
 | Tested firmwares | `24.4.5` |
 | Since version | `2.3.0` |
 
@@ -368,7 +378,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1743.webp" style="width: 200px"> |
 | Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1743.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1743.groovy` |
 | Tested firmwares | `2.2.010`｜`24.4.6` |
 | Since version | `2.0.0` |
 
@@ -378,6 +388,8 @@ Below you can find the details of each device, including the features and pairin
 * Button Release events: both buttons
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off and Brightness
+
 
 #### Pairing Instructions
 1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
@@ -395,7 +407,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1766.webp" style="width: 200px"> |
 | Product Code | |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1766.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1766.groovy` |
 | Tested firmwares | `24.4.6` |
 | Since version | `3.3.0` |
 
@@ -421,7 +433,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1810.webp" style="width: 200px"> |
 | Product Code | `304.431.24`｜`004.431.30` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1810.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1810.groovy` |
 | Tested firmwares | `24.4.5` |
 | Since version | `1.1.0` |
 
@@ -433,6 +445,8 @@ Below you can find the details of each device, including the features and pairin
 * Button 2 (🔆) and Button 3 (🔅) act as a switch level (0 - 100%)
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off and Brightness
+
 
 #### Known Issues
 * Old firmware versions suppport binding to groups only and this functionality is not supported by the Hubitat hub. You can update the device to the latest version using Hubitat.
@@ -453,7 +467,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E1812.webp" style="width: 200px"> |
 | Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E1812.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1812.groovy` |
 | Tested firmwares | `2.3.015`｜`24.4.6` |
 | Since version | `2.0.0` |
 
@@ -464,6 +478,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Release event
 * Battery indicator: %
 * Health status: online / offline
+* Directly control Zigbee devices: On/Off
 
 #### Pairing Instructions
 1. Using a small screwdriver, open the battery compartiment and you should see the small pair button (🔗).
@@ -481,7 +496,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2134.webp" style="width: 200px"> |
 | Product Code | `405.043.48` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2134.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2134.groovy` |
 | Tested firmwares | ` 1.0.57` |
 | Since version | `3.6.0` |
 
@@ -510,7 +525,7 @@ Below you can find the details of each device, including the features and pairin
 |-----------|-------------|
 | Product Image | <img src="img/Ikea_E2112.webp" style="width: 200px"> |
 | Product Code | `404.982.34` |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/E2112.groovy` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2112.groovy` |
 | Tested firmwares | `1.0.10`｜`1.0.11` |
 | Since version | `3.8.0` |
 

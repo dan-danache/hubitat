@@ -1,42 +1,43 @@
 /**
- * {{ device.model }}
+ * IKEA Vallhorn Motion Sensor (E2134)
  *
-{{# device.links }}
- * @see {{ . }}
-{{/ device.links }}
+ * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+ * @see https://zigbee.blakadder.com/Ikea_E2134.html
+ * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
+ * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = "{{ device.model }}"
-@Field static final String DRIVER_VERSION = "{{ driver.version }}"
-{{# device.capabilities }}
-{{> file@fields }}
-{{/ device.capabilities }}
+@Field static final String DRIVER_NAME = "IKEA Vallhorn Motion Sensor (E2134)"
+@Field static final String DRIVER_VERSION = "4.0.0"
+
+// Fields for capability.HealthCheck
+@Field static final Map<String, String> HEALTH_CHECK = [
+    "schedule": "0 0 0/1 ? * * *", // Health will be checked using this cron schedule
+    "thereshold": "43200" // When checking, mark the device as offline if no Zigbee message was received in the last 43200 seconds
+]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:"{{ driver.namespace }}", author:"{{ driver.author }}", importUrl:"{{ device.importUrl }}") {
+    definition(name:DRIVER_NAME, namespace:"dandanache", author:"Dan Danache", importUrl:"https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2134.groovy") {
         capability "Configuration"
-        {{# device.capabilities }}
-        {{#name}}
-        capability "{{ name }}"
-        {{/name}}
-        {{# file }}
-        {{> file@definition }}
-        {{/ file }}
-        {{/ device.capabilities }}
-        {{# zigbee.fingerprints }}
+        capability "MotionSensor"
+        capability "IlluminanceMeasurement"
+        capability "Sensor"
+        capability "Battery"
+        capability "HealthCheck"
+        capability "PowerSource"
+        capability "Refresh"
 
-        // For firmware: {{ firmwares }}
-        {{{ value }}}
-        {{/ zigbee.fingerprints }}
-        {{# device.capabilities }}
-        {{> file@attributes }}
-        {{/ device.capabilities }}
+        // For firmware: 1.0.57 (117C-1938-01000057)
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,0B05,1000,FC7C,FC81", outClusters:"0003,0004,0006,0019,1000", model:"VALLHORN Wireless Motion Sensor", manufacturer:"IKEA of Sweden"
+        
+        // Attributes for capability.HealthCheck
+        attribute "healthStatus", "enum", ["offline", "online", "unknown"]
     }
-    {{# device.capabilities }}
-    {{> file@commands }}
-    {{/ device.capabilities }}
+    
+    // Commands for capability.FirmwareUpdate
+    command "updateFirmware"
 
     preferences {
         input(
@@ -53,9 +54,6 @@ metadata {
             defaultValue: "1",
             required: true
         )
-        {{# device.capabilities }}
-        {{> file@inputs }}
-        {{/ device.capabilities }}
     }
 }
 
@@ -82,9 +80,9 @@ def updated(auto = false) {
     }
     if (logLevel == "1") runIn 1800, "logsOff"
     Log.info "🛠️ logLevel = ${["1":"Debug", "2":"Info", "3":"Warning", "4":"Error"].get(logLevel)}"
-    {{# device.capabilities }}
-    {{> file@updated }}
-    {{/ device.capabilities }}
+    
+    // Preferences for capability.HealthCheck
+    schedule HEALTH_CHECK.schedule, "healthCheck"
 
     if (auto) return cmds
     Utils.sendZigbeeCommands cmds
@@ -99,9 +97,13 @@ def logsOff() {
    Log.info '⏲️ Automatically reverting log level to "Info"'
    device.updateSetting("logLevel", [value:"2", type:"enum"])
 }
-{{# device.capabilities }}
-{{> file@helpers }}
-{{/ device.capabilities }}
+
+// Helpers for capability.HealthCheck
+def healthCheck() {
+    Log.debug '⏲️ Automatically running health check'
+    String healthStatus = state.lastRx == 0 || state.lastRx == null ? "unknown" : (now() - state.lastRx < Integer.parseInt(HEALTH_CHECK.thereshold) * 1000 ? "online" : "offline")
+    Utils.sendEvent name:"healthStatus", value:healthStatus, type:"physical", descriptionText:"Health status is ${healthStatus}"
+}
 
 // ===================================================================================================================
 // Implement Hubitat Capabilities
@@ -128,32 +130,28 @@ def configure(auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
 
-    // Configure {{ device.model }} specific Zigbee reporting
-    {{# zigbee.reporting }}
-    cmds += "he cr 0x${device.deviceNetworkId} {{ endpoint }} {{ cluster }} {{ attr }} {{ type }} {{ min }} {{ max }} {00} {}" // {{ reason }}
-    {{/ zigbee.reporting }}
-    {{^ zigbee.reporting }}
-    // -- No reporting needed
-    {{/ zigbee.reporting }}
+    // Configure IKEA Vallhorn Motion Sensor (E2134) specific Zigbee reporting
+    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x4650 {00} {}" // Report Occupancy/MeasuredValue (map8) at least every 5 hours (Δ = 0)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x03 0x0400 0x0000 0x21 0x0000 0x4650 {00} {}" // Report Illuminance/MeasuredValue (uint16) at least every 5 hours (Δ = 0)
 
-    // Add {{ device.model }} specific Zigbee binds
-    {{# zigbee.binds }}
-    cmds += "zdo bind 0x${device.deviceNetworkId} {{ endpoint }} 0x01 {{ cluster }} {${device.zigbeeId}} {}" // {{ reason }}
-    {{/ zigbee.binds }}
-    {{^ zigbee.binds }}
-    // -- No binds needed
-    {{/ zigbee.binds }}
+    // Add IKEA Vallhorn Motion Sensor (E2134) specific Zigbee binds
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0x0400 {${device.zigbeeId}} {}" // Illuminance Measurement cluster
 
-    // Remove {{ device.model }} specific Zigbee binds
-    {{# zigbee.unbinds }}
-    cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${Utils.payload "${device.zigbeeId}"} ${Utils.payload "{{ endpoint }}"} ${Utils.payload "{{ cluster }}"} 03 ${Utils.payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // {{ reason }}
-    {{/ zigbee.unbinds }}
-    {{^ zigbee.unbinds }}
+    // Remove IKEA Vallhorn Motion Sensor (E2134) specific Zigbee binds
     // -- No unbinds needed
-    {{/ zigbee.unbinds }}
-    {{# device.capabilities }}
-    {{> file@configure }}
-    {{/ device.capabilities }}
+    
+    // Configuration for capability.Battery
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
+    
+    // Configuration for capability.HealthCheck
+    sendEvent name:"healthStatus", value:"online", descriptionText:"Health status initialized to online"
+    sendEvent name:"checkInterval", value:3600, unit:"second", descriptionText:"Health check interval is 3600 seconds"
+    
+    // Configuration for capability.PowerSource
+    sendEvent name:"powerSource", value:"unknown", type:"digital", descriptionText:"Power source initialized to unknown"
+    cmds += zigbee.readAttribute(0x0000, 0x0007) // PowerSource
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
@@ -166,9 +164,55 @@ private autoConfigure() {
     Log.warn "Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
     configure true
 }
-{{# device.capabilities }}
-{{> file@implementation }}
-{{/ device.capabilities }}
+
+// Implementation for capability.HealthCheck
+def ping() {
+    Log.warn "ping ..."
+    Utils.sendZigbeeCommands(zigbee.readAttribute(0x0000, 0x0000))
+    Log.debug "Ping command sent to the device; we'll wait 5 seconds for a reply ..."
+    runIn 5, "pingExecute"
+}
+
+def pingExecute() {
+    if (state.lastRx == 0) return Log.info("Did not sent any messages since it was last configured")
+
+    Date now = new Date(Math.round(now() / 1000) * 1000)
+    Date lastRx = new Date(Math.round(state.lastRx / 1000) * 1000)
+    String lastRxAgo = TimeCategory.minus(now, lastRx).toString().replace(".000 seconds", " seconds")
+    Log.info "Sent last message at ${lastRx.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${lastRxAgo} ago)"
+
+    Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
+    String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace(".000 seconds", " seconds")
+    Log.info "Will be marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
+
+    String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace(".000 seconds", " seconds")
+    Log.info "Will be marked as offline if no message is received until ${thereshold.format("yyyy-MM-dd HH:mm:ss", location.timeZone)} (${offlineMarkAgo} from now)"
+}
+
+// Implementation for capability.Refresh
+def refresh(buttonPress = true) {
+    if (buttonPress) {
+        Log.warn "Refreshing device current state ..."
+        if (device.currentValue("powerSource", true) == "battery") {
+            Log.warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
+        }
+    }
+
+    List<String> cmds = []
+    cmds += zigbee.readAttribute(0x0001, 0x0021, [:]) // BatteryPercentage
+    cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x02, ]) // Occupancy
+    cmds += zigbee.readAttribute(0x0400, 0x0000, [destEndpoint:0x03, ]) // MeasuredValue
+    Utils.sendZigbeeCommands cmds
+}
+
+// Implementation for capability.FirmwareUpdate
+def updateFirmware() {
+    Log.info "Looking for firmware updates ..."
+    if (device.currentValue("powerSource", true) == "battery") {
+        Log.warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
+    }
+    Utils.sendZigbeeCommands(zigbee.updateFirmware())
+}
 
 // ===================================================================================================================
 // Handle incoming Zigbee messages
@@ -196,9 +240,11 @@ def parse(String description) {
     Log.debug "msg=[${msg}]"
 
     state.lastRx = now()
-    {{# device.capabilities }}
-    {{> file@parse }}
-    {{/ device.capabilities }}
+    
+    // Parse for capability.HealthCheck
+    if (device.currentValue("healthStatus", true) != "online") {
+        Utils.sendEvent name:"healthStatus", value:"online", type:"digital", descriptionText:"Health status changed to online"
+    }
 
     // If we sent a Zigbee command in the last 3 seconds, we assume that this Zigbee event is a consequence of this driver doing something
     // Therefore, we mark this event as "digital"
@@ -207,19 +253,91 @@ def parse(String description) {
     switch (msg) {
 
         // ---------------------------------------------------------------------------------------------------------------
-        // Handle {{ device.model }} specific Zigbee messages
+        // Handle IKEA Vallhorn Motion Sensor (E2134) specific Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
-        {{# zigbee.messages }}
 
-        {{ > file }}
-        {{/ zigbee.messages }}
+        // Report/Read Attributes Reponse: Occupancy/MeasuredValue
+        case { contains it, [clusterInt:0x0406, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
+            String motion = msg.value == "01" ? "active" : "inactive"
+            Utils.sendEvent(name:"motion", value:motion, type:"physical", descriptionText:"Is ${motion}")
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Occupancy/MeasuredValue=${msg.value}")
+        
+        // Report/Read Attributes Reponse: Illuminance/MeasuredValue
+        case { contains it, [clusterInt:0x0400, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0400, commandInt:0x01, attrInt:0x0000] }:
+            Integer illuminance = Integer.parseInt(msg.value, 16)
+        
+            // 0xFFFF represents an invalid illuminance value, so we just ignore it
+            if (illuminance == 0xFFFF) return Log.warn("Ignored invalid reported illuminance value: 0xFFFF")
+        
+            // Transform raw value to lux
+            if (illuminance != 0) {
+                illuminance = Math.pow(10, (illuminance - 1) / 10000)
+            }
+            Utils.sendEvent name:"illuminance", value:illuminance, unit:"lx", descriptionText:"Illuminance is ${illuminance} lux", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Illuminance/MeasuredValue=${msg.value}")
+        
+        // Ignore Configure Reporting Response for attribute Occupancy/MeasuredValue
+        case { contains it, [clusterInt:0x0406, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=motion, data=${msg.data}")
+        
+        // Ignore Configure Reporting Response for attribute Illuminance/MeasuredValue
+        case { contains it, [clusterInt:0x0400, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=illuminance, data=${msg.data}")
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle capabilities Zigbee messages
         // ---------------------------------------------------------------------------------------------------------------
-        {{# device.capabilities }}
-        {{> file@events }}
-        {{/ device.capabilities }}
+        
+        // Events for capability.Battery
+        
+        // Report/Read Attributes Reponse: BatteryPercentage
+        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
+        case { contains it, [clusterInt:0x0001, commandInt:0x01] }:
+        
+            // Hubitat fails to parse some Read Attributes Responses
+            if (msg.value == null && msg.data != null && msg.data[0] == "21" && msg.data[1] == "00") {
+                msg.value = msg.data[2]
+            }
+        
+            // The value 0xff indicates an invalid or unknown reading
+            if (msg.value == "FF") return Log.warn("Ignored invalid remaining battery percentage value: 0x${msg.value}")
+        
+            Integer percentage = Integer.parseInt(msg.value, 16)
+            percentage =  percentage / 2
+            Utils.sendEvent name:"battery", value:percentage, unit:"%", descriptionText:"Battery is ${percentage}% full", type:type
+            return Utils.processedZclMessage("${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "BatteryPercentage=${percentage}%")
+        
+        // Other events that we expect but are not usefull for capability.Battery behavior
+        case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
+            return Utils.processedZclMessage("Configure Reporting Response", "attribute=battery, data=${msg.data}")
+        
+        // Events for capability.HealthCheck
+        case { contains it, [clusterInt:0x0000, attrInt:0x0000] }:
+            return Log.warn("... pong")
+        
+        // Read Attributes Reponse: PowerSource
+        case { contains it, [clusterInt:0x0000, commandInt:0x01, attrInt:0x0007] }:
+            String powerSource = "unknown"
+        
+            // PowerSource := { 0x00:Unknown, 0x01:MainsSinglePhase, 0x02:MainsThreePhase, 0x03:Battery, 0x04:DC, 0x05:EmergencyMainsConstantlyPowered, 0x06:EmergencyMainsAndTransferSwitch }
+            switch (msg.value) {
+                case "01":
+                case "02":
+                case "05":
+                case "06":
+                    powerSource = "mains"
+                    break
+                case "03":
+                    powerSource = "battery"
+                    break
+                case "04":
+                    powerSource = "dc"
+                    break
+            }
+            Utils.sendEvent name:"powerSource", value:powerSource, type:"digital", descriptionText:"Power source is ${powerSource}"
+            return Utils.processedZclMessage("Read Attributes Response", "PowerSource=${msg.value}")
 
         // ---------------------------------------------------------------------------------------------------------------
         // Handle common messages (e.g.: received during pairing when we query the device for information)

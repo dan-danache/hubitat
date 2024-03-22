@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2024-04-??
+
+### Changed
+- Change file naming scheme to support other manufacturers
+
+### Added
+- Add Zigbee Groups membership control for mains-powered devices (E1603, E1836, ICPSHC24)
+- Add Zigbee Bindings control for devices that support this feature (E1743, E1810, E1812, E2002, E2013, E2123, E2201, RDM001, RWL022)
+- Add driver for Aqara Dual Relay Module T2 (DCM-K01)
+- Add driver for Philips Hue Wall Switch Module (RDM001)
+- Add driver for Philips Hue Dimmer Switch (RWL022)
+- Add driver for Swann One Key Fob (SWO-KEF1PA)
+
 ## [3.9.0] - 2024-03-14
 
 ### Added

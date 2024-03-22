@@ -52,9 +52,7 @@ def ping() {
 }
 
 def pingExecute() {
-    if (state.lastRx == 0) {
-        return Log.info("Did not sent any messages since it was last configured")
-    }
+    if (state.lastRx == 0) return Log.info("Did not sent any messages since it was last configured")
 
     Date now = new Date(Math.round(now() / 1000) * 1000)
     Date lastRx = new Date(Math.round(state.lastRx / 1000) * 1000)

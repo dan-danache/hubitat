@@ -1,0 +1,47 @@
+device:
+  model: Philips Hue Wall Switch Module (RDM001)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RDM001.groovy
+  links:
+  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
+  - https://zigbee.blakadder.com/Philips_RDM001.html
+
+  capabilities:
+    - file: src/capabilities/Battery.groovy
+      params:
+        half: true
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage every 5 hours)
+    - file: src/capabilities/PowerSource.groovy
+    - file: src/capabilities/HoldableButton.groovy
+    - file: src/capabilities/PushableButton.groovy
+      params:
+        buttons:
+        - { id: 'BUTTON_1', name: 'Left', number: 1 }
+        - { id: 'BUTTON_2', name: 'Right', number: 2 }
+    - file: src/capabilities/Refresh.groovy
+      params:
+        readAttributes:
+        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
+        writeAttributes:
+        - { cluster: '0x0000', attr: '0x0031', type: '0x19', value: '0x0B00', mfgCode: '0x100B', description: 'Philips magic attribute' }
+    - file: src/capabilities/ReleasableButton.groovy
+    - file: src/capabilities/FirmwareUpdate.groovy
+    - file: src/devices/Philips_RDM001/RDM001.groovy
+    - file: src/capabilities/ZigbeeBindings.groovy
+      params:
+        clusters: ['0x0006', '0x0008']
+        groups: true
+
+zigbee:
+  fingerprints:
+  - firmwares: 1.0.5 (100B-011C-0000041A)
+    value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,FC00", outClusters:"0003,0004,0006,0008,0019", model:"RDM001", manufacturer:"Signify Netherlands B.V."
+
+  binds:
+  - { endpoint: '0x01', cluster: '0xFC00', reason: Hue Specific cluster }
+
+  messages:
+  - file: src/devices/Philips_RDM001/events.groovy
