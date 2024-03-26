@@ -1,7 +1,7 @@
 {
     "packageName": "IKEA Zigbee drivers",
     "version": "4.0.0",
-    "releaseNotes": "v4.0.0\n - Add Zigbee Groups membership control for mains-powered devices (E1603, E1836, ICPSHC24)\n - Add Zigbee Bindings control for devices that support this feature (E1743, E1810, E1812, E2002, E2013, E2123, E2201, RDM001, RWL022)\n - Change file naming scheme to support other manufacturers\n - Ignore \"Mgmt_Rtg_rsp\" messages that are generated when the Hub restarts - @a.mcdear",
+    "releaseNotes": "v4.0.0\n - Add Zigbee Groups membership control for mains-powered devices (E1603, E1836, ICPSHC24)\n - Add Zigbee Bindings control for devices that support this feature (E1743, E1810, E1812, E2002, E2013, E2123, E2201, RDM001, RWL022)\n - Change file naming scheme to support other manufacturers\n - Ignore \"Mgmt_Rtg_rsp\" and \"Parent_annce_rsp\" messages that are generated when the Hub restarts - @a.mcdear, @hubitrep",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
     "dateReleased": "2024-03-14",

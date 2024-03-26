@@ -1,5 +1,7 @@
 # IKEA Zigbee drivers
-This document provides instructions on how to install and use custom drivers for IKEA Zigbee devices on Hubitat hub. These drivers enable advanced features and functionalities for the following devices:
+This document provides instructions on how to install and use custom drivers for IKEA Zigbee devices on Hubitat hub.
+
+These drivers enable advanced features and functionalities for the following devices:
 
 * [Askvader On/Off Switch (E1836)](#askvader-onoff-switch-e1836)
 * [Badring Water Leakage Sensor (E2202)](#badring-water-leakage-sensor-e2202)
@@ -19,6 +21,9 @@ This document provides instructions on how to install and use custom drivers for
 * [Vallhorn Motion Sensor (E2134)](#vallhorn-motion-sensor-e2134)
 * [Vindstyrka Air Quality Sensor (E2112)](#vindstyrka-air-quality-sensor-e2112)
 
+Advanced usage:
+* [Direct Zigbee Bindings](Direct_Zigbee_Bindings.md)
+
 ## Installation
 There are two ways to install the drivers: using Hubitat Package Manager (HPM) or manually importing the driver code.
 
@@ -27,20 +32,20 @@ HPM is an app that allows you to easily install and update custom drivers and ap
 
 Once you have HPM installed, follow these steps to install the IKEA Zigbee drivers:
 
-- In the Hubitat interface, go to **Apps** and select **Hubitat Package Manager**.
-- Select **Install**, then **Search by Keywords**.
-- Enter **IKEA Zigbee drivers** in the search box and click **Next**.
-- Select **IKEA Zigbee drivers by Dan Danache** and click **Next**.
-- Select the driver(s) you need from the dropdown list and follow the install instructions.
+* In the Hubitat interface, go to **Apps** and select **Hubitat Package Manager**.
+* Select **Install**, then **Search by Keywords**.
+* Enter **IKEA Zigbee drivers** in the search box and click **Next**.
+* Select **IKEA Zigbee drivers by Dan Danache** and click **Next**.
+* Select the driver(s) you need from the dropdown list and follow the install instructions.
 
 ### Manual Installation
 If you don’t want to use HPM, you can also install the drivers manually by importing the driver code from GitHub. Follow these steps to do so:
 
-- In the Hubitat interface, go to **Drivers Code**.
-- Click **New Driver** in the top right, then click **Import** in the top right.
-- Search below for your device, look for the **Manual install file** property and enter it in the URL field.
-- Click **Import**, then click **OK** and the code should load in the editor.
-- Click **Save** in the top right.
+* In the Hubitat interface, go to **Drivers Code**.
+* Click **New Driver** in the top right, then click **Import** in the top right.
+* Search below for your device, look for the **Manual install file** property and enter it in the URL field.
+* Click **Import**, then click **OK** and the code should load in the editor.
+* Click **Save** in the top right.
 
 More info about installing custom drivers is available in the [Official Documentation](https://docs2.hubitat.com/en/how-to/install-custom-drivers).
 
