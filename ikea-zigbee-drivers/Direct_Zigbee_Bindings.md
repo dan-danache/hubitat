@@ -54,7 +54,8 @@ Disadvantages:
 * Increased response times, as all communications necessitate passage through the Hubitat Hub.
 
 ## Direct Device-to-Device Bindings
-Direct Device-to-Device Bindings leverage the inherent capabilities of the Zigbee protocol to facilitate seamless communication between devices. This method bypasses the need for a central hub, enabling devices to interact directly through a process known as “binding.” In this setup, a source device is directly linked to a target device, establishing a streamlined communication channel.
+
+Direct Device-to-Device Bindings leverage the inherent capabilities of the Zigbee protocol to facilitate seamless communication between devices. This method bypasses the need for a central hub, enabling devices to interact directly through a process known as "binding". In this setup, a source device is directly linked to a target device, establishing a new streamlined communication channel.
 
 ```
 ┌─────────────┐          ┌───────────┐┌────────────┐
@@ -93,7 +94,7 @@ Disadvantages:
 
 ### Configuring Direct Device-to-Device Bindings
 
-The bindings configuration must be executed on the device issuing commands, such as buttons and sensors
+The bindings configuration must be executed on the device issuing commands, such as buttons and sensors.
 
 The following devices support the direct device-to-device bindings feature:
 
@@ -108,15 +109,16 @@ The following devices support the direct device-to-device bindings feature:
 
 Follow this steps in order to setup device-to-device bindings:
 
-1. Go the device details page
-1. In the Preferences section, select the target device you want to be directly contrrolled
-1. Wake up the source device (e.g. push a button)
-1. Immediately click the "Save Preferences" button
-1. You're done! The source device will now directly control the target device, bypassing the need for Hubitat Hub programming.
+1. Navigate to the device's details page.
+1. Within the Preferences section, select the desired target device for direct control.
+1. Wake up the source device (e.g. push a button).
+1. Immediately click the "Save Preferences" button.
+1. The setup is complete! The source device will now directly control the target device, bypassing the need for Hubitat Hub programming.
 
 ![Setup device bindings](img/device_zigbee_bindings.png)
 
 ## Direct Group Bindings
+
 Direct Group Bindings in Zigbee networks offer a sophisticated method of communication, where devices are not only members of a Zigbee Group but also capable of issuing commands to the entire group simultaneously. This advanced feature allows for a streamlined and efficient operation within a smart home network.
 
 ```
@@ -174,8 +176,8 @@ Steps for setting Up Device-to-Device Bindings:
 
 1. Navigate to the device's details page.
 1. Within the Preferences section, select the desired target group for direct control.
-1. Activate the source device (e.g., press a button).
-1. Promptly click the "Save Preferences" button.
+1. Wake up the source device (e.g. push a button).
+1. Immediately click the "Save Preferences" button.
 1. The setup is complete! Button presses will now directly control all devices in the target group, bypassing the need for programming on the Hubitat Hub.
 
 ![Setup group bindings](img/group_zigbee_bindings.png)
