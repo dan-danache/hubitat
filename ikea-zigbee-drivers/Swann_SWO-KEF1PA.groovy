@@ -5,6 +5,7 @@
  * @see https://zigbee.blakadder.com/Swann_SWO-KEF1PA.html
  */
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = 'Swann One Key Fob (SWO-KEF1PA)'
@@ -501,6 +502,6 @@ private String utils_payload(String value) {
 }
 
 // switch/case syntactic sugar
-private boolean contains(Map msg, Map spec) {
+@CompileStatic private boolean contains(Map msg, Map spec) {
     return msg.keySet().containsAll(spec.keySet()) && spec.every { it.value == msg[it.key] }
 }

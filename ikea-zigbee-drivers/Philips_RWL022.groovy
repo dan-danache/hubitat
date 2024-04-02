@@ -5,6 +5,7 @@
  * @see https://zigbee.blakadder.com/Philips_RWL022.html
  */
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = 'Philips Hue Dimmer Switch (RWL022)'
@@ -656,6 +657,6 @@ private String utils_payload(String value) {
 }
 
 // switch/case syntactic sugar
-private boolean contains(Map msg, Map spec) {
+@CompileStatic private boolean contains(Map msg, Map spec) {
     return msg.keySet().containsAll(spec.keySet()) && spec.every { it.value == msg[it.key] }
 }

@@ -7,6 +7,7 @@
  * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = 'IKEA Parasoll Door/Window Sensor (E2013)'
@@ -662,6 +663,6 @@ private String utils_payload(String value) {
 }
 
 // switch/case syntactic sugar
-private boolean contains(Map msg, Map spec) {
+@CompileStatic private boolean contains(Map msg, Map spec) {
     return msg.keySet().containsAll(spec.keySet()) && spec.every { it.value == msg[it.key] }
 }
