@@ -41,7 +41,7 @@ Centralized Hub Communication serves as the foundational interaction model withi
 └─────────────┘          └───────────┘        └────────────┘
 ```
 
-The process unfolds as follows
+The process unfolds as follows:
 
 1. The **Motion Sensor** detects movement and relays this event to the **Hubitat Hub**.
 1. The **Hubitat Hub** consults its suite of applications, such as Rule Machine, Button Controller, and Room Lighting, to determine if an automation task is triggered by the reported event.
