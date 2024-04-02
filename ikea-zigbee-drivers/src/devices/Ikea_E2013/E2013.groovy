@@ -1,4 +1,27 @@
 {{!--------------------------------------------------------------------------}}
+{{# @inputs }}
+
+// Inputs for devices.E2013
+input(
+    name: 'swapOpenClosed',
+    type: 'bool',
+    title: 'Swap open / closed',
+    description: '<small>Swap open / closed value for the "contact" attribute.</small>',
+    defaultValue: false,
+    required: true
+)
+{{/ @inputs }}
+{{!--------------------------------------------------------------------------}}
+{{# @updated }}
+
+// Preferences for devices.E2013
+if (swapOpenClosed == null) {
+    swapOpenClosed = false
+    device.updateSetting('swapOpenClosed', [value:swapOpenClosed, type:'bool'])
+}
+log_info "🛠️ swapOpenClosed = ${swapOpenClosed}"
+{{/ @updated }}
+{{!--------------------------------------------------------------------------}}
 {{# @events }}
 
 // Events for devices.E2013
@@ -7,7 +30,7 @@
 // Report/Read Attributes Reponse: ZoneStatus
 case { contains it, [clusterInt:0x0500, commandInt:0x0A, attrInt:0x0002] }:
 case { contains it, [clusterInt:0x0500, commandInt:0x01, attrInt:0x0002] }:
-    String contact = msg.value[-1] == '1' ? 'open' : 'closed'
+    String contact = msg.value[-1] == '1' ^ (swapOpenClosed == true) ? 'open' : 'closed'
     utils_sendEvent name:'contact', value:contact, descriptionText:"Is ${contact}", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ZoneStatus=${msg.value}"
     return

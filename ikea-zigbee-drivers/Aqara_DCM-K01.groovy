@@ -127,7 +127,7 @@ metadata {
             options: [
                 '0':'Disabled - control lights and other devices',
                 '1':'Enabled - control bi-directional motors',
-            ],,
+            ],
             defaultValue: '0',
             required: true
         )
