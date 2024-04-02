@@ -7,6 +7,10 @@ device:
   - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
   - https://static.homesmart.ikea.com/releaseNotes/
 
+  fingerprints:
+  - firmwares: 1.0.002 (117C-110D-00010002)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57', outClusters:'0019', model:'ASKVADER on/off switch', manufacturer:'IKEA of Sweden'
+
   capabilities:
     - file: src/capabilities/Switch.groovy
       params:
@@ -18,16 +22,5 @@ device:
         checkInterval: 3600  # every hour
         thereshold: 3600     # report device as offline if no message was received in the last 60 minutes (device should report On/Off status every 10 minutes)
     - file: src/capabilities/PowerSource.groovy
-    - file: src/capabilities/Refresh.groovy
-      params:
-        readGroups: true
-        readAttributes:
-        - { cluster: '0x0006', attr: '0x0000', description: 'OnOff' }
-        - { cluster: '0x0006', attr: '0x4003', description: 'PowerOnBehavior' }
     - file: src/capabilities/FirmwareUpdate.groovy
-    - file: src/capabilities/ZigbeeGroupMember.groovy
-
-zigbee:
-  fingerprints:
-  - firmwares: 1.0.002 (117C-110D-00010002)
-    value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,0008,1000,FC57", outClusters:"0019", model:"ASKVADER on/off switch", manufacturer:"IKEA of Sweden"
+    - file: src/capabilities/ZigbeeGroups.groovy

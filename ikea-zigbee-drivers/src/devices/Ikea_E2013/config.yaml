@@ -7,6 +7,10 @@ device:
   - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
   - https://static.homesmart.ikea.com/releaseNotes/
 
+  fingerprints:
+  - firmwares: 1.0.19 (117C-3277-01000019)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,0B05,1000,FC7C,FC81', outClusters:'0003,0004,0006,0019,1000', model:'PARASOLL Door/Window Sensor', manufacturer:'IKEA of Sweden'
+
   capabilities:
     - name: Sensor
     - name: ContactSensor
@@ -22,23 +26,8 @@ device:
         checkInterval: 3600  # every hour
         thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage every 5 hours)
     - file: src/capabilities/PowerSource.groovy
-    - file: src/capabilities/Refresh.groovy
-      params:
-        readAttributes:
-        - { cluster: '0x0001', attr: '0x0021', description: 'BatteryPercentage' }
-        - { endpoint: '0x02', cluster: '0x0500', attr: '0x0000', description: 'IAS ZoneState' }
-        - { endpoint: '0x02', cluster: '0x0500', attr: '0x0001', description: 'IAS ZoneType' }
-        - { endpoint: '0x02', cluster: '0x0500', attr: '0x0002', description: 'IAS ZoneStatus' }
     - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeBindings.groovy
       params:
         clusters: ['0x0006']
         groups: true
-
-zigbee:
-  fingerprints:
-  - firmwares: 1.0.19 (117C-3277-01000019)
-    value: fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0001,0003,0020,0B05,1000,FC7C,FC81", outClusters:"0003,0004,0006,0019,1000", model:"PARASOLL Door/Window Sensor", manufacturer:"IKEA of Sweden"
-
-  messages:
-  - file: src/devices/Ikea_E2013/events.groovy

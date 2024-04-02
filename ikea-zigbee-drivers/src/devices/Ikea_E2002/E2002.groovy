@@ -1,25 +1,43 @@
+{{!--------------------------------------------------------------------------}}
+{{# @configure }}
+
+// Configuration for devices.E2002
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0005 {${device.zigbeeId}} {}" // Scenes cluster
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
+cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
+{{/ @configure }}
+{{!--------------------------------------------------------------------------}}
+{{# @events }}
+
+// Events for devices.E2002
+// ===================================================================================================================
+
 // Plus/Minus button was pushed
 case { contains it, [clusterInt:0x0006, commandInt:0x00] }:
 case { contains it, [clusterInt:0x0006, commandInt:0x01] }:
-    def button = msg.commandInt == 0x00 ? BUTTONS.MINUS : BUTTONS.PLUS
-    return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+    List<String> button = msg.commandInt == 0x00 ? BUTTONS.MINUS : BUTTONS.PLUS
+    utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
+    return
 
 // Plus/Minus button was held
 case { contains it, [clusterInt:0x0008, commandInt:0x01] }:
 case { contains it, [clusterInt:0x0008, commandInt:0x05] }:
-    def button = msg.commandInt == 0x01 ? BUTTONS.MINUS : BUTTONS.PLUS
-    return Utils.sendEvent(name:"held", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held")
+    List<String> button = msg.commandInt == 0x01 ? BUTTONS.MINUS : BUTTONS.PLUS
+    utils_sendEvent name:'held', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held"
+    return
 
 // Plus/Minus button was released
 case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
 case { contains it, [clusterInt:0x0008, commandInt:0x03] }:
-    def button = device.currentValue("held", true) == 2 || msg.commandInt == 0x03 ? BUTTONS.MINUS : BUTTONS.PLUS
-    return Utils.sendEvent(name:"released", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released")
+    List<String> button = device.currentValue('held', true) == 2 || msg.commandInt == 0x03 ? BUTTONS.MINUS : BUTTONS.PLUS
+    utils_sendEvent name:'released', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released"
+    return
 
 // Next/Prev button was pushed
 case { contains it, [clusterInt:0x0005, commandInt:0x07] }:
-    def button = msg.data[0] == "00" ? BUTTONS.NEXT : BUTTONS.PREV
-    return Utils.sendEvent(name:"pushed", value:button[0], type:"physical", isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed")
+    List<String> button = msg.data[0] == '00' ? BUTTONS.NEXT : BUTTONS.PREV
+    utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
+    return
 
 /*
 Holding the PREV and NEXT buttons works in a weird way:
@@ -47,3 +65,5 @@ and the moment message #4 is received (the moment we can figure out what button 
 
 IMHO, this weird behavior makes the use of the hold actions on the PREV and NEXT button unusable.
 */
+{{/ @events }}
+{{!--------------------------------------------------------------------------}}

@@ -22,7 +22,7 @@ These drivers enable advanced features and functionalities for the following dev
 * [Vindstyrka Air Quality Sensor (E2112)](#vindstyrka-air-quality-sensor-e2112)
 
 Advanced usage:
-* [Direct Zigbee Bindings](Direct_Zigbee_Bindings.md)
+* [Zigbee Bindings](Zigbee_Bindings.md)
 
 ## Installation
 There are two ways to install the drivers: using Hubitat Package Manager (HPM) or manually importing the driver code.

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Change file naming scheme to support other manufacturers
+- Refactored the build system
 
 ### Added
 - Add Zigbee Groups membership control for mains-powered devices (E1603, E1836, ICPSHC24)
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add driver for Philips Hue Wall Switch Module (RDM001)
 - Add driver for Philips Hue Dimmer Switch (RWL022)
 - Add driver for Swann One Key Fob (SWO-KEF1PA)
+- Add driver for Legrand Connected Outlet (741811)
 
 ### Fixed
 - Ignore "Mgmt_Rtg_rsp" and "Parent_annce_rsp" messages that are generated when the Hub restarts - `@a.mcdear`, `@hubitrep`

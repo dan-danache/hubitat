@@ -1,0 +1,41 @@
+{
+    "extends": "recommended",
+    "rules": {
+        "BlockStartsWithBlankLine": {
+            "enabled": false
+        },
+        "CompileStatic": {
+            "enabled": false
+        },
+        "DuplicateMapLiteral": {
+            "enabled": false
+        },
+        "DuplicateNumberLiteral": {
+            "enabled": false
+        },
+        "DuplicateStringLiteral": {
+            "enabled": false
+        },
+        "IfStatementBraces": {
+            "enabled": false
+        },
+        "ImplicitClosureParameter": {
+            "enabled": false
+        },
+        "LineLength": {
+            "enabled": false
+        },
+        "MethodSize": {
+            "enabled": false
+        },
+        "NoJavaUtilDate": {
+            "enabled": false
+        },
+        "PublicMethodsBeforeNonPublicMethods": {
+            "enabled": false
+        },
+        "TrailingWhitespace": {
+            "enabled": false
+        }
+    }
+}
