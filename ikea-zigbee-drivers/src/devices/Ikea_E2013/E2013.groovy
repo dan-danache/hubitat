@@ -5,8 +5,8 @@
 input(
     name: 'swapOpenClosed',
     type: 'bool',
-    title: 'Swap open / closed',
-    description: '<small>Swap open / closed value for the "contact" attribute.</small>',
+    title: 'Invert contact state',
+    description: '<small>Swaps "open" and "closed" status reports.</small>',
     defaultValue: false,
     required: true
 )

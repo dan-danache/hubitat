@@ -48,10 +48,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -177,7 +177,7 @@ List<String> updated(boolean auto = false) {
         device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
     }
     log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-    cmds += zigbee.writeAttribute(0xFCC0, 0x0517, 0x20, Integer.parseInt(powerOnBehavior), [mfgCode:'0x115F', destEndpoint:0x01])
+    cmds += zigbee.writeAttribute(0xFCC0, 0x0517, 0x20, Integer.parseInt(powerOnBehavior),  [mfgCode:'0x115F', destEndpoint:0x01])
     
     if (operationModeS1 == null) {
         operationModeS1 = '1'
@@ -386,8 +386,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)

@@ -8,7 +8,7 @@ import hubitat.zigbee.clusters.iaszone.ZoneStatus
 {{# @configure }}
 
 // Configuration for capability.IAS
-String ep0500 = '{{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}'
+Integer ep0500 = {{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}
 cmds += "he wattr 0x${device.deviceNetworkId} ${ep0500} 0x0500 0x0010 0xF0 {${utils_payload "${location.hub.zigbeeEui}"}}"
 cmds += "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 00 00 00}" // Zone Enroll Response (0x00): status=Success, zoneId=0x00
 cmds += "zdo bind 0x${device.deviceNetworkId} ${ep0500} 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster
@@ -24,7 +24,7 @@ attribute 'ias', 'enum', ['enrolled', 'not enrolled']
 {{# @refresh }}
 
 // Refresh for capability.IAS
-String ep0500 = '{{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}'
+Integer ep0500 = {{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}
 cmds += zigbee.readAttribute(0x0500, 0x0000, [destEndpoint: ep0500]) // IAS ZoneState
 cmds += zigbee.readAttribute(0x0500, 0x0001, [destEndpoint: ep0500]) // IAS ZoneType
 cmds += zigbee.readAttribute(0x0500, 0x0002, [destEndpoint: ep0500]) // IAS ZoneStatus
@@ -53,7 +53,7 @@ case { contains it, [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true] 
 
 // Enroll Request
 case { contains it, [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true] }:
-    String ep0500 = '{{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}'
+    Integer ep0500 = {{# params.endpoint }}{{params.endpoint}}{{/ params.endpoint }}{{^ params.endpoint }}0x01{{/ params.endpoint }}
     utils_sendZigbeeCommands([
         "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 00 00 00}",  // Zone Enroll Response (0x00): status=Success, zoneId=0x00
         "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 01}",        // Initiate Normal Operation Mode (0x01): no_payload

@@ -25,6 +25,9 @@
         "LineLength": {
             "enabled": false
         },
+        "MethodCount": {
+            "enabled": false
+        },
         "MethodSize": {
             "enabled": false
         },

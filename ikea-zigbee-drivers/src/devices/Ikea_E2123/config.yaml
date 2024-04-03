@@ -37,8 +37,8 @@ device:
         - { id: 'DOT_1', name: '•',     number: 6 }
         - { id: 'DOT_2', name: '••',    number: 7 }
     - file: src/capabilities/ReleasableButton.groovy
-    - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeBindings.groovy
       params:
         clusters: ['0x0006']
         groups: true
+    - file: src/capabilities/FirmwareUpdate.groovy

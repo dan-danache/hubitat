@@ -52,10 +52,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -138,7 +138,7 @@ void configure(boolean auto = false) {
     state.lastCx = DRIVER_VERSION
     
     // Configuration for capability.IAS
-    String ep0500 = '0x01'
+    Integer ep0500 = 0x01
     cmds += "he wattr 0x${device.deviceNetworkId} ${ep0500} 0x0500 0x0010 0xF0 {${utils_payload "${location.hub.zigbeeEui}"}}"
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 00 00 00}" // Zone Enroll Response (0x00): status=Success, zoneId=0x00
     cmds += "zdo bind 0x${device.deviceNetworkId} ${ep0500} 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster
@@ -178,7 +178,7 @@ void refresh(boolean auto = false) {
     List<String> cmds = []
     
     // Refresh for capability.IAS
-    String ep0500 = '0x01'
+    Integer ep0500 = 0x01
     cmds += zigbee.readAttribute(0x0500, 0x0000, [destEndpoint: ep0500]) // IAS ZoneState
     cmds += zigbee.readAttribute(0x0500, 0x0001, [destEndpoint: ep0500]) // IAS ZoneType
     cmds += zigbee.readAttribute(0x0500, 0x0002, [destEndpoint: ep0500]) // IAS ZoneStatus
@@ -239,8 +239,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -299,7 +299,7 @@ void parse(String description) {
         
         // Enroll Request
         case { contains it, [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true] }:
-            String ep0500 = '0x01'
+            Integer ep0500 = 0x01
             utils_sendZigbeeCommands([
                 "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 00 00 00}",  // Zone Enroll Response (0x00): status=Success, zoneId=0x00
                 "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 01}",        // Initiate Normal Operation Mode (0x01): no_payload

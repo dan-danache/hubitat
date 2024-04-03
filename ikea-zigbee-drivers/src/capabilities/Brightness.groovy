@@ -192,7 +192,7 @@ if (turnOnBehavior == null) {
 log_info "🛠️ turnOnBehavior = ${turnOnBehavior}"
 if (turnOnBehavior == 'FIXED_VALUE') {
     Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
-    device.updateSetting('onLevelValue', [ value:lvl, type:'number' ])
+    device.updateSetting('onLevelValue', [value:lvl, type:'number'])
     log_info "🛠️ onLevelValue = ${lvl}%"
     applyOnLevel(lvl)
 } else {

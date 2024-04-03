@@ -29,7 +29,7 @@ device:
         - { id: 'OPEN',  name: 'Open',  number: 1 }
         - { id: 'CLOSE', name: 'Close', number: 2 }
     - file: src/capabilities/ReleasableButton.groovy
-    - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeBindings.groovy
       params:
         clusters: ['0x0102']
+    - file: src/capabilities/FirmwareUpdate.groovy

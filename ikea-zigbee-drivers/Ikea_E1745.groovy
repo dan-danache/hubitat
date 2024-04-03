@@ -55,10 +55,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -71,16 +71,16 @@ metadata {
             title: 'Clear motion after',
             description: '<small>Set status inactive if no motion is detected in this period.</small>',
             options: [
-                '60'  : '1 minute',
-                '120' : '2 minutes',
-                '180' : '3 minutes',
-                '240' : '4 minutes',
-                '300' : '5 minutes',
-                '360' : '6 minutes',
-                '420' : '7 minutes',
-                '480' : '8 minutes',
-                '540' : '9 minutes',
-                '600' : '10 minutes'
+                 '60': '1 minute',
+                '120': '2 minutes',
+                '180': '3 minutes',
+                '240': '4 minutes',
+                '300': '5 minutes',
+                '360': '6 minutes',
+                '420': '7 minutes',
+                '480': '8 minutes',
+                '540': '9 minutes',
+                '600': '10 minutes'
             ],
             defaultValue: '180',
             required: true
@@ -101,7 +101,7 @@ metadata {
             type: 'enum',
             title: 'Control Zigbee device',
             description: '<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-            options: [ '0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -' ] + retrieveSwitchDevices(),
+            options: ['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
             defaultValue: '----',
             required: false
         )
@@ -110,7 +110,7 @@ metadata {
             type: 'enum',
             title: 'Control Zigbee group',
             description: '<small>Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-            options: [ '0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -' ] + GROUPS,
+            options: ['0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue: '----',
             required: false
         )
@@ -321,8 +321,8 @@ void updateFirmware() {
 // Implementation for capability.ZigbeeBindings
 private Map<String, String> retrieveSwitchDevices() {
     try {
-        List<Integer> switchDeviceIds = httpGet([ uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch' ]) { it.data*.id }
-        httpGet([ uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json' ]) { response ->
+        List<Integer> switchDeviceIds = httpGet([uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch']) { it.data*.id }
+        httpGet([uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json']) { response ->
             response.data.devices
                 .findAll { switchDeviceIds.contains(it.id) }
                 .sort { it.name }
@@ -348,8 +348,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -386,7 +386,7 @@ void parse(String description) {
                 return
             }
         
-            runIn Integer.parseInt(clearMotionPeriod), 'clearMotion', [ overwrite:true ]
+            runIn Integer.parseInt(clearMotionPeriod), 'clearMotion', [overwrite:true]
             utils_sendEvent name:'motion', value:'active', type:'physical', descriptionText:'Is active'
             return
         

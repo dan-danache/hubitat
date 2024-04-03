@@ -33,7 +33,7 @@ device:
         - { id: 'NEXT',  name: 'Next',  number: 3 }
         - { id: 'PREV',  name: 'Prev',  number: 4 }
     - file: src/capabilities/ReleasableButton.groovy
-    - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeBindings.groovy
       params:
         clusters: ['0x0006', '0x0008']
+    - file: src/capabilities/FirmwareUpdate.groovy

@@ -19,16 +19,16 @@ input(
     title: 'Clear motion after',
     description: '<small>Set status inactive if no motion is detected in this period.</small>',
     options: [
-        '60'  : '1 minute',
-        '120' : '2 minutes',
-        '180' : '3 minutes',
-        '240' : '4 minutes',
-        '300' : '5 minutes',
-        '360' : '6 minutes',
-        '420' : '7 minutes',
-        '480' : '8 minutes',
-        '540' : '9 minutes',
-        '600' : '10 minutes'
+         '60': '1 minute',
+        '120': '2 minutes',
+        '180': '3 minutes',
+        '240': '4 minutes',
+        '300': '5 minutes',
+        '360': '6 minutes',
+        '420': '7 minutes',
+        '480': '8 minutes',
+        '540': '9 minutes',
+        '600': '10 minutes'
     ],
     defaultValue: '180',
     required: true
@@ -92,7 +92,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x42] }:
         return
     }
 
-    runIn Integer.parseInt(clearMotionPeriod), 'clearMotion', [ overwrite:true ]
+    runIn Integer.parseInt(clearMotionPeriod), 'clearMotion', [overwrite:true]
     utils_sendEvent name:'motion', value:'active', type:'physical', descriptionText:'Is active'
     return
 

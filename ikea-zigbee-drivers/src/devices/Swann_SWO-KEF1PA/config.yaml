@@ -27,3 +27,4 @@ device:
         - { id: 'HOME',  name: 'Home',  number: 2 }
         - { id: 'AWAY',  name: 'Away',  number: 3 }
         - { id: 'NIGHT', name: 'Night', number: 4 }
+    - file: src/capabilities/FirmwareUpdate.groovy

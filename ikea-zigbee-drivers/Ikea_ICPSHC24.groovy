@@ -69,10 +69,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -183,7 +183,7 @@ metadata {
             type: 'enum',
             title: 'Join a Zigbee group',
             description: '<small>Select a Zigbee group you want to join.</small>',
-            options: [ '0000':'❌ Leave all Zigbee groups', '----':'- - - -' ] + GROUPS,
+            options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue: '----',
             required: false
         )
@@ -242,7 +242,7 @@ List<String> updated(boolean auto = false) {
     log_info "🛠️ turnOnBehavior = ${turnOnBehavior}"
     if (turnOnBehavior == 'FIXED_VALUE') {
         Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
-        device.updateSetting('onLevelValue', [ value:lvl, type:'number' ])
+        device.updateSetting('onLevelValue', [value:lvl, type:'number'])
         log_info "🛠️ onLevelValue = ${lvl}%"
         applyOnLevel(lvl)
     } else {
@@ -521,8 +521,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -570,7 +570,7 @@ void parse(String description) {
                 default: log_warn "Received attribute value: powerOnBehavior=${msg.value}"; return
             }
             powerOnBehavior = newValue
-            device.updateSetting('powerOnBehavior', [ value:newValue, type:'enum' ])
+            device.updateSetting('powerOnBehavior', [value:newValue, type:'enum'])
         
             utils_processedZclMessage 'Read Attributes Response', "PowerOnBehavior=${newValue}"
             return

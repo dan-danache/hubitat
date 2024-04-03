@@ -54,10 +54,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -202,7 +202,7 @@ void refresh(boolean auto = false) {
 private Integer lerp(Integer ylo, Integer yhi, BigDecimal xlo, BigDecimal xhi, Integer cur) {
     return Math.round(((cur - xlo) / (xhi - xlo)) * (yhi - ylo) + ylo)
 }
-private pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
+private List pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
     if (pm25 <=  12.1) return [lerp(  0,  50,   0.0,  12.0, pm25), 'good', 'green']
     if (pm25 <=  35.5) return [lerp( 51, 100,  12.1,  35.4, pm25), 'moderate', 'gold']
     if (pm25 <=  55.5) return [lerp(101, 150,  35.5,  55.4, pm25), 'unhealthy for sensitive groups', 'darkorange']
@@ -264,8 +264,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)

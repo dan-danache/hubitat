@@ -24,5 +24,5 @@ device:
         checkInterval: 3600  # every hour
         thereshold: 3600     # report device as offline if no message was received in the last 60 minutes (device should report On/Off status every 10 minutes)
     - file: src/capabilities/PowerSource.groovy
-    - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeGroups.groovy
+    - file: src/capabilities/FirmwareUpdate.groovy

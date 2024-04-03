@@ -67,10 +67,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -83,11 +83,11 @@ metadata {
             title: 'Sensor report frequency',
             description: '<small>Adjust how often the device sends its PM 2.5 sensor data.</small>',
             options: [
-                '01' : 'Very High - report changes of +/- 1μg/m3',
-                '02' : 'High - report changes of +/- 2μg/m3',
-                '03' : 'Medium - report changes of +/- 3μg/m3',
-                '05' : 'Low - report changes of +/- 5μg/m3',
-                '10' : 'Very Low - report changes of +/- 10μg/m3'
+                '01': 'Very High - report changes of +/- 1μg/m3',
+                '02': 'High - report changes of +/- 2μg/m3',
+                '03': 'Medium - report changes of +/- 3μg/m3',
+                '05': 'Low - report changes of +/- 5μg/m3',
+                '10': 'Very Low - report changes of +/- 10μg/m3'
             ],
             defaultValue: '03',
             required: true
@@ -98,10 +98,10 @@ metadata {
             title: 'Filter life time',
             description: '<small>Configure time between filter changes (default 6 months).</small>',
             options: [
-                 '90' : '3 months',
-                '180' : '6 months',
-                '270' : '9 months',
-                '360' : '1 year'
+                 '90': '3 months',
+                '180': '6 months',
+                '270': '9 months',
+                '360': '1 year'
             ],
             defaultValue: '180',
             required: true
@@ -362,7 +362,7 @@ void cycleSpeed() {
 private Integer lerp(Integer ylo, Integer yhi, BigDecimal xlo, BigDecimal xhi, Integer cur) {
     return Math.round(((cur - xlo) / (xhi - xlo)) * (yhi - ylo) + ylo)
 }
-private pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
+private List pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
     if (pm25 <=  12.1) return [lerp(  0,  50,   0.0,  12.0, pm25), 'good', 'green']
     if (pm25 <=  35.5) return [lerp( 51, 100,  12.1,  35.4, pm25), 'moderate', 'gold']
     if (pm25 <=  55.5) return [lerp(101, 150,  35.5,  55.4, pm25), 'unhealthy for sensitive groups', 'darkorange']
@@ -424,8 +424,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)

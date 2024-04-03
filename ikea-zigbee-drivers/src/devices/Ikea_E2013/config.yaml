@@ -27,8 +27,8 @@ device:
         checkInterval: 3600  # every hour
         thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage every 5 hours)
     - file: src/capabilities/PowerSource.groovy
-    - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeBindings.groovy
       params:
         clusters: ['0x0006']
         groups: true
+    - file: src/capabilities/FirmwareUpdate.groovy

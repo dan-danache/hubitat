@@ -17,7 +17,7 @@ input(
     type: 'enum',
     title: 'Control Zigbee device',
     description: '<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-    options: [ '0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -' ] + retrieveSwitchDevices(),
+    options: ['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
     defaultValue: '----',
     required: false
 )
@@ -27,7 +27,7 @@ input(
     type: 'enum',
     title: 'Control Zigbee group',
     description: '<small>Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-    options: [ '0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -' ] + GROUPS,
+    options: ['0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -'] + GROUPS,
     defaultValue: '----',
     required: false
 )
@@ -39,8 +39,8 @@ input(
 // Implementation for capability.ZigbeeBindings
 private Map<String, String> retrieveSwitchDevices() {
     try {
-        List<Integer> switchDeviceIds = httpGet([ uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch' ]) { it.data*.id }
-        httpGet([ uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json' ]) { response ->
+        List<Integer> switchDeviceIds = httpGet([uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch']) { it.data*.id }
+        httpGet([uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json']) { response ->
             response.data.devices
                 .findAll { switchDeviceIds.contains(it.id) }
                 .sort { it.name }

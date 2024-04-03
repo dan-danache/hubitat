@@ -116,7 +116,7 @@ if (powerOnBehavior == null) {
     device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
 }
 log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-cmds += zigbee.writeAttribute(0xFCC0, 0x0517, 0x20, Integer.parseInt(powerOnBehavior), [mfgCode:'0x115F', destEndpoint:0x01])
+cmds += zigbee.writeAttribute(0xFCC0, 0x0517, 0x20, Integer.parseInt(powerOnBehavior),  [mfgCode:'0x115F', destEndpoint:0x01])
 
 if (operationModeS1 == null) {
     operationModeS1 = '1'

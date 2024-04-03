@@ -57,10 +57,10 @@ metadata {
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
-                '1' : 'Debug - log everything',
-                '2' : 'Info - log important events',
-                '3' : 'Warning - log events that require attention',
-                '4' : 'Error - log errors'
+                '1': 'Debug - log everything',
+                '2': 'Info - log important events',
+                '3': 'Warning - log events that require attention',
+                '4': 'Error - log errors'
             ],
             defaultValue: '1',
             required: true
@@ -70,8 +70,8 @@ metadata {
         input(
             name: 'swapOpenClosed',
             type: 'bool',
-            title: 'Swap open / closed',
-            description: '<small>Swap open / closed value for the "contact" attribute.</small>',
+            title: 'Invert contact state',
+            description: '<small>Swaps "open" and "closed" status reports.</small>',
             defaultValue: false,
             required: true
         )
@@ -82,7 +82,7 @@ metadata {
             type: 'enum',
             title: 'Control Zigbee device',
             description: '<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-            options: [ '0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -' ] + retrieveSwitchDevices(),
+            options: ['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
             defaultValue: '----',
             required: false
         )
@@ -91,7 +91,7 @@ metadata {
             type: 'enum',
             title: 'Control Zigbee group',
             description: '<small>Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-            options: [ '0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -' ] + GROUPS,
+            options: ['0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue: '----',
             required: false
         )
@@ -208,7 +208,7 @@ void configure(boolean auto = false) {
     state.lastCx = DRIVER_VERSION
     
     // Configuration for capability.IAS
-    String ep0500 = '0x02'
+    Integer ep0500 = 0x02
     cmds += "he wattr 0x${device.deviceNetworkId} ${ep0500} 0x0500 0x0010 0xF0 {${utils_payload "${location.hub.zigbeeEui}"}}"
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 00 00 00}" // Zone Enroll Response (0x00): status=Success, zoneId=0x00
     cmds += "zdo bind 0x${device.deviceNetworkId} ${ep0500} 0x01 0x0500 {${device.zigbeeId}} {}" // IAS Zone cluster
@@ -248,7 +248,7 @@ void refresh(boolean auto = false) {
     List<String> cmds = []
     
     // Refresh for capability.IAS
-    String ep0500 = '0x02'
+    Integer ep0500 = 0x02
     cmds += zigbee.readAttribute(0x0500, 0x0000, [destEndpoint: ep0500]) // IAS ZoneState
     cmds += zigbee.readAttribute(0x0500, 0x0001, [destEndpoint: ep0500]) // IAS ZoneType
     cmds += zigbee.readAttribute(0x0500, 0x0002, [destEndpoint: ep0500]) // IAS ZoneStatus
@@ -288,20 +288,11 @@ void pingExecute() {
     log_info "Will be marked as offline if no message is received until ${thereshold.format('yyyy-MM-dd HH:mm:ss', location.timeZone)} (${offlineMarkAgo} from now)"
 }
 
-// Implementation for capability.FirmwareUpdate
-void updateFirmware() {
-    log_info 'Looking for firmware updates ...'
-    if (device.currentValue('powerSource', true) == 'battery') {
-        log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
-    }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
-}
-
 // Implementation for capability.ZigbeeBindings
 private Map<String, String> retrieveSwitchDevices() {
     try {
-        List<Integer> switchDeviceIds = httpGet([ uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch' ]) { it.data*.id }
-        httpGet([ uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json' ]) { response ->
+        List<Integer> switchDeviceIds = httpGet([uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch']) { it.data*.id }
+        httpGet([uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json']) { response ->
             response.data.devices
                 .findAll { switchDeviceIds.contains(it.id) }
                 .sort { it.name }
@@ -310,6 +301,15 @@ private Map<String, String> retrieveSwitchDevices() {
     } catch (Exception ex) {
         return ['ZZZZ': "Exception: ${ex}"]
     }
+}
+
+// Implementation for capability.FirmwareUpdate
+void updateFirmware() {
+    log_info 'Looking for firmware updates ...'
+    if (device.currentValue('powerSource', true) == 'battery') {
+        log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
+    }
+    utils_sendZigbeeCommands(zigbee.updateFirmware())
 }
 
 // ===================================================================================================================
@@ -327,8 +327,8 @@ void parse(String description) {
 
     // Extract msg
     Map msg = [:]
-    if (description.startsWith('zone status')) msg += [ clusterInt:0x500, commandInt:0x00, isClusterSpecific:true ]
-    if (description.startsWith('enroll request')) msg += [ clusterInt:0x500, commandInt:0x01, isClusterSpecific:true ]
+    if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
+    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -387,7 +387,7 @@ void parse(String description) {
         
         // Enroll Request
         case { contains it, [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true] }:
-            String ep0500 = '0x02'
+            Integer ep0500 = 0x02
             utils_sendZigbeeCommands([
                 "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 00 00 00}",  // Zone Enroll Response (0x00): status=Success, zoneId=0x00
                 "he raw 0x${device.deviceNetworkId} 0x01 ${ep0500} 0x0500 {01 23 01}",        // Initiate Normal Operation Mode (0x01): no_payload

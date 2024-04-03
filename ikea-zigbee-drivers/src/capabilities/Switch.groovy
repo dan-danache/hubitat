@@ -121,7 +121,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
         default: log_warn "Received attribute value: powerOnBehavior=${msg.value}"; return
     }
     powerOnBehavior = newValue
-    device.updateSetting('powerOnBehavior', [ value:newValue, type:'enum' ])
+    device.updateSetting('powerOnBehavior', [value:newValue, type:'enum'])
 
     utils_processedZclMessage 'Read Attributes Response', "PowerOnBehavior=${newValue}"
     return

@@ -31,7 +31,7 @@ device:
         buttons:
         - { id: 'ONOFF', name: 'On/Off', number: 1 }
     - file: src/capabilities/ReleasableButton.groovy
-    - file: src/capabilities/FirmwareUpdate.groovy
     - file: src/capabilities/ZigbeeBindings.groovy
       params:
         clusters: ['0x0006']
+    - file: src/capabilities/FirmwareUpdate.groovy
