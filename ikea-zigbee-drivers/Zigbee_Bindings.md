@@ -120,11 +120,11 @@ Follow this steps in order to setup device-to-device bindings:
 1. Immediately click the "Save Preferences" button.
 1. The setup is complete! The source device will now directly control the target device, bypassing the need for Hubitat Hub programming.
 
-![Setup device bindings](img/device_zigbee_bindings.png)
+![Setup device bindings](img/doc/device_zigbee_bindings.png)
 
 Note: After clicking the "Save Preferences" button, you need to reload the device details page in order to see the newly bound device in the "State Variables" section (the page is rendered before the device bind confirmation is received):
 
-![Bound devices list](img/bound_devices_list.png)
+![Bound devices list](img/doc/bound_devices_list.png)
 
 ## Direct Group Bindings
 
@@ -191,11 +191,11 @@ Steps for setting Up Device-to-Device Bindings:
 1. Immediately click the "Save Preferences" button.
 1. The setup is complete! Button presses will now directly control all devices in the target group, bypassing the need for programming on the Hubitat Hub.
 
-![Setup group bindings](img/group_zigbee_bindings.png)
+![Setup group bindings](img/doc/group_zigbee_bindings.png)
 
 Note: After clicking the "Save Preferences" button, you need to reload the device details page in order to see the newly bound group in the "State Variables" section (the page is rendered before the group bind confirmation is received):
 
-![Bound groups list](img/bound_groups_list.png)
+![Bound groups list](img/doc/bound_groups_list.png)
 
 ### Joining a Group
 
@@ -213,11 +213,11 @@ Steps for joining a group:
 1. Select the "Save Preferences" button.
 1. The process is complete! The device will now receive commands sent to the group.
 
-![Join group](img/join_group.png)
+![Join group](img/doc/join_group.png)
 
 Note: After clicking the "Save Preferences" button, you need to reload the device details page in order to see the newly joined group in the "State Variables" section (the page is rendered before the group join confirmation is received):
 
-![Joined groups list](img/joined_groups_list.png)
+![Joined groups list](img/doc/joined_groups_list.png)
 
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)

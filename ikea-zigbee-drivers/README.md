@@ -18,11 +18,19 @@ These drivers enable advanced features and functionalities for the following dev
 * [Tradfri Open/Close Remote (E1766)](#tradfri-openclose-remote-e1766)
 * [Tradfri Remote Control (E1810)](#tradfri-remote-control-e1810)
 * [Tradfri Shortcut Button (E1812)](#tradfri-shortcut-button-e1812)
+* [Tretakt Smart Plug (E2204)](#tretakt-smart-plug-e2204)
 * [Vallhorn Motion Sensor (E2134)](#vallhorn-motion-sensor-e2134)
 * [Vindstyrka Air Quality Sensor (E2112)](#vindstyrka-air-quality-sensor-e2112)
 
-Advanced usage:
+Advanced features:
 * [Zigbee Bindings](Zigbee_Bindings.md)
+
+Devices from other vendors (not in HPM):
+* [Aqara Dual Relay Module T2 (DCM-K01)](#aqara-dual-relay-module-t2-dcm-k01)
+* [Legrand Connected Outlet (741811)](#legrand-connected-outlet-741811)
+* [Philips Hue Wall Switch Module (RDM001)](#philips-hue-wall-switch-module-rdm001)
+* [Philips Hue Dimmer Switch (RWL022)](#philips-hue-dimmer-switch-rwl022)
+* [Swann One Key Fob (SWO-KEF1PA)](#swann-one-key-fob-swo-kef1pa)
 
 ## Installation
 There are two ways to install the drivers: using Hubitat Package Manager (HPM) or manually importing the driver code.
@@ -92,7 +100,7 @@ Below you can find the details of each device, including the features and pairin
 
 #### Features
 * Water detection: wet / dry
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 
 #### Pairing Instructions
@@ -152,7 +160,7 @@ Below you can find the details of each device, including the features and pairin
 
 #### Features
 * Contact status: open / close
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off
 * Directly control Zigbee groups: On/Off
@@ -181,7 +189,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Push events: both buttons
 * Button Hold events: both buttons
 * Button Release events: both buttons
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off and Brightness
 * Directly control Zigbee groups: On/Off and Brightness
@@ -212,7 +220,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Double-Tap event: both buttons
 * Button Hold events: both buttons
 * Button Release events: both buttons
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 
 #### Pairing Instructions
@@ -269,7 +277,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Push events for: all buttons
 * Button Hold events for: Button 1 (🔆) and Button 2 (🔅)
 * Button Release events for: Button 1 (🔆), Button 2 (🔅)
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off and Brightness
 
@@ -302,7 +310,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Hold events: Button 2 (Plus), Button 3 (Minus), Button 6 (•) and Button 7 (••)
 * Button Release events: Button 6 (•) and Button 7 (••)
 * Button Double-Tap events: Button 6 (•) and Button 7 (••)
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off
 * Directly control Zigbee groups: On/Off
@@ -360,7 +368,7 @@ Below you can find the details of each device, including the features and pairin
 * Motion detection: active / inactive (50 seconds cooldown)
 * Illumination detection: dim / bright
 * Option to detect motion only when dark
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 
 #### Known Issues
@@ -392,7 +400,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Push events: both buttons
 * Button Hold events: both buttons
 * Button Release events: both buttons
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off and Brightness
 
@@ -420,7 +428,7 @@ Below you can find the details of each device, including the features and pairin
 #### Features
 * Button Push events: both buttons
 * Button Release events: both buttons
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: Window Covering
 
@@ -450,7 +458,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Release events: Button 2 (🔆), Button 3 (🔅), Button 4 (Next) and Button 5 (Prev)
 * Button 1 (Play) acts as a switch (on / off)
 * Button 2 (🔆) and Button 3 (🔅) act as a switch level (0 - 100%)
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off and Brightness
 
@@ -483,7 +491,7 @@ Below you can find the details of each device, including the features and pairin
 * Button Double-Tap event (only on firmware `24.4.6` and above)
 * Button Hold event
 * Button Release event
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 * Directly control Zigbee devices: On/Off
 
@@ -495,6 +503,33 @@ Below you can find the details of each device, including the features and pairin
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. Close the device battery compartiment.
 1. You're all set! Enjoy using your Tradfri Shortcut Button.
+
+
+### Tretakt Smart Plug (E2204)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Ikea_E2204.webp" style="width: 200px"> |
+| Product Code | `805.403.49` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2204.groovy` |
+| Tested firmwares | `???` |
+| Since version | `4.0.0` |
+
+#### Features
+* Commands: On, Off, Toggle, On with Timed Off
+* Configure what happens after a power outage (Power On, Power Off, Restore previous state)
+* Health status: online / offline
+* Refresh switch state on demand
+* Can be member of Zigbee groups
+
+#### Pairing Instructions
+1. Find the small reset button near on/off button and make sure you have a pointy object at hand.
+1. If the device is already plugged in, unplug it for 20 seconds (power-cycle) before each pairing attempt.
+1. Plug the device back into an outlet.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Push the small reset button on top of the smart plug with a pointy object for at least 5 seconds until the LED starts pulsating.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Tretakt Smart Plug.
 
 
 ### Vallhorn Motion Sensor (E2134)
@@ -510,7 +545,7 @@ Below you can find the details of each device, including the features and pairin
 #### Features
 * Motion detection: active / inactive (20 seconds cooldown)
 * Illumination lux reporting (5 minutes cooldown)
-* Battery indicator: %
+* Battery report: %
 * Health status: online / offline
 
 #### Known Issues
@@ -548,6 +583,139 @@ Below you can find the details of each device, including the features and pairin
 1. Click the pair button (🔗), located on the top of the device, 4 times in 5 seconds.
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your Vindstyrka Air Quality Sensor.
+
+
+### Aqara Dual Relay Module T2 (DCM-K01)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Aqara_DCM-K01.webp" style="width: 200px"> |
+| Product Link | https://www.aqara.com/eu/dual-relay-module-t2/ |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Aqara_DCM-K01.groovy` |
+| Since version | `4.0.0` |
+
+#### Features
+* Standard operation mode: switch S1/S2 controls relay L1/L2
+* Decoupled operation mode: switch S1/S2 only sends "push" events
+* Configure switch type: latching / momentary / disabled
+* Configure relay type: wet contact / dry contact / pulse mode (with configurable pulse duration: 200ms .. 2000ms)
+* Configure interlock mode: prevent both Relay L1 and Relay L2 being On at the same time
+* Configure what happens after a power outage (Power On, Power Off, Restore previous state)
+* Report device temperature
+* Report power (W): L1 + L2
+* Report energy consumption (kWh): L1 + L2
+* Health status: online / offline
+* Refresh device state on demand
+
+#### Pairing Instructions
+1. If the device is already powered on, disconnect it for 20 seconds (power-cycle) before each pairing attempt.
+1. Power on the device.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Push and hold the pairing button for 5 seconds; the LED light will start blinking upon release.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Aqara Dual Relay Module T2.
+
+
+### Legrand Connected Outlet (741811)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Legrand_741811.webp" style="width: 200px"> |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Legrand_741811.groovy` |
+| Since version | `4.0.0` |
+
+#### Features
+* Commands: On, Off, Toggle, On with Timed Off
+* Configure what happens after a power outage (Power On, Power Off, Restore previous state)
+* Report power (W)
+* Health status: online / offline
+* Refresh device state on demand
+
+#### Pairing Instructions
+1. Find the small reset hole under the device face plate and make sure you have at hand a pin that can fit the reset hole
+   (e.g.: a paper clip or SIM card eject pin).
+1. If the device is already powered on, disconnect it for 20 seconds (power-cycle) before each pairing attempt.
+1. Power on the device.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Insert the pin into the reset hole and press it for at least 5 seconds; upon release, the LED light will start blinking.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Legrand Connected Outlet.
+
+
+### Philips Hue Wall Switch Module (RDM001)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Philips_RDM001.webp" style="width: 200px"> |
+| Product Link | [Single](https://www.philips-hue.com/en-us/p/hue-philips-hue-wall-switch-module/046677571160)｜[2-Pack](https://www.philips-hue.com/en-us/p/hue-philips-hue-wall-switch-module-2-pack/046677571245) |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RDM001.groovy` |
+| Since version | `4.0.0` |
+
+#### Features
+* Configure switch style: single rocker / single push button / dual rocker / dual push button
+* Button Push event: both switches
+* Battery report: %
+* Health status: online / offline
+* Directly control Zigbee devices: On/Off
+* Directly control Zigbee groups: On/Off
+
+#### Pairing Instructions
+1. Connect the S1 switch cable
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Press the reset button for 10 seconds.
+1. When the LED starts blinking, close and release the S1 switch.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Philips Hue Wall Switch Module.
+
+
+### Philips Hue Dimmer Switch (RWL022)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Philips_RWL022.webp" style="width: 200px"> |
+| Product Link | https://www.philips-hue.com/en-gb/p/hue-dimmer-switch--latest-model-/8719514274617 |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RWL022.groovy` |
+| Since version | `4.0.0` |
+
+#### Features
+* Button Push event: all 4 buttons
+* Button Hold events: all 4 buttons
+* Button Release events: all 4 buttons
+* Battery report: %
+* Health status: online / offline
+* Directly control Zigbee devices: On/Off
+* Directly control Zigbee groups: On/Off
+
+#### Pairing Instructions
+1. Open the battery compartiment, find the small reset hole and make sure you have at hand a pin that can fit the reset hole
+   (e.g.: a paper clip or SIM card eject pin).
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Insert the pin into the reset hole and press it for at least 5 seconds; upon release, the LED light on the first button will start blinking.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Philips Hue Dimmer Switch.
+
+
+### Swann One Key Fob (SWO-KEF1PA)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Swann_SWO-KEF1PA.webp" style="width: 200px"> |
+| Product Link | https://cdn.swann.com/media/wysiwyg/docs/en/Key_Fob_QSG.pdf |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Swann_SWO-KEF1PA.groovy` |
+| Since version | `4.0.0` |
+
+> I don't own this device and did not test it myself.
+
+#### Features
+* Button Push event: all 4 buttons
+* Battery report: %
+* Health status: online / offline
+
+#### Known Issues
+* Device drops off the Zigbee mesh (unknown reason)
+
+#### Pairing Instructions
+Unknown
 
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)

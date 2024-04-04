@@ -1,5 +1,5 @@
 /**
- * IKEA Askvader On/Off Switch (E1836)
+ * IKEA Tretakt Smart Plug (E2204)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
@@ -7,7 +7,7 @@ import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 
-@Field static final String DRIVER_NAME = 'IKEA Askvader On/Off Switch (E1836)'
+@Field static final String DRIVER_NAME = 'IKEA Tretakt Smart Plug (E2204)'
 @Field static final String DRIVER_VERSION = '4.0.0'
 
 // Fields for capability.HealthCheck
@@ -22,17 +22,17 @@ import groovy.transform.Field
 ]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1836.groovy') {
+    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2204.groovy') {
         capability 'Configuration'
         capability 'Refresh'
-        capability 'RelaySwitch'
+        capability 'Outlet'
         capability 'Actuator'
         capability 'Switch'
         capability 'HealthCheck'
         capability 'PowerSource'
 
-        // For firmware: 1.0.002 (117C-110D-00010002)
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57', outClusters:'0019', model:'ASKVADER on/off switch', manufacturer:'IKEA of Sweden'
+        // For firmware: 2.3.089 (117C-1101-23089631)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC7C', outClusters:'0019,0020,1000', model:'TRADFRI control outlet', manufacturer:'IKEA of Sweden'
         
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
@@ -49,10 +49,10 @@ metadata {
         input(
             name: 'helpInfo', type: 'hidden',
             title: '''
-            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1836.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Askvader On/Off Switch (E1836) <small>v4.0.0</small><br>
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2204.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Tretakt Smart Plug (E2204) <small>v4.0.0</small><br>
                 <small><div>
-                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#askvader-onoff-switch-e1836" target="_blank">device details</a><br>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tretakt-smart-plug-e2204" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
                 </div></small>
             </div>

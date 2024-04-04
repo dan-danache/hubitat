@@ -1,9 +1,7 @@
 /**
  * {{ device.model }}
  *
-{{# device.links }}
- * @see {{ . }}
-{{/ device.links }}
+ * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -42,8 +40,21 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('{{ device.image }}') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                {{ device.model }} <small>v{{ driver.version }}</small><br>
+                <small><div>
+                {{# device.links }}
+                • <a href="{{ url }}" target="_blank">{{ name }}</a><br>
+                {{/ device.links }}
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [

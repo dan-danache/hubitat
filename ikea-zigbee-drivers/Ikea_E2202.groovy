@@ -2,9 +2,6 @@
  * IKEA Badring Water Leakage Sensor (E2202)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E2202.html
- * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
- * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -47,8 +44,20 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2202.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Badring Water Leakage Sensor (E2202) <small>v4.0.0</small><br>
+                <small><div>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#badring-water-leakage-sensor-e2202" target="_blank">device details</a><br>
+                • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [

@@ -1,17 +1,19 @@
 device:
   model: IKEA Askvader On/Off Switch (E1836)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1836.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1836.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Ikea_E1836.html
-  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
-  - https://static.homesmart.ikea.com/releaseNotes/
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#askvader-onoff-switch-e1836
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 1.0.002 (117C-110D-00010002)
     value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57', outClusters:'0019', model:'ASKVADER on/off switch', manufacturer:'IKEA of Sweden'
 
   capabilities:
+    - name: RelaySwitch
     - file: src/capabilities/Switch.groovy
       params:
         powerOnBehavior: true

@@ -34,8 +34,7 @@ command 'toggle'
 
 // Inputs for devices.E2006
 input(
-    name: 'pm25ReportDelta',
-    type: 'enum',
+    name: 'pm25ReportDelta', type: 'enum',
     title: 'Sensor report frequency',
     description: '<small>Adjust how often the device sends its PM 2.5 sensor data.</small>',
     options: [
@@ -49,8 +48,7 @@ input(
     required: true
 )
 input(
-    name: 'filterLifeTime',
-    type: 'enum',
+    name: 'filterLifeTime', type: 'enum',
     title: 'Filter life time',
     description: '<small>Configure time between filter changes (default 6 months).</small>',
     options: [
@@ -63,15 +61,13 @@ input(
     required: true
 )
 input(
-    name: 'childLock',
-    type: 'bool',
+    name: 'childLock', type: 'bool',
     title: 'Child lock',
     description: '<small>Lock physical controls on the device.</small>',
     defaultValue: false
 )
 input(
-    name: 'panelIndicator',
-    type: 'bool',
+    name: 'panelIndicator', type: 'bool',
     title: 'LED status',
     description: '<small>Keep the LED indicators on the device constantly lit.</small>',
     defaultValue: true

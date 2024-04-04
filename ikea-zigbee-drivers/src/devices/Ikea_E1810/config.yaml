@@ -1,11 +1,12 @@
 device:
   model: IKEA Tradfri Remote Control (E1810)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1810.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1810.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Ikea_E1810.html
-  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
-  - https://static.homesmart.ikea.com/releaseNotes/
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-remote-control-e1810
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 24.4.5 (117C-11C1-24040005)

@@ -2,9 +2,6 @@
  * IKEA Starkvind Air Purifier (E2006)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E1603.html
- * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
- * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -62,8 +59,20 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2006.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Starkvind Air Purifier (E2006) <small>v4.0.0</small><br>
+                <small><div>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#starkvind-air-purifier-e2006" target="_blank">device details</a><br>
+                • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
@@ -78,8 +87,7 @@ metadata {
         
         // Inputs for devices.E2006
         input(
-            name: 'pm25ReportDelta',
-            type: 'enum',
+            name: 'pm25ReportDelta', type: 'enum',
             title: 'Sensor report frequency',
             description: '<small>Adjust how often the device sends its PM 2.5 sensor data.</small>',
             options: [
@@ -93,8 +101,7 @@ metadata {
             required: true
         )
         input(
-            name: 'filterLifeTime',
-            type: 'enum',
+            name: 'filterLifeTime', type: 'enum',
             title: 'Filter life time',
             description: '<small>Configure time between filter changes (default 6 months).</small>',
             options: [
@@ -107,15 +114,13 @@ metadata {
             required: true
         )
         input(
-            name: 'childLock',
-            type: 'bool',
+            name: 'childLock', type: 'bool',
             title: 'Child lock',
             description: '<small>Lock physical controls on the device.</small>',
             defaultValue: false
         )
         input(
-            name: 'panelIndicator',
-            type: 'bool',
+            name: 'panelIndicator', type: 'bool',
             title: 'LED status',
             description: '<small>Keep the LED indicators on the device constantly lit.</small>',
             defaultValue: true

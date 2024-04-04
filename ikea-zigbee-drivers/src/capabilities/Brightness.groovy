@@ -8,8 +8,7 @@ capability 'SwitchLevel'
 
 // Inputs for capability.Brightness
 input(
-    name: 'levelStep',
-    type: 'enum',
+    name: 'levelStep', type: 'enum',
     title: 'Brightness up/down step',
     description: '<small>Level adjust when using the levelUp/levelDown commands.</small>',
     options: [
@@ -25,8 +24,7 @@ input(
     required: true
 )
 input(
-    name: 'startLevelChangeRate',
-    type: 'enum',
+    name: 'startLevelChangeRate', type: 'enum',
     title: 'Brightness change rate',
     description: '<small>The rate of brightness change when using the startLevelChange() command.</small>',
     options: [
@@ -40,8 +38,7 @@ input(
     required: true
 )
 input(
-    name: 'turnOnBehavior',
-    type: 'enum',
+    name: 'turnOnBehavior', type: 'enum',
     title: 'Turn On behavior',
     description: '<small>Select what happens when the device is turned On.</small>',
     options: [
@@ -63,8 +60,7 @@ if (turnOnBehavior == 'FIXED_VALUE') {
     )
 }
 input(
-    name: 'transitionTime',
-    type: 'enum',
+    name: 'transitionTime', type: 'enum',
     title: 'On/Off transition time',
     description: '<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
     options: [
@@ -82,8 +78,7 @@ input(
     required: true
 )
 input(
-    name: 'prestaging',
-    type: 'bool',
+    name: 'prestaging', type: 'bool',
     title: 'Pre-staging',
     description: '<small>Set the brightness level without turning On the device (for later use).</small>',
     defaultValue: false,

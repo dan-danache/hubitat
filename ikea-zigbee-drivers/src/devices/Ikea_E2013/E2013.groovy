@@ -3,8 +3,7 @@
 
 // Inputs for devices.E2013
 input(
-    name: 'swapOpenClosed',
-    type: 'bool',
+    name: 'swapOpenClosed', type: 'bool',
     title: 'Invert contact state',
     description: '<small>Swaps "open" and "closed" status reports.</small>',
     defaultValue: false,

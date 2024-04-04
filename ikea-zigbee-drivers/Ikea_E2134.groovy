@@ -2,9 +2,6 @@
  * IKEA Vallhorn Motion Sensor (E2134)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E2134.html
- * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
- * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -47,8 +44,20 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2134.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Vallhorn Motion Sensor (E2134) <small>v4.0.0</small><br>
+                <small><div>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vallhorn-motion-sensor-e2134" target="_blank">device details</a><br>
+                • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
@@ -63,8 +72,7 @@ metadata {
         
         // Inputs for capability.ZigbeeBindings
         input(
-            name: 'controlDevice',
-            type: 'enum',
+            name: 'controlDevice', type: 'enum',
             title: 'Control Zigbee device',
             description: '<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
             options: ['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
@@ -72,8 +80,7 @@ metadata {
             required: false
         )
         input(
-            name: 'controlGroup',
-            type: 'enum',
+            name: 'controlGroup', type: 'enum',
             title: 'Control Zigbee group',
             description: '<small>Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
             options: ['0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -'] + GROUPS,

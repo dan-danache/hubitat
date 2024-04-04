@@ -1,11 +1,12 @@
 device:
   model: IKEA Vindstyrka Air Quality Sensor (E2112)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2112.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2112.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Ikea_E2112.html
-  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
-  - https://static.homesmart.ikea.com/releaseNotes/
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vindstyrka-air-quality-sensor-e2112
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 1.0.010 (117C-110F-00010010)

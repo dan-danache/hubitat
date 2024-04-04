@@ -14,8 +14,7 @@
 
 // Inputs for devices.RDM001
 input(
-    name: 'switchStyle',
-    type: 'enum',
+    name: 'switchStyle', type: 'enum',
     title: 'Switch Style',
     description: '<small>Select physical switch button configuration</small>',
     options: RDM001_SWITCH_STYLE,

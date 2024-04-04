@@ -1,11 +1,12 @@
 device:
   model: IKEA Tradfri LED Driver (ICPSHC24)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_ICPSHC24.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_ICPSHC24.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Ikea_ICPSHC24-30EU-IL-1.html
-  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
-  - https://static.homesmart.ikea.com/releaseNotes/
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#led-driver-icpshc24
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 10EU-IL-1/1.2.245 (117C-4101-12245572)

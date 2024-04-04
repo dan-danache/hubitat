@@ -2,7 +2,6 @@
  * Aqara Dual Relay Module T2 (DCM-K01)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Aqara_LLKZMK12LM.html
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -43,8 +42,20 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Aqara_DCM-K01.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                Aqara Dual Relay Module T2 (DCM-K01) <small>v4.0.0</small><br>
+                <small><div>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#aqara-dual-relay-module-t2-dcm-k01" target="_blank">device details</a><br>
+                • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
@@ -59,8 +70,7 @@ metadata {
         
         // Inputs for devices.Aqara_DCM-K01
         input(
-            name: 'switchType',
-            type: 'enum',
+            name: 'switchType', type: 'enum',
             title: 'Switch type',
             description: '<small>What type of switches are connected to S1 and S2.</small>',
             options: [
@@ -72,8 +82,7 @@ metadata {
             required: true
         )
         input(
-            name: 'operationModeS1',
-            type: 'enum',
+            name: 'operationModeS1', type: 'enum',
             title: 'Operation mode for Switch S1',
             description: '<small>What happens when Switch S1 is used.</small>',
             options: [
@@ -84,8 +93,7 @@ metadata {
             required: true
         )
         input(
-            name: 'operationModeS2',
-            type: 'enum',
+            name: 'operationModeS2', type: 'enum',
             title: 'Operation mode for Switch S2',
             description: '<small>What happens when Switch S2 is used.</small>',
             options: [
@@ -96,8 +104,7 @@ metadata {
             required: true
         )
         input(
-            name: 'relayMode',
-            type: 'enum',
+            name: 'relayMode', type: 'enum',
             title: 'Relay mode',
             description: '<small>How Relay L1 and Relay L2 operate.</small>',
             options: [
@@ -110,9 +117,8 @@ metadata {
         )
         if ("${relayMode}" == '1') {
             input(
-                name: 'pulseLength',
-                type: 'number',
-                title: 'Pulse length',
+                name: 'pulseDuration', type: 'number',
+                title: 'Pulse duration',
                 description: '<small>Only when Relay mode is Pulse. Range 200ms .. 2000ms.</small>',
                 defaultValue: 1000,
                 range: '200..2000',
@@ -120,8 +126,7 @@ metadata {
             )
         }
         input(
-            name: 'interlock',
-            type: 'enum',
+            name: 'interlock', type: 'enum',
             title: 'Interlock',
             description: '<small>Prevent both Relay L1 and Relay L2 being On at the same time.</small>',
             options: [
@@ -132,8 +137,7 @@ metadata {
             required: true
         )
         input(
-            name: 'powerOnBehavior',
-            type: 'enum',
+            name: 'powerOnBehavior', type: 'enum',
             title: 'Power On behaviour',
             description: '<small>What happens after a power outage.</small>',
             options: [
@@ -215,11 +219,11 @@ List<String> updated(boolean auto = false) {
     cmds += zigbee.writeAttribute(0xFCC0, 0x0289, 0x20, Integer.parseInt(relayMode), [mfgCode:'0x115F', destEndpoint:0x01])
     
     if (relayMode == '1') {
-        Integer pulseLengthInt = pulseLength == null ? 2000 : pulseLength.intValue()
-        device.updateSetting('pulseLength', [value:pulseLengthInt, type:'number'])
+        Integer pulseDurationInt = pulseDuration == null ? 2000 : pulseDuration.intValue()
+        device.updateSetting('pulseDuration', [value:pulseDurationInt, type:'number'])
     
-        log_info "🛠️ pulseLength = ${pulseLengthInt}"
-        cmds += zigbee.writeAttribute(0xFCC0, 0x00EB, 0x21, pulseLengthInt, [mfgCode:'0x115F', destEndpoint:0x01])
+        log_info "🛠️ pulseDuration = ${pulseDurationInt}"
+        cmds += zigbee.writeAttribute(0xFCC0, 0x00EB, 0x21, pulseDurationInt, [mfgCode:'0x115F', destEndpoint:0x01])
     }
 
     if (auto) return cmds
@@ -513,7 +517,7 @@ void parse(String description) {
             utils_processedZclMessage 'Report Attributes Response', "RelayMode=${msg.value}"
             return
         case { contains it, [clusterInt:0xFCC0, commandInt:0x0A, attrInt:0x00EB] }:
-            utils_processedZclMessage 'Report Attributes Response', "PulseLength=${msg.value}"
+            utils_processedZclMessage 'Report Attributes Response', "pulseDuration=${msg.value}"
             return
         case { contains it, [clusterInt:0xFCC0, commandInt:0x04] }:  // Write Attribute Response
             return

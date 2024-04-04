@@ -1,9 +1,12 @@
 device:
   model: Swann One Key Fob (SWO-KEF1PA)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Swann_SWO-KEF1PA.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Swann_SWO-KEF1PA.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Swann_SWO-KEF1PA.html
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#swann-one-key-fob-swo-kef1pa
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: TBD

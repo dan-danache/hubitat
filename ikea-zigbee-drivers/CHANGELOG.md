@@ -8,18 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.0] - 2024-04-??
 
 ### Changed
+- E2013: App option to swap "open" / "closed" value for the "contact" attribute
 - Change file naming scheme to support other manufacturers
 - Refactored the build system
 
 ### Added
-- Add Zigbee Groups membership control for mains-powered devices (E1603, E1836, ICPSHC24)
-- Add Zigbee Bindings control for devices that support this feature (E1743, E1810, E1812, E2002, E2013, E2123, E2201, RDM001, RWL022)
-- E2013: App option to swap "open" / "closed" value for the "contact" attribute
+- Add Zigbee Bindings control for devices that support this feature
+- Add Zigbee Groups membership control for mains-powered devices
+- Add driver for IKEA Tretakt Smart Plug (E2204)
 - Add driver for Aqara Dual Relay Module T2 (DCM-K01)
+- Add driver for Legrand Connected Outlet (741811)
 - Add driver for Philips Hue Wall Switch Module (RDM001)
 - Add driver for Philips Hue Dimmer Switch (RWL022)
 - Add driver for Swann One Key Fob (SWO-KEF1PA)
-- Add driver for Legrand Connected Outlet (741811)
 
 ### Fixed
 - Ignore "Mgmt_Rtg_rsp" and "Parent_annce_rsp" messages that are generated when the Hub restarts - `@a.mcdear`, `@hubitrep`

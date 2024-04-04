@@ -1,9 +1,12 @@
 device:
   model: Philips Hue Dimmer Switch (RWL022)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RWL022.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Philips_RWL022.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Philips_RWL022.html
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#philips-hue-dimmer-switch-rwl022
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 2.45.2_hF4400CA (100B-0119-02002D02)

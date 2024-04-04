@@ -1,9 +1,12 @@
 device:
   model: Philips Hue Wall Switch Module (RDM001)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RDM001.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Philips_RDM001.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Philips_RDM001.html
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#philips-hue-wall-switch-module-rmd001
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 1.0.5 (100B-011C-0000041A)

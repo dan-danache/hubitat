@@ -1,10 +1,10 @@
 {
     "packageName": "Knockturn Alley",
-    "version": "2.2.0",
-    "releaseNotes": "v2.2.0\n - Add \"Bombarda\" spell to execute raw Zigbee commands",
+    "version": "2.3.0",
+    "releaseNotes": "v2.3.0\n - Add possibility to show command names in plain english\n - \"Revelio\" now shows all records, not just the ones that fit in a single Zigbee message",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2023-11-07",
+    "dateReleased": "2024-04-03",
     "documentationLink": "https://dan-danache.github.io/hubitat/knockturn-alley-driver/",
     "communityLink": "https://community.hubitat.com/t/dev-knockturn-alley/125167/3",
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",

@@ -2,9 +2,6 @@
  * IKEA Tradfri Control Outlet (E1603)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_E1603.html
- * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
- * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -28,6 +25,7 @@ metadata {
     definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1603.groovy') {
         capability 'Configuration'
         capability 'Refresh'
+        capability 'Outlet'
         capability 'Actuator'
         capability 'Switch'
         capability 'HealthCheck'
@@ -52,8 +50,20 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1603.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Tradfri Control Outlet (E1603) <small>v4.0.0</small><br>
+                <small><div>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-control-outlet-e1603-e1706" target="_blank">device details</a><br>
+                • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
@@ -83,8 +93,7 @@ metadata {
         
         // Inputs for capability.ZigbeeBindings
         input(
-            name: 'joinGroup',
-            type: 'enum',
+            name: 'joinGroup', type: 'enum',
             title: 'Join a Zigbee group',
             description: '<small>Select a Zigbee group you want to join.</small>',
             options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,

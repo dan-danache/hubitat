@@ -1,11 +1,12 @@
 device:
   model: IKEA Vallhorn Motion Sensor (E2134)
   importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2134.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2134.webp
   links:
-  - https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
-  - https://zigbee.blakadder.com/Ikea_E2134.html
-  - https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
-  - https://static.homesmart.ikea.com/releaseNotes/
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vallhorn-motion-sensor-e2134
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
   - firmwares: 1.0.57 (117C-1938-01000057)

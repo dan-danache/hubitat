@@ -1,23 +1,23 @@
 device:
-  model: Legrand Connected Outlet (741811)
-  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Legrand_741811.groovy
-  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Legrand_741811.webp
+  model: IKEA Tretakt Smart Plug (E2204)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2204.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2204.webp
   links:
   - name: device details
-    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#legrand-connected-outlet-741811
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tretakt-smart-plug-e2204
   - name: community page
     url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
-  - firmwares: 003e (1021-0011-003E4203)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006', outClusters:'0006,0000,FC01,0005,0019', model:' Connected outlet', manufacturer:' Legrand'
+  - firmwares: 2.3.089 (117C-1101-23089631)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC7C', outClusters:'0019,0020,1000', model:'TRADFRI control outlet', manufacturer:'IKEA of Sweden'
 
   capabilities:
+    - name: Outlet
     - file: src/capabilities/Switch.groovy
       params:
         powerOnBehavior: true
         onWithTimedOff: true
-    - file: src/capabilities/PowerMeter.groovy
     - file: src/capabilities/HealthCheck.groovy
       params:
         schedule: 0 0 0/1 ? * * *

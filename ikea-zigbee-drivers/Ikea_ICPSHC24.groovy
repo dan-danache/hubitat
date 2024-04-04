@@ -2,9 +2,6 @@
  * IKEA Tradfri LED Driver (ICPSHC24)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
- * @see https://zigbee.blakadder.com/Ikea_ICPSHC24-30EU-IL-1.html
- * @see https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html
- * @see https://static.homesmart.ikea.com/releaseNotes/
  */
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
@@ -64,8 +61,20 @@ metadata {
 
     preferences {
         input(
-            name: 'logLevel',
-            type: 'enum',
+            name: 'helpInfo', type: 'hidden',
+            title: '''
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_ICPSHC24.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Tradfri LED Driver (ICPSHC24) <small>v4.0.0</small><br>
+                <small><div>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#led-driver-icpshc24" target="_blank">device details</a><br>
+                • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
+                </div></small>
+            </div>
+            '''
+        )
+
+        input(
+            name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
             description: '<small>Select what type of messages appear in the "Logs" section.</small>',
             options: [
@@ -95,8 +104,7 @@ metadata {
         
         // Inputs for capability.Brightness
         input(
-            name: 'levelStep',
-            type: 'enum',
+            name: 'levelStep', type: 'enum',
             title: 'Brightness up/down step',
             description: '<small>Level adjust when using the levelUp/levelDown commands.</small>',
             options: [
@@ -112,8 +120,7 @@ metadata {
             required: true
         )
         input(
-            name: 'startLevelChangeRate',
-            type: 'enum',
+            name: 'startLevelChangeRate', type: 'enum',
             title: 'Brightness change rate',
             description: '<small>The rate of brightness change when using the startLevelChange() command.</small>',
             options: [
@@ -127,8 +134,7 @@ metadata {
             required: true
         )
         input(
-            name: 'turnOnBehavior',
-            type: 'enum',
+            name: 'turnOnBehavior', type: 'enum',
             title: 'Turn On behavior',
             description: '<small>Select what happens when the device is turned On.</small>',
             options: [
@@ -150,8 +156,7 @@ metadata {
             )
         }
         input(
-            name: 'transitionTime',
-            type: 'enum',
+            name: 'transitionTime', type: 'enum',
             title: 'On/Off transition time',
             description: '<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
             options: [
@@ -169,8 +174,7 @@ metadata {
             required: true
         )
         input(
-            name: 'prestaging',
-            type: 'bool',
+            name: 'prestaging', type: 'bool',
             title: 'Pre-staging',
             description: '<small>Set the brightness level without turning On the device (for later use).</small>',
             defaultValue: false,
@@ -179,8 +183,7 @@ metadata {
         
         // Inputs for capability.ZigbeeBindings
         input(
-            name: 'joinGroup',
-            type: 'enum',
+            name: 'joinGroup', type: 'enum',
             title: 'Join a Zigbee group',
             description: '<small>Select a Zigbee group you want to join.</small>',
             options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,

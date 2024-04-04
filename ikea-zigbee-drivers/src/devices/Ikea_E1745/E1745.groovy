@@ -14,8 +14,7 @@ attribute 'illumination', 'enum', ['dim', 'bright']  // Works only in night mode
 
 // Inputs for devices.E1745
 input(
-    name: 'clearMotionPeriod',
-    type: 'enum',
+    name: 'clearMotionPeriod', type: 'enum',
     title: 'Clear motion after',
     description: '<small>Set status inactive if no motion is detected in this period.</small>',
     options: [
@@ -35,8 +34,7 @@ input(
 )
 // Inputs for devices.E1745
 input(
-    name: 'onlyTriggerInDimLight',
-    type: 'bool',
+    name: 'onlyTriggerInDimLight', type: 'bool',
     title: 'Only detect motion in the dark',
     description: '<small>Select the night mode 🌙 option on device for this to work.</small>',
     defaultValue: false,
