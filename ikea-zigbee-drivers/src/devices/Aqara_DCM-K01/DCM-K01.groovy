@@ -21,7 +21,7 @@ input(
         '1':'Latching switch - toggle/rocker',
         '2':'Momentary switch - push button',
         '3':'Disabled - connected switches are ignored',
-    ],,
+    ],
     defaultValue: '1',
     required: true
 )
@@ -168,7 +168,7 @@ cmds += zigbee.readAttribute(0xFCC0, 0x00F7, [mfgCode: '0x115F']) // LumiSpecifi
 
 // Switch was flipped
 case { contains it, [clusterInt:0x0012, commandInt:0x0A] }:
-    def button = msg.endpointInt == 0x01 ? BUTTONS.S1 : BUTTONS.S2
+    List<String> button = msg.endpointInt == 0x01 ? BUTTONS.S1 : BUTTONS.S2
     utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
     return
 
@@ -227,7 +227,7 @@ case { contains it, [clusterInt:0xFCC0, commandInt:0x0A, attrInt:0x00F7] }:
     String temperature = convertTemperatureIfNeeded(Integer.parseInt(msg.value[4..5], 16), 'C', 0)
     utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature} °${location.temperatureScale}", type:type
 
-    Integer powerOutageCount = Integer.parseInt(msg.value[12..13] + msg.value[10..11], 16);
+    Integer powerOutageCount = Integer.parseInt(msg.value[12..13] + msg.value[10..11], 16)
     utils_sendEvent name:'powerOutageCount', value:powerOutageCount, descriptionText:"Power outage count is ${powerOutageCount}", type:type
 
     String softwareBuild = '0.0.0_' + [
@@ -237,16 +237,16 @@ case { contains it, [clusterInt:0xFCC0, commandInt:0x0A, attrInt:0x00F7] }:
     ].join('').padLeft(4, '0')
     utils_dataValue('softwareBuild', softwareBuild)
 
-    def energy = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[82..83]}${msg.value[80..81]}${msg.value[78..79]}${msg.value[76..77]}", 16))) / 1000
+    Integer energy = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[82..83]}${msg.value[80..81]}${msg.value[78..79]}${msg.value[76..77]}", 16))) / 1000
     //utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Energy is ${energy} kWh", type:type
 
-    def voltage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[94..95]}${msg.value[92..93]}${msg.value[90..91]}${msg.value[88..89]}", 16))) / 10
+    Integer voltage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[94..95]}${msg.value[92..93]}${msg.value[90..91]}${msg.value[88..89]}", 16))) / 10
     //utils_sendEvent name:'voltage', value:voltage, unit:'V', descriptionText:"Voltage is ${voltage} V", type:type
 
-    def power = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[106..107]}${msg.value[104..105]}${msg.value[102..103]}${msg.value[100..101]}", 16)))
+    Integer power = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[106..107]}${msg.value[104..105]}${msg.value[102..103]}${msg.value[100..101]}", 16)))
     //utils_sendEvent name:'power', value:power, unit:'W', descriptionText:"Power is ${power} W", type:type
 
-    def amperage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[118..119]}${msg.value[116..117]}${msg.value[114..115]}${msg.value[112..113]}", 16))) / 1000
+    Integer amperage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[118..119]}${msg.value[116..117]}${msg.value[114..115]}${msg.value[112..113]}", 16))) / 1000
     //utils_sendEvent name:'amperage', value:amperage, unit:'A', descriptionText:"Amperage is ${amperage} W", type:type
 
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${temperature}, PowerOutageCount=${powerOutageCount}, SoftwareBuild=${softwareBuild}, Energy=${energy}kWh, Voltage=${voltage}V, Power=${power}W, Amperage=${amperage}A"

@@ -26,9 +26,9 @@ cmds += zigbee.readAttribute(0x0702, 0x0302) // EnergyDivisor
 // Report/Read Attributes Reponse: EnergySummation
 case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
-    def energy = Integer.parseInt(msg.value, 16) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)
+    Integer energy = Integer.parseInt(msg.value, 16) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)
     utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Energy is ${energy} kWh", type:type
-    utils_processedZclMessage "${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "EnergySummation=${msg.value}"
+    utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "EnergySummation=${msg.value}"
     return
 
 // Read Attributes Reponse: EnergyMultiplier

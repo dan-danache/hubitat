@@ -3,7 +3,6 @@
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
-import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 
@@ -16,6 +15,8 @@ import groovy.transform.Field
 ]
 
 // Fields for capability.HealthCheck
+import groovy.time.TimeCategory
+
 @Field static final Map<String, String> HEALTH_CHECK = [
     'schedule': '0 0 0/1 ? * * *', // Health will be checked using this cron schedule
     'thereshold': '3600' // When checking, mark the device as offline if no Zigbee message was received in the last 3600 seconds

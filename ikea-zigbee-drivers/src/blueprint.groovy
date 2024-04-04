@@ -3,7 +3,6 @@
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
-import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 

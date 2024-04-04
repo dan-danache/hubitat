@@ -6,6 +6,8 @@ capability 'HealthCheck'
 {{# @fields }}
 
 // Fields for capability.HealthCheck
+import groovy.time.TimeCategory
+
 @Field static final Map<String, String> HEALTH_CHECK = [
     'schedule': '{{ params.schedule }}', // Health will be checked using this cron schedule
     'thereshold': '{{ params.thereshold }}' // When checking, mark the device as offline if no Zigbee message was received in the last {{ params.thereshold }} seconds

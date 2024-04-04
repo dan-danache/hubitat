@@ -3,7 +3,6 @@
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
-import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 
@@ -19,6 +18,14 @@ import com.hubitat.app.ChildDeviceWrapper
     'S2': ['2', 'S2'],
 ]
 
+// Fields for capability.HealthCheck
+import groovy.time.TimeCategory
+
+@Field static final Map<String, String> HEALTH_CHECK = [
+    'schedule': '0 0 0/1 ? * * *', // Health will be checked using this cron schedule
+    'thereshold': '3600' // When checking, mark the device as offline if no Zigbee message was received in the last 3600 seconds
+]
+
 metadata {
     definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Aqara_DCM-K01.groovy') {
         capability 'Configuration'
@@ -29,12 +36,16 @@ metadata {
         capability 'EnergyMeter'
         capability 'Actuator'
         capability 'PushableButton'
+        capability 'HealthCheck'
 
         // For firmware: Unknown
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0B04,0702,0005,0004,0003,0012,0000,0006,FCC0', outClusters:'0019,000A', model:'lumi.switch.acn047', manufacturer:'Aqara'
         
         // Attributes for devices.Aqara_DCM-K01
         attribute 'powerOutageCount', 'number'
+        
+        // Attributes for capability.HealthCheck
+        attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
     
     // Commands for capability.FirmwareUpdate
@@ -77,7 +88,7 @@ metadata {
                 '1':'Latching switch - toggle/rocker',
                 '2':'Momentary switch - push button',
                 '3':'Disabled - connected switches are ignored',
-            ],,
+            ],
             defaultValue: '1',
             required: true
         )
@@ -225,6 +236,9 @@ List<String> updated(boolean auto = false) {
         log_info "🛠️ pulseDuration = ${pulseDurationInt}"
         cmds += zigbee.writeAttribute(0xFCC0, 0x00EB, 0x21, pulseDurationInt, [mfgCode:'0x115F', destEndpoint:0x01])
     }
+    
+    // Preferences for capability.HealthCheck
+    schedule HEALTH_CHECK.schedule, 'healthCheck'
 
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
@@ -239,6 +253,13 @@ List<String> updated(boolean auto = false) {
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
     device.updateSetting('logLevel', [value:'2', type:'enum'])
+}
+
+// Helpers for capability.HealthCheck
+void healthCheck() {
+    log_debug '⏲️ Automatically running health check'
+    String healthStatus = state.lastRx == 0 || state.lastRx == null ? 'unknown' : (now() - state.lastRx < Integer.parseInt(HEALTH_CHECK.thereshold) * 1000 ? 'online' : 'offline')
+    utils_sendEvent name:'healthStatus', value:healthStatus, type:'physical', descriptionText:"Health status is ${healthStatus}"
 }
 
 // ===================================================================================================================
@@ -288,6 +309,10 @@ void configure(boolean auto = false) {
     // Configuration for capability.PushableButton
     Integer numberOfButtons = BUTTONS.count { true }
     sendEvent name:'numberOfButtons', value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
+    
+    // Configuration for capability.HealthCheck
+    sendEvent name:'healthStatus', value:'online', descriptionText:'Health status initialized to online'
+    sendEvent name:'checkInterval', value:3600, unit:'second', descriptionText:'Health check interval is 3600 seconds'
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x0005, 0x000A, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, ModelIdentifier, ProductCode, SWBuildID
@@ -330,28 +355,24 @@ void refresh(boolean auto = false) {
 }
 
 // Implementation for capability.MultiRelay
-private ChildDeviceWrapper fetchChildDevice(Integer moduleNumber){
-    def childDevice = getChildDevice("${device.deviceNetworkId}-${moduleNumber}")
-    if (!childDevice) {
-        childDevice = addChildDevice('hubitat', 'Generic Component Switch', "${device.deviceNetworkId}-${moduleNumber}", [name:"${device.displayName} - Relay L${moduleNumber}", label:"Relay L${moduleNumber}", isComponent:true])
-        childDevice.parse([[name:'switch', value:'off', descriptionText:'Set initial switch value']])
-    }
-    return childDevice
+private ChildDeviceWrapper fetchChildDevice(Integer moduleNumber) {
+    ChildDeviceWrapper childDevice = getChildDevice("${device.deviceNetworkId}-${moduleNumber}")
+    return childDevice ?: addChildDevice('hubitat', 'Generic Component Switch', "${device.deviceNetworkId}-${moduleNumber}", [name:"${device.displayName} - Relay L${moduleNumber}", label:"Relay L${moduleNumber}", isComponent:true])
 }
 
-void componentOff(childDevice) {
+void componentOff(ChildDeviceWrapper childDevice) {
     log_debug "▲ Received Off request from ${childDevice.displayName}"
     Integer endpointInt = Integer.parseInt(childDevice.deviceNetworkId.split('-')[1])
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x0${endpointInt} 0x0006 {014300}"])
 }
 
-void componentOn(childDevice) {
+void componentOn(ChildDeviceWrapper childDevice) {
     log_debug "▲ Received On request from ${childDevice.displayName}"
     Integer endpointInt = Integer.parseInt(childDevice.deviceNetworkId.split('-')[1])
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x0${endpointInt} 0x0006 {014301}"])
 }
 
-void componentRefresh(childDevice) {
+void componentRefresh(ChildDeviceWrapper childDevice) {
     log_debug "▲ Received Refresh request from ${childDevice.displayName}"
     refresh()
 }
@@ -364,6 +385,33 @@ void push(BigDecimal buttonNumber) {
         return
     }
     utils_sendEvent name:'pushed', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was pressed"
+}
+
+// Implementation for capability.HealthCheck
+void ping() {
+    log_warn 'ping ...'
+    utils_sendZigbeeCommands(zigbee.readAttribute(0x0000, 0x0000))
+    log_debug 'Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
+    runIn 5, 'pingExecute'
+}
+
+void pingExecute() {
+    if (state.lastRx == 0) {
+        log_info 'Did not sent any messages since it was last configured'
+        return
+    }
+
+    Date now = new Date(Math.round(now() / 1000) * 1000)
+    Date lastRx = new Date(Math.round(state.lastRx / 1000) * 1000)
+    String lastRxAgo = TimeCategory.minus(now, lastRx).toString().replace('.000 seconds', ' seconds')
+    log_info "Sent last message at ${lastRx.format('yyyy-MM-dd HH:mm:ss', location.timeZone)} (${lastRxAgo} ago)"
+
+    Date thereshold = new Date(Math.round(state.lastRx / 1000 + Integer.parseInt(HEALTH_CHECK.thereshold)) * 1000)
+    String theresholdAgo = TimeCategory.minus(thereshold, lastRx).toString().replace('.000 seconds', ' seconds')
+    log_info "Will be marked as offline if no message is received for ${theresholdAgo} (hardcoded)"
+
+    String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace('.000 seconds', ' seconds')
+    log_info "Will be marked as offline if no message is received until ${thereshold.format('yyyy-MM-dd HH:mm:ss', location.timeZone)} (${offlineMarkAgo} from now)"
 }
 
 // Implementation for capability.FirmwareUpdate
@@ -401,6 +449,11 @@ void parse(String description) {
     log_debug "msg=[${msg}]"
 
     state.lastRx = now()
+    
+    // Parse for capability.HealthCheck
+    if (device.currentValue('healthStatus', true) != 'online') {
+        utils_sendEvent name:'healthStatus', value:'online', type:'digital', descriptionText:'Health status changed to online'
+    }
 
     // If we sent a Zigbee command in the last 3 seconds, we assume that this Zigbee event is a consequence of this driver doing something
     // Therefore, we mark this event as "digital"
@@ -413,7 +466,7 @@ void parse(String description) {
         
         // Switch was flipped
         case { contains it, [clusterInt:0x0012, commandInt:0x0A] }:
-            def button = msg.endpointInt == 0x01 ? BUTTONS.S1 : BUTTONS.S2
+            List<String> button = msg.endpointInt == 0x01 ? BUTTONS.S1 : BUTTONS.S2
             utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
             return
         
@@ -472,7 +525,7 @@ void parse(String description) {
             String temperature = convertTemperatureIfNeeded(Integer.parseInt(msg.value[4..5], 16), 'C', 0)
             utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature} °${location.temperatureScale}", type:type
         
-            Integer powerOutageCount = Integer.parseInt(msg.value[12..13] + msg.value[10..11], 16);
+            Integer powerOutageCount = Integer.parseInt(msg.value[12..13] + msg.value[10..11], 16)
             utils_sendEvent name:'powerOutageCount', value:powerOutageCount, descriptionText:"Power outage count is ${powerOutageCount}", type:type
         
             String softwareBuild = '0.0.0_' + [
@@ -482,16 +535,16 @@ void parse(String description) {
             ].join('').padLeft(4, '0')
             utils_dataValue('softwareBuild', softwareBuild)
         
-            def energy = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[82..83]}${msg.value[80..81]}${msg.value[78..79]}${msg.value[76..77]}", 16))) / 1000
+            Integer energy = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[82..83]}${msg.value[80..81]}${msg.value[78..79]}${msg.value[76..77]}", 16))) / 1000
             //utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Energy is ${energy} kWh", type:type
         
-            def voltage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[94..95]}${msg.value[92..93]}${msg.value[90..91]}${msg.value[88..89]}", 16))) / 10
+            Integer voltage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[94..95]}${msg.value[92..93]}${msg.value[90..91]}${msg.value[88..89]}", 16))) / 10
             //utils_sendEvent name:'voltage', value:voltage, unit:'V', descriptionText:"Voltage is ${voltage} V", type:type
         
-            def power = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[106..107]}${msg.value[104..105]}${msg.value[102..103]}${msg.value[100..101]}", 16)))
+            Integer power = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[106..107]}${msg.value[104..105]}${msg.value[102..103]}${msg.value[100..101]}", 16)))
             //utils_sendEvent name:'power', value:power, unit:'W', descriptionText:"Power is ${power} W", type:type
         
-            def amperage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[118..119]}${msg.value[116..117]}${msg.value[114..115]}${msg.value[112..113]}", 16))) / 1000
+            Integer amperage = Math.round(Float.intBitsToFloat(Integer.parseInt("${msg.value[118..119]}${msg.value[116..117]}${msg.value[114..115]}${msg.value[112..113]}", 16))) / 1000
             //utils_sendEvent name:'amperage', value:amperage, unit:'A', descriptionText:"Amperage is ${amperage} W", type:type
         
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${temperature}, PowerOutageCount=${powerOutageCount}, SoftwareBuild=${softwareBuild}, Energy=${energy}kWh, Voltage=${voltage}V, Power=${power}W, Amperage=${amperage}A"
@@ -564,9 +617,9 @@ void parse(String description) {
         // Report/Read Attributes Reponse: EnergySummation
         case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
-            def energy = Integer.parseInt(msg.value, 16) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)
+            Integer energy = Integer.parseInt(msg.value, 16) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)
             utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Energy is ${energy} kWh", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "EnergySummation=${msg.value}"
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "EnergySummation=${msg.value}"
             return
         
         // Read Attributes Reponse: EnergyMultiplier
@@ -596,17 +649,24 @@ void parse(String description) {
             String newState = msg.value == '00' ? 'off' : 'on'
         
             // Send event to module child device (only if state needs to change)
-            def childDevice = fetchChildDevice(moduleNumber)
+            ChildDeviceWrapper childDevice = fetchChildDevice(moduleNumber)
             if (newState != childDevice.currentValue('switch', true)) {
                 childDevice.parse([[name:'switch', value:newState, descriptionText:"${childDevice.displayName} was turned ${newState}", type:type]])
             }
         
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Module=${moduleNumber}, Switch=${newState}"
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Module=${moduleNumber}, Switch=${newState}"
             return
         
         // Other events that we expect but are not usefull for capability.MultiRelay behavior
         case { contains it, [clusterInt:0x0006, commandInt:0x07] }:
             utils_processedZclMessage 'Configure Reporting Response', "attribute=switch, data=${msg.data}"
+            return
+        
+        // Events for capability.HealthCheck
+        // ===================================================================================================================
+        
+        case { contains it, [clusterInt:0x0000, attrInt:0x0000] }:
+            log_warn '... pong'
             return
 
         // ---------------------------------------------------------------------------------------------------------------

@@ -12,28 +12,24 @@ import com.hubitat.app.ChildDeviceWrapper
 {{# @implementation }}
 
 // Implementation for capability.MultiRelay
-private ChildDeviceWrapper fetchChildDevice(Integer moduleNumber){
-    def childDevice = getChildDevice("${device.deviceNetworkId}-${moduleNumber}")
-    if (!childDevice) {
-        childDevice = addChildDevice('hubitat', 'Generic Component Switch', "${device.deviceNetworkId}-${moduleNumber}", [name:"${device.displayName} - Relay L${moduleNumber}", label:"Relay L${moduleNumber}", isComponent:true])
-        childDevice.parse([[name:'switch', value:'off', descriptionText:'Set initial switch value']])
-    }
-    return childDevice
+private ChildDeviceWrapper fetchChildDevice(Integer moduleNumber) {
+    ChildDeviceWrapper childDevice = getChildDevice("${device.deviceNetworkId}-${moduleNumber}")
+    return childDevice ?: addChildDevice('hubitat', 'Generic Component Switch', "${device.deviceNetworkId}-${moduleNumber}", [name:"${device.displayName} - Relay L${moduleNumber}", label:"Relay L${moduleNumber}", isComponent:true])
 }
 
-void componentOff(childDevice) {
+void componentOff(ChildDeviceWrapper childDevice) {
     log_debug "▲ Received Off request from ${childDevice.displayName}"
     Integer endpointInt = Integer.parseInt(childDevice.deviceNetworkId.split('-')[1])
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x0${endpointInt} 0x0006 {014300}"])
 }
 
-void componentOn(childDevice) {
+void componentOn(ChildDeviceWrapper childDevice) {
     log_debug "▲ Received On request from ${childDevice.displayName}"
     Integer endpointInt = Integer.parseInt(childDevice.deviceNetworkId.split('-')[1])
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x0${endpointInt} 0x0006 {014301}"])
 }
 
-void componentRefresh(childDevice) {
+void componentRefresh(ChildDeviceWrapper childDevice) {
     log_debug "▲ Received Refresh request from ${childDevice.displayName}"
     refresh()
 }
@@ -71,12 +67,12 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
     String newState = msg.value == '00' ? 'off' : 'on'
 
     // Send event to module child device (only if state needs to change)
-    def childDevice = fetchChildDevice(moduleNumber)
+    ChildDeviceWrapper childDevice = fetchChildDevice(moduleNumber)
     if (newState != childDevice.currentValue('switch', true)) {
         childDevice.parse([[name:'switch', value:newState, descriptionText:"${childDevice.displayName} was turned ${newState}", type:type]])
     }
 
-    utils_processedZclMessage "${msg.commandInt == 0x0A ? "Report" : "Read"} Attributes Response", "Module=${moduleNumber}, Switch=${newState}"
+    utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Module=${moduleNumber}, Switch=${newState}"
     return
 
 // Other events that we expect but are not usefull for capability.MultiRelay behavior
