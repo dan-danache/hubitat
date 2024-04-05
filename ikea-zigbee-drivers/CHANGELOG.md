@@ -5,12 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0] - 2024-04-??
+## [4.0.0] - 2024-04-05
 
 ### Changed
 - E2013: App option to swap "open" / "closed" value for the "contact" attribute
-- Change file naming scheme to support other manufacturers
-- Refactored the build system
+- Refactor the build system & change file naming scheme to support other manufacturers
 
 ### Added
 - Add Zigbee Bindings control for devices that support this feature

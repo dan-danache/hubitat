@@ -4,7 +4,7 @@
     "releaseNotes": "v4.0.0\n - Add driver for IKEA Tretakt Smart Plug (E2204)\n - Add Zigbee Bindings control for devices that support this feature\n - Add Zigbee Groups membership control for mains-powered devices\n - E2013: App option to swap \"open\" / \"closed\" value for the \"contact\" attribute\n - Change file naming scheme to support other manufacturers\n - Ignore \"Mgmt_Rtg_rsp\" and \"Parent_annce_rsp\" messages that are generated when the Hub restarts - @a.mcdear, @hubitrep",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2024-04-14",
+    "dateReleased": "2024-04-05",
     "documentationLink": "https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
