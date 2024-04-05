@@ -58,7 +58,7 @@ case { contains it, [clusterInt:0x042A, commandInt:0x01, attrInt:0x0000] }:
 
     Integer pm25 = Math.round Float.intBitsToFloat(Integer.parseInt(msg.value, 16))
     utils_sendEvent name:'pm25', value:pm25, unit:'μg/m³', descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m³", type:type
-    List aqi = pm25Aqi(pm25)
+    List aqi = pm25Aqi pm25
     utils_sendEvent name:'airQualityIndex', value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
     utils_sendEvent name:'airQuality', value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "PM25Measurement=${pm25} μg/m³"

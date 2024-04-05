@@ -62,7 +62,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -116,7 +115,7 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
@@ -131,12 +130,11 @@ List<String> updated(boolean auto = false) {
             state.stopControlling = 'devices'
         } else {
             log_info "🛠️ Adding binding to device #${controlDevice} for clusters [0x0006 0x0008]"
-            
+    
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0006'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0006
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0008'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0008
         }
-    
-        device.updateSetting('controlDevice', [value:'----', type:'enum'])
+        device.updateSetting 'controlDevice', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
     }
     
@@ -149,8 +147,7 @@ List<String> updated(boolean auto = false) {
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0006'} 01 ${utils_payload "${controlGroup}"}} {0x0000}" // Add group binding for cluster 0x0006
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0008'} 01 ${utils_payload "${controlGroup}"}} {0x0000}" // Add group binding for cluster 0x0008
         }
-    
-        device.updateSetting('controlGroup', [value:'----', type:'enum'])
+        device.updateSetting 'controlGroup', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
     }
 
@@ -166,7 +163,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -190,7 +187,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -201,7 +198,7 @@ void configure(boolean auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
     
-    // Configuration for devices.E2201
+    // Configuration for devices.Ikea_E2201
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
     
@@ -328,7 +325,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -369,7 +366,7 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.E2201
+        // Events for devices.Ikea_E2201
         // ===================================================================================================================
         
         // On/Off button was pushed
@@ -508,7 +505,7 @@ void parse(String description) {
                     }
         
                     log_debug "Found binding for device ${dstDeviceName} on cluster 0x${cluster}"
-                    devices.add(dstDeviceName)
+                    devices.add dstDeviceName
                     continue
                 }
         
@@ -523,7 +520,7 @@ void parse(String description) {
                     deleted++
                 } else {
                     log_debug "Found binding for group ${dstGroupName} on cluster 0x${cluster}"
-                    groups.add(dstGroupName)
+                    groups.add dstGroupName
                 }
                 pos += 14
             }

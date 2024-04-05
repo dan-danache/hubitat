@@ -9,7 +9,7 @@ import groovy.transform.Field
 @Field static final String DRIVER_NAME = 'Philips Hue Wall Switch Module (RDM001)'
 @Field static final String DRIVER_VERSION = '4.0.0'
 
-// Fields for devices.RDM001
+// Fields for devices.Philips_RDM001
 @Field static final Map<Integer, String> RDM001_SWITCH_STYLE = [
     '00': 'Single Rocker',
     '01': 'Single Push Button',
@@ -70,7 +70,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -85,7 +84,7 @@ metadata {
             required: true
         )
         
-        // Inputs for devices.RDM001
+        // Inputs for devices.Philips_RDM001
         input(
             name: 'switchStyle', type: 'enum',
             title: 'Switch Style',
@@ -134,15 +133,15 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
     
-    // Preferences for devices.RDM001
+    // Preferences for devices.Philips_RDM001
     if (switchStyle == null) {
         switchStyle = '02'
-        device.updateSetting('switchStyle', [value:switchStyle, type:'enum'])
+        device.updateSetting 'switchStyle', [value:switchStyle, type:'enum']
     }
     log_info "🛠️ switchStyle = ${switchStyle} (${RDM001_SWITCH_STYLE[switchStyle]})"
     utils_sendZigbeeCommands(["he raw ${device.deviceNetworkId} 0x01 0x01 0x0000 {040B104302 3400 30 ${switchStyle}}"])
@@ -161,12 +160,11 @@ List<String> updated(boolean auto = false) {
             state.stopControlling = 'devices'
         } else {
             log_info "🛠️ Adding binding to device #${controlDevice} for clusters [0x0006 0x0008]"
-            
+    
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0006'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0006
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0008'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0008
         }
-    
-        device.updateSetting('controlDevice', [value:'----', type:'enum'])
+        device.updateSetting 'controlDevice', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
     }
     
@@ -179,8 +177,7 @@ List<String> updated(boolean auto = false) {
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0006'} 01 ${utils_payload "${controlGroup}"}} {0x0000}" // Add group binding for cluster 0x0006
             cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0008'} 01 ${utils_payload "${controlGroup}"}} {0x0000}" // Add group binding for cluster 0x0008
         }
-    
-        device.updateSetting('controlGroup', [value:'----', type:'enum'])
+        device.updateSetting 'controlGroup', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
     }
 
@@ -196,7 +193,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -220,7 +217,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -231,7 +228,7 @@ void configure(boolean auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
     
-    // Configuration for devices.RDM001
+    // Configuration for devices.Philips_RDM001
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Specific cluster
     
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
@@ -365,7 +362,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -406,7 +403,7 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.RDM001
+        // Events for devices.Philips_RDM001
         // ===================================================================================================================
         
         // Button was pressed := { 16:Button, 08:EventType, 08:NextValueType, 08:Action, 08:NextValueType, 16:DurationRotation}
@@ -446,7 +443,7 @@ void parse(String description) {
         case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x0A, attrInt:0x0034] }:
             device.clearSetting 'switchStyle'
             device.removeSetting 'switchStyle'
-            device.updateSetting 'switchStyle', msg.value
+            device.updateSetting 'switchStyle', [value:msg.value, type:'enum']
         
             Integer numberOfButtons = msg.value == '01' || msg.value == '02' ? 1 : 2
             sendEvent name:'numberOfButtons', value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
@@ -573,7 +570,7 @@ void parse(String description) {
                     }
         
                     log_debug "Found binding for device ${dstDeviceName} on cluster 0x${cluster}"
-                    devices.add(dstDeviceName)
+                    devices.add dstDeviceName
                     continue
                 }
         
@@ -588,7 +585,7 @@ void parse(String description) {
                     deleted++
                 } else {
                     log_debug "Found binding for group ${dstGroupName} on cluster 0x${cluster}"
-                    groups.add(dstGroupName)
+                    groups.add dstGroupName
                 }
                 pos += 14
             }

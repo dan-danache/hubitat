@@ -1,14 +1,14 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E2213
+// Configuration for devices.Ikea_E2213
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 01)
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 02)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E2213
+// Events for devices.Ikea_E2213
 // ===================================================================================================================
 
 // IGNORED: We don't know yet if this will be a push, double-tap or hold

@@ -106,49 +106,49 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0012 {${device.zigbeeI
 // Preferences for devices.Aqara_DCM-K01
 if (powerOnBehavior == null) {
     powerOnBehavior = '1'
-    device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
+    device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
 }
 log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
 cmds += zigbee.writeAttribute(0xFCC0, 0x0517, 0x20, Integer.parseInt(powerOnBehavior),  [mfgCode:'0x115F', destEndpoint:0x01])
 
 if (operationModeS1 == null) {
     operationModeS1 = '1'
-    device.updateSetting('operationModeS1', [value:operationModeS1, type:'enum'])
+    device.updateSetting 'operationModeS1', [value:operationModeS1, type:'enum']
 }
 log_info "🛠️ operationModeS1 = ${operationModeS1}"
 cmds += zigbee.writeAttribute(0xFCC0, 0x0200, 0x20, Integer.parseInt(operationModeS1), [mfgCode:'0x115F', destEndpoint:0x01])
 
 if (operationModeS2 == null) {
     operationModeS2 = '1'
-    device.updateSetting('operationModeS2', [value:operationModeS2, type:'enum'])
+    device.updateSetting 'operationModeS2', [value:operationModeS2, type:'enum']
 }
 log_info "🛠️ operationModeS2 = ${operationModeS2}"
 cmds += zigbee.writeAttribute(0xFCC0, 0x0200, 0x20, Integer.parseInt(operationModeS2), [mfgCode:'0x115F', destEndpoint:0x02])
 
 if (switchType == null) {
     switchType = '1'
-    device.updateSetting('switchType', [value:switchType, type:'enum'])
+    device.updateSetting 'switchType', [value:switchType, type:'enum']
 }
 log_info "🛠️ switchType = ${switchType}"
 cmds += zigbee.writeAttribute(0xFCC0, 0x000A, 0x20, Integer.parseInt(switchType), [mfgCode:'0x115F', destEndpoint:0x01])
 
 if (interlock == null) {
     interlock = '0'
-    device.updateSetting('interlock', [value:interlock, type:'enum'])
+    device.updateSetting 'interlock', [value:interlock, type:'enum']
 }
 log_info "🛠️ interlock = ${interlock}"
 cmds += zigbee.writeAttribute(0xFCC0, 0x02D0, 0x10, Integer.parseInt(interlock), [mfgCode:'0x115F', destEndpoint:0x01])
 
 if (relayMode == null) {
     relayMode = '0'
-    device.updateSetting('relayMode', [value:relayMode, type:'enum'])
+    device.updateSetting 'relayMode', [value:relayMode, type:'enum']
 }
 log_info "🛠️ relayMode = ${relayMode}"
 cmds += zigbee.writeAttribute(0xFCC0, 0x0289, 0x20, Integer.parseInt(relayMode), [mfgCode:'0x115F', destEndpoint:0x01])
 
 if (relayMode == '1') {
     Integer pulseDurationInt = pulseDuration == null ? 2000 : pulseDuration.intValue()
-    device.updateSetting('pulseDuration', [value:pulseDurationInt, type:'number'])
+    device.updateSetting 'pulseDuration', [value:pulseDurationInt, type:'number']
 
     log_info "🛠️ pulseDuration = ${pulseDurationInt}"
     cmds += zigbee.writeAttribute(0xFCC0, 0x00EB, 0x21, pulseDurationInt, [mfgCode:'0x115F', destEndpoint:0x01])

@@ -1,7 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.RWL022
+// Configuration for devices.Philips_RWL022
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Specific cluster
 
 cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload '0x01'} ${utils_payload '0x0005'} 03 ${utils_payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // Unbind Scenes cluster
@@ -13,7 +13,7 @@ cmds += zigbee.writeAttribute(0x0000, 0x0031, 0x19, 0x0B00, [mfgCode: '0x100B'])
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.RWL022
+// Events for devices.Philips_RWL022
 // ===================================================================================================================
 
 // Button was pressed := { 16:Button, 08:EventType, 08:NextValueType, 08:Action, 08:NextValueType, 16:DurationRotation}

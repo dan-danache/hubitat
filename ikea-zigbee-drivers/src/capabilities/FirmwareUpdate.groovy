@@ -13,7 +13,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 {{/ @implementation }}
 {{!--------------------------------------------------------------------------}}

@@ -1,7 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @fields }}
 
-// Fields for devices.RDM001
+// Fields for devices.Philips_RDM001
 @Field static final Map<Integer, String> RDM001_SWITCH_STYLE = [
     '00': 'Single Rocker',
     '01': 'Single Push Button',
@@ -12,7 +12,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
-// Inputs for devices.RDM001
+// Inputs for devices.Philips_RDM001
 input(
     name: 'switchStyle', type: 'enum',
     title: 'Switch Style',
@@ -25,7 +25,7 @@ input(
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.RDM001
+// Configuration for devices.Philips_RDM001
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC00 {${device.zigbeeId}} {}" // Hue Specific cluster
 
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
@@ -39,10 +39,10 @@ cmds += zigbee.writeAttribute(0x0000, 0x0031, 0x19, 0x0B00, [mfgCode: '0x100B'])
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
-// Preferences for devices.RDM001
+// Preferences for devices.Philips_RDM001
 if (switchStyle == null) {
     switchStyle = '02'
-    device.updateSetting('switchStyle', [value:switchStyle, type:'enum'])
+    device.updateSetting 'switchStyle', [value:switchStyle, type:'enum']
 }
 log_info "🛠️ switchStyle = ${switchStyle} (${RDM001_SWITCH_STYLE[switchStyle]})"
 utils_sendZigbeeCommands(["he raw ${device.deviceNetworkId} 0x01 0x01 0x0000 {040B104302 3400 30 ${switchStyle}}"])
@@ -54,7 +54,7 @@ log_info "🛠️ numberOfButtons = ${numberOfButtons}"
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.RDM001
+// Events for devices.Philips_RDM001
 // ===================================================================================================================
 
 // Button was pressed := { 16:Button, 08:EventType, 08:NextValueType, 08:Action, 08:NextValueType, 16:DurationRotation}
@@ -94,7 +94,7 @@ case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x01, attrI
 case { contains it, [endpointInt:0x01, clusterInt:0x0000, commandInt:0x0A, attrInt:0x0034] }:
     device.clearSetting 'switchStyle'
     device.removeSetting 'switchStyle'
-    device.updateSetting 'switchStyle', msg.value
+    device.updateSetting 'switchStyle', [value:msg.value, type:'enum']
 
     Integer numberOfButtons = msg.value == '01' || msg.value == '02' ? 1 : 2
     sendEvent name:'numberOfButtons', value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"

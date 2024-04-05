@@ -62,7 +62,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -98,7 +97,7 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
@@ -118,7 +117,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -142,7 +141,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -153,7 +152,7 @@ void configure(boolean auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
     
-    // Configuration for devices.SWO-KEF1PA
+    // Configuration for devices.Swann_SWO-KEF1PA
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0501 {${device.zigbeeId}} {}" // IAS Ancillary Control Equipment cluster
     
     // Configuration for capability.IAS
@@ -250,7 +249,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -291,7 +290,7 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.SWO-KEF1PA
+        // Events for devices.Swann_SWO-KEF1PA
         // ===================================================================================================================
         
         // Arm := { 16:Button, 08:ArmMode, ??:ArmDisarmCode, 08:ZoneId}

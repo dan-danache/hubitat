@@ -1,13 +1,13 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.SWO-KEF1PA
+// Configuration for devices.Swann_SWO-KEF1PA
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0501 {${device.zigbeeId}} {}" // IAS Ancillary Control Equipment cluster
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.SWO-KEF1PA
+// Events for devices.Swann_SWO-KEF1PA
 // ===================================================================================================================
 
 // Arm := { 16:Button, 08:ArmMode, ??:ArmDisarmCode, 08:ZoneId}

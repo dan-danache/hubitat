@@ -58,7 +58,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -94,7 +93,7 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
@@ -114,7 +113,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -138,7 +137,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -149,7 +148,7 @@ void configure(boolean auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
     
-    // Configuration for devices.E2213
+    // Configuration for devices.Ikea_E2213
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 01)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 02)
     
@@ -268,7 +267,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -309,7 +308,7 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.E2213
+        // Events for devices.Ikea_E2213
         // ===================================================================================================================
         
         // IGNORED: We don't know yet if this will be a push, double-tap or hold

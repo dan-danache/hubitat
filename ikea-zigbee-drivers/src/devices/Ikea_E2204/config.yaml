@@ -9,8 +9,8 @@ device:
     url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
-  - firmwares: 2.3.089 (117C-1101-23089631)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC7C', outClusters:'0019,0020,1000', model:'TRADFRI control outlet', manufacturer:'IKEA of Sweden'
+  - firmwares: 2.4.4 (117C-1100-02040004)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57,FC7C,FC85', outClusters:'0019', model:'TRETAKT Smart plug', manufacturer:'IKEA of Sweden'
 
   capabilities:
     - name: Outlet
@@ -18,6 +18,7 @@ device:
       params:
         powerOnBehavior: true
         onWithTimedOff: true
+    - file: src/devices/Ikea_E2204/E2204.groovy
     - file: src/capabilities/HealthCheck.groovy
       params:
         schedule: 0 0 0/1 ? * * *

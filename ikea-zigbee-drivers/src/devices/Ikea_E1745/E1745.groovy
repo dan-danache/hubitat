@@ -5,14 +5,14 @@ capability 'MotionSensor'
 {{!--------------------------------------------------------------------------}}
 {{# @attributes }}
 
-// Attributes for devices.E1745
+// Attributes for devices.Ikea_E1745
 attribute 'requestedBrightness', 'number'            // Syncs with the brightness option on device (◐/⭘)
 attribute 'illumination', 'enum', ['dim', 'bright']  // Works only in night mode 🌙
 {{/ @attributes }}
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
-// Inputs for devices.E1745
+// Inputs for devices.Ikea_E1745
 input(
     name: 'clearMotionPeriod', type: 'enum',
     title: 'Clear motion after',
@@ -32,7 +32,7 @@ input(
     defaultValue: '180',
     required: true
 )
-// Inputs for devices.E1745
+// Inputs for devices.Ikea_E1745
 input(
     name: 'onlyTriggerInDimLight', type: 'bool',
     title: 'Only detect motion in the dark',
@@ -44,7 +44,7 @@ input(
 {{!--------------------------------------------------------------------------}}
 {{# @implementation }}
 
-// Implementation for devices.E1745
+// Implementation for devices.Ikea_E1745
 void clearMotion() {
     utils_sendEvent name:'motion', value:'inactive', type:'digital', descriptionText:'Is inactive'
     return
@@ -53,29 +53,29 @@ void clearMotion() {
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E1745
+// Configuration for devices.Ikea_E1745
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
-// Preferences for devices.E1745
+// Preferences for devices.Ikea_E1745
 if (clearMotionPeriod == null) {
     clearMotionPeriod = '180'
-    device.updateSetting('clearMotionPeriod', [value:clearMotionPeriod, type:'enum'])
+    device.updateSetting 'clearMotionPeriod', [value:clearMotionPeriod, type:'enum']
 }
 log_info "🛠️ clearMotionPeriod = ${clearMotionPeriod} seconds"
 
 if (onlyTriggerInDimLight == null) {
     onlyTriggerInDimLight = false
-    device.updateSetting('onlyTriggerInDimLight', [value:onlyTriggerInDimLight, type:'bool'])
+    device.updateSetting 'onlyTriggerInDimLight', [value:onlyTriggerInDimLight, type:'bool']
 }
 log_info "🛠️ onlyTriggerInDimLight = ${onlyTriggerInDimLight}"
 {{/ @updated }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E1745
+// Events for devices.Ikea_E1745
 // ===================================================================================================================
 
 // OnWithTimedOff := { 08:OnOffControl, 16:OnTime, 16:OffWaitTime }

@@ -67,7 +67,7 @@ void onWithTimedOff(BigDecimal onTime = 1) {
 // Preferences for capability.Switch
 if (powerOnBehavior == null) {
     powerOnBehavior = 'RESTORE_PREVIOUS_STATE'
-    device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
+    device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
 }
 log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
 cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : 0xFF))
@@ -121,8 +121,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x4003] }:
         default: log_warn "Received attribute value: powerOnBehavior=${msg.value}"; return
     }
     powerOnBehavior = newValue
-    device.updateSetting('powerOnBehavior', [value:newValue, type:'enum'])
-
+    device.updateSetting 'powerOnBehavior', [value:newValue, type:'enum']
     utils_processedZclMessage 'Read Attributes Response', "PowerOnBehavior=${newValue}"
     return
 {{/ params.powerOnBehavior }}

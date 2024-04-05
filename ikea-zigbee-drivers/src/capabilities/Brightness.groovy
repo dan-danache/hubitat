@@ -101,7 +101,6 @@ void startLevelChange(String direction) {
 
     Integer mode = direction == 'up' ? 0x00 : 0x01
     Integer rate = Integer.parseInt(startLevelChangeRate) * 2.54
-
     String payload = "${zigbee.convertToHexString(mode, 2)} ${zigbee.convertToHexString(rate, 2)}"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114301 ${payload}}"])
 }
@@ -135,7 +134,6 @@ void setLevel(BigDecimal level, BigDecimal duration = 0) {
     if (device.currentValue('switch', true) == 'on' || prestaging == false) {
         Integer lvl = newLevel * 2.54
         Integer dur = (duration > 1800 ? 1800 : (duration < 0 ? 0 : duration)) * 10   // Max transition time = 30 min
-
         String command = prestaging == false ? '04' : '00'
         String payload = "${zigbee.convertToHexString(lvl, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
         utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {1143${command} ${payload}}"])
@@ -150,7 +148,7 @@ void setLevel(BigDecimal level, BigDecimal duration = 0) {
 
     // Device is Off: keep the device turned Off, use the OnLevel attribute
     log_debug('Device is turned Off so we pre-stage brightness level for when the device will be turned On')
-    applyOnLevel(newLevel)
+    applyOnLevel newLevel
     utils_sendEvent(name:'level', value:newLevel, descriptionText:"Brightness is ${newLevel}%", type:'digital', isStateChange:true)
 }
 void applyOnLevel(Integer level) {
@@ -170,24 +168,24 @@ private void turnOnCallback(String switchState) {
 // Preferences for capability.Brightness
 if (levelStep == null) {
     levelStep = '20'
-    device.updateSetting('levelStep', [value:levelStep, type:'enum'])
+    device.updateSetting 'levelStep', [value:levelStep, type:'enum']
 }
 log_info "🛠️ levelStep = ${levelStep}%"
 
 if (startLevelChangeRate == null) {
     startLevelChangeRate = '20'
-    device.updateSetting('startLevelChangeRate', [value:startLevelChangeRate, type:'enum'])
+    device.updateSetting 'startLevelChangeRate', [value:startLevelChangeRate, type:'enum']
 }
 log_info "🛠️ startLevelChangeRate = ${startLevelChangeRate}% / second"
 
 if (turnOnBehavior == null) {
     turnOnBehavior = 'RESTORE_PREVIOUS_LEVEL'
-    device.updateSetting('turnOnBehavior', [value:turnOnBehavior, type:'enum'])
+    device.updateSetting 'turnOnBehavior', [value:turnOnBehavior, type:'enum']
 }
 log_info "🛠️ turnOnBehavior = ${turnOnBehavior}"
 if (turnOnBehavior == 'FIXED_VALUE') {
     Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
-    device.updateSetting('onLevelValue', [value:lvl, type:'number'])
+    device.updateSetting 'onLevelValue', [value:lvl, type:'number']
     log_info "🛠️ onLevelValue = ${lvl}%"
     applyOnLevel(lvl)
 } else {
@@ -197,14 +195,14 @@ if (turnOnBehavior == 'FIXED_VALUE') {
 
 if (transitionTime == null) {
     transitionTime = '5'
-    device.updateSetting('transitionTime', [value:transitionTime, type:'enum'])
+    device.updateSetting 'transitionTime', [value:transitionTime, type:'enum']
 }
 log_info "🛠️ transitionTime = ${Integer.parseInt(transitionTime) / 10} second(s)"
 cmds += zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.parseInt(transitionTime))
 
 if (prestaging == null) {
     prestaging = false
-    device.updateSetting('prestaging', [value:prestaging, type:'bool'])
+    device.updateSetting 'prestaging', [value:prestaging, type:'bool']
 }
 log_info "🛠️ prestaging = ${prestaging}"
 {{/ @updated }}
@@ -244,7 +242,7 @@ case { contains it, [clusterInt:0x0008, commandInt:0x01, attrInt:0x0011] }:
 
     // Clear OnLevel attribute value (if previously set)
     if (turnOnBehavior != 'FIXED_VALUE' && msg.value != 'FF') {
-        setLevel(device.currentValue('level', true))
+        setLevel device.currentValue('level', true)
         log_debug 'Disabling OnLevel (0xFF)'
         utils_sendZigbeeCommands zigbee.writeAttribute(0x0008, 0x0011, 0x20, 0xFF)
         return

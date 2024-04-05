@@ -59,13 +59,12 @@ if (controlDevice != null && controlDevice != '----') {
         state.stopControlling = 'devices'
     } else {
         log_info "🛠️ Adding binding to device #${controlDevice} for clusters {{params.clusters}}"
-        
+
         {{# params.clusters }}
         cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '{{ . }}'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster {{ . }}
         {{/ params.clusters }}
     }
-
-    device.updateSetting('controlDevice', [value:'----', type:'enum'])
+    device.updateSetting 'controlDevice', [value:'----', type:'enum']
     cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
 }
 {{# params.groups }}
@@ -80,8 +79,7 @@ if (controlGroup != null && controlGroup != '----') {
         cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '{{ . }}'} 01 ${utils_payload "${controlGroup}"}} {0x0000}" // Add group binding for cluster {{ . }}
         {{/ params.clusters }}
     }
-
-    device.updateSetting('controlGroup', [value:'----', type:'enum'])
+    device.updateSetting 'controlGroup', [value:'----', type:'enum']
     cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
 }
 {{/ params.groups }}
@@ -149,7 +147,7 @@ case { contains it, [endpointInt:0x00, clusterInt:0x8033] }:
             }
 
             log_debug "Found binding for device ${dstDeviceName} on cluster 0x${cluster}"
-            devices.add(dstDeviceName)
+            devices.add dstDeviceName
             continue
         }
 
@@ -165,7 +163,7 @@ case { contains it, [endpointInt:0x00, clusterInt:0x8033] }:
             deleted++
         } else {
             log_debug "Found binding for group ${dstGroupName} on cluster 0x${cluster}"
-            groups.add(dstGroupName)
+            groups.add dstGroupName
         }
 {{/ params.groups }}
         pos += 14

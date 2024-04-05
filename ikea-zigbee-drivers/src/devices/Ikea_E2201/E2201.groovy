@@ -1,14 +1,14 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E2201
+// Configuration for devices.Ikea_E2201
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E2201
+// Events for devices.Ikea_E2201
 // ===================================================================================================================
 
 // On/Off button was pushed

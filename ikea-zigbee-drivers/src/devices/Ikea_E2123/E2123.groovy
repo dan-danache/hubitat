@@ -1,7 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E2123
+// Configuration for devices.Ikea_E2123
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0xFC7F {${device.zigbeeId}} {}" // Unknown 64639 cluster --> For firmware 1.0.012
@@ -11,7 +11,7 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0xFC80
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E2123
+// Events for devices.Ikea_E2123
 // ===================================================================================================================
 
 // Play button was pushed

@@ -1,13 +1,13 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E1743
+// Configuration for devices.Ikea_E1743
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0102 {${device.zigbeeId}} {}" // Window Covering cluster
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E1743
+// Events for devices.Ikea_E1743
 // ===================================================================================================================
 
 // I/O button was pressed

@@ -33,7 +33,7 @@ if (joinGroup != null && joinGroup != '----') {
         cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 00 ${utils_payload joinGroup} ${Integer.toHexString(groupName.length()).padLeft(2, '0')}${groupName.bytes.encodeHex()}}"  // Join group
     }
 
-    device.updateSetting('joinGroup', [value:'----', type:'enum'])
+    device.updateSetting 'joinGroup', [value:'----', type:'enum']
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}"  // Get groups membership
 }
 {{/ @updated }}
@@ -57,7 +57,7 @@ case { contains it, [clusterInt:0x0004, commandInt:0x02, direction:'01'] }:
         String groupId = "${msg.data[pos * 2 + 3]}${msg.data[pos * 2 + 2]}"
         String groupName = GROUPS.getOrDefault(groupId, "Unknown (${groupId})")
         log_debug "Found group membership: ${groupName}"
-        groupNames.add(groupName)
+        groupNames.add groupName
     }
     state.joinGrp = groupNames.findAll { !it.startsWith('Unknown') }
     if (state.joinGrp.size() == 0) state.remove 'joinGrp'

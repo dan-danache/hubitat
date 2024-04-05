@@ -9,7 +9,7 @@ import groovy.transform.Field
 @Field static final String DRIVER_NAME = 'IKEA Starkvind Air Purifier (E2006)'
 @Field static final String DRIVER_VERSION = '4.0.0'
 
-// Fields for devices.E2006
+// Fields for devices.Ikea_E2006
 @Field static final List<String> SUPPORTED_FAN_SPEEDS = [
     'auto', 'low', 'medium-low', 'medium', 'medium-high', 'high', 'off'
 ]
@@ -41,7 +41,7 @@ metadata {
         // For firmware: 1.1.001 (117C-110C-00011001)
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0202,FC57,FC7C,FC7D', outClusters:'0019,0400,042A', model:'STARKVIND Air purifier table', manufacturer:'IKEA of Sweden'
         
-        // Attributes for devices.E2006
+        // Attributes for devices.Ikea_E2006
         attribute 'airQuality', 'enum', ['good', 'moderate', 'unhealthy for sensitive groups', 'unhealthy', 'hazardous']
         attribute 'filterUsage', 'number'
         attribute 'pm25', 'number'
@@ -51,7 +51,7 @@ metadata {
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
     
-    // Commands for devices.E2006
+    // Commands for devices.Ikea_E2006
     command 'setSpeed', [[name:'Fan speed*', type:'ENUM', description:'Fan speed to set', constraints:SUPPORTED_FAN_SPEEDS]]
     command 'toggle'
     
@@ -71,7 +71,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -86,7 +85,7 @@ metadata {
             required: true
         )
         
-        // Inputs for devices.E2006
+        // Inputs for devices.Ikea_E2006
         input(
             name: 'pm25ReportDelta', type: 'enum',
             title: 'Sensor report frequency',
@@ -117,7 +116,7 @@ metadata {
         input(
             name: 'childLock', type: 'bool',
             title: 'Child lock',
-            description: '<small>Lock physical controls on the device.</small>',
+            description: '<small>Lock physical controls, safeguarding against accidental operation.</small>',
             defaultValue: false
         )
         input(
@@ -148,22 +147,22 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
     
-    // Preferences for devices.E2006
+    // Preferences for devices.Ikea_E2006
     if (pm25ReportDelta == null) {
         pm25ReportDelta = '03'
-        device.updateSetting('pm25ReportDelta', [value:pm25ReportDelta, type:'enum'])
+        device.updateSetting 'pm25ReportDelta', [value:pm25ReportDelta, type:'enum']
     }
     log_info "🛠️ pm25ReportDelta = +/- ${pm25ReportDelta} μg/m3"
     cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7D 0x0004 0x21 0x0000 0x0258 {${pm25ReportDelta}} {117C}"
     
     if (filterLifeTime == null) {
         filterLifeTime = '180'
-        device.updateSetting('filterLifeTime', [value:filterLifeTime, type:'enum'])
+        device.updateSetting 'filterLifeTime', [value:filterLifeTime, type:'enum']
     }
     log_info "🛠️ filterLifeTime = ${filterLifeTime} days"
     cmds += zigbee.writeAttribute(0xFC7D, 0x0002, 0x23, Integer.parseInt(filterLifeTime) * 1440, [mfgCode:'0x117C'])
@@ -171,14 +170,14 @@ List<String> updated(boolean auto = false) {
     
     if (childLock == null) {
         childLock = false
-        device.updateSetting('childLock', [value:childLock, type:'bool'])
+        device.updateSetting 'childLock', [value:childLock, type:'bool']
     }
     log_info "🛠️ childLock = ${childLock}"
     cmds += zigbee.writeAttribute(0xFC7D, 0x0005, 0x10, childLock ? 0x01 : 0x00, [mfgCode:'0x117C'])
     
     if (panelIndicator == null) {
         panelIndicator = true
-        device.updateSetting('panelIndicator', [value:panelIndicator, type:'bool'])
+        device.updateSetting 'panelIndicator', [value:panelIndicator, type:'bool']
     }
     log_info "🛠️ panelIndicator = ${panelIndicator}"
     cmds += zigbee.writeAttribute(0xFC7D, 0x0003, 0x10, panelIndicator ? 0x00 : 0x01, [mfgCode:'0x117C'])
@@ -198,7 +197,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -222,7 +221,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -276,7 +275,7 @@ void refresh(boolean auto = false) {
 
     List<String> cmds = []
     
-    // Refresh for devices.E2006
+    // Refresh for devices.Ikea_E2006
     cmds += zigbee.readAttribute(0xFC7D, 0x0000, [mfgCode: '0x117C']) // FilterRunTime
     cmds += zigbee.readAttribute(0xFC7D, 0x0001, [mfgCode: '0x117C']) // ReplaceFilter
     cmds += zigbee.readAttribute(0xFC7D, 0x0002, [mfgCode: '0x117C']) // FilterLifeTime
@@ -287,7 +286,7 @@ void refresh(boolean auto = false) {
     utils_sendZigbeeCommands cmds
 }
 
-// Implementation for devices.E2006
+// Implementation for devices.Ikea_E2006
 void on() {
     if (device.currentValue('switch', true) == 'on') return
     log_debug 'Sending On command'
@@ -412,7 +411,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -453,7 +452,7 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.E2006
+        // Events for devices.Ikea_E2006
         // ===================================================================================================================
         
         // Report/Read Attributes: PM25
@@ -465,7 +464,7 @@ void parse(String description) {
             if (pm25 == 0xFFFF) return
         
             utils_sendEvent name:'pm25', value:pm25, unit:'μg/m³', descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m³", type:type
-            List aqi = pm25Aqi(pm25)
+            List aqi = pm25Aqi pm25
             utils_sendEvent name:'airQualityIndex', value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
             utils_sendEvent name:'airQuality', value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "PM25Measurement=${pm25} μg/m³"
@@ -543,14 +542,14 @@ void parse(String description) {
                 utils_sendZigbeeCommands(zigbee.writeAttribute(0xFC7D, 0x0002, 0x23, lifeTimeDays * 1440, [mfgCode:'0x117C']))
             }
             filterLifeTime = "${filterLifeTime}"
-            device.updateSetting('filterLifeTime', [value:filterLifeTime, type:'enum'])
+            device.updateSetting 'filterLifeTime', [value:filterLifeTime, type:'enum']
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "FilterLifeTime=${msg.value} (${lifeTimeDays} days)"
             return
         
         // Read Attributes: DisablePanelLights
         case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0003] }:
             panelIndicator = msg.value == '00'
-            device.updateSetting('panelIndicator', [value:panelIndicator, type:'bool'])
+            device.updateSetting 'panelIndicator', [value:panelIndicator, type:'bool']
             utils_processedZclMessage 'Read Attributes Response', "DisablePanelLights=${msg.value}"
             return
         
@@ -558,7 +557,7 @@ void parse(String description) {
         case { contains it, [clusterInt:0xFC7D, commandInt:0x0A, attrInt:0x0005] }:
         case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0005] }:
             childLock = msg.value == '01'
-            device.updateSetting('childLock', [value:childLock, type:'bool'])
+            device.updateSetting 'childLock', [value:childLock, type:'bool']
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ChildLock=${msg.value}"
             return
         

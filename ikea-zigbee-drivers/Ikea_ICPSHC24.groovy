@@ -73,7 +73,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -213,7 +212,7 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
@@ -221,7 +220,7 @@ List<String> updated(boolean auto = false) {
     // Preferences for capability.Switch
     if (powerOnBehavior == null) {
         powerOnBehavior = 'RESTORE_PREVIOUS_STATE'
-        device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
+        device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
     }
     log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
     cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : 0xFF))
@@ -229,24 +228,24 @@ List<String> updated(boolean auto = false) {
     // Preferences for capability.Brightness
     if (levelStep == null) {
         levelStep = '20'
-        device.updateSetting('levelStep', [value:levelStep, type:'enum'])
+        device.updateSetting 'levelStep', [value:levelStep, type:'enum']
     }
     log_info "🛠️ levelStep = ${levelStep}%"
     
     if (startLevelChangeRate == null) {
         startLevelChangeRate = '20'
-        device.updateSetting('startLevelChangeRate', [value:startLevelChangeRate, type:'enum'])
+        device.updateSetting 'startLevelChangeRate', [value:startLevelChangeRate, type:'enum']
     }
     log_info "🛠️ startLevelChangeRate = ${startLevelChangeRate}% / second"
     
     if (turnOnBehavior == null) {
         turnOnBehavior = 'RESTORE_PREVIOUS_LEVEL'
-        device.updateSetting('turnOnBehavior', [value:turnOnBehavior, type:'enum'])
+        device.updateSetting 'turnOnBehavior', [value:turnOnBehavior, type:'enum']
     }
     log_info "🛠️ turnOnBehavior = ${turnOnBehavior}"
     if (turnOnBehavior == 'FIXED_VALUE') {
         Integer lvl = onLevelValue == null ? 50 : onLevelValue.intValue()
-        device.updateSetting('onLevelValue', [value:lvl, type:'number'])
+        device.updateSetting 'onLevelValue', [value:lvl, type:'number']
         log_info "🛠️ onLevelValue = ${lvl}%"
         applyOnLevel(lvl)
     } else {
@@ -256,14 +255,14 @@ List<String> updated(boolean auto = false) {
     
     if (transitionTime == null) {
         transitionTime = '5'
-        device.updateSetting('transitionTime', [value:transitionTime, type:'enum'])
+        device.updateSetting 'transitionTime', [value:transitionTime, type:'enum']
     }
     log_info "🛠️ transitionTime = ${Integer.parseInt(transitionTime) / 10} second(s)"
     cmds += zigbee.writeAttribute(0x0008, 0x0010, 0x21, Integer.parseInt(transitionTime))
     
     if (prestaging == null) {
         prestaging = false
-        device.updateSetting('prestaging', [value:prestaging, type:'bool'])
+        device.updateSetting 'prestaging', [value:prestaging, type:'bool']
     }
     log_info "🛠️ prestaging = ${prestaging}"
     
@@ -281,7 +280,7 @@ List<String> updated(boolean auto = false) {
             cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 00 ${utils_payload joinGroup} ${Integer.toHexString(groupName.length()).padLeft(2, '0')}${groupName.bytes.encodeHex()}}"  // Join group
         }
     
-        device.updateSetting('joinGroup', [value:'----', type:'enum'])
+        device.updateSetting 'joinGroup', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}"  // Get groups membership
     }
 
@@ -297,7 +296,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -321,7 +320,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -411,7 +410,6 @@ void startLevelChange(String direction) {
 
     Integer mode = direction == 'up' ? 0x00 : 0x01
     Integer rate = Integer.parseInt(startLevelChangeRate) * 2.54
-
     String payload = "${zigbee.convertToHexString(mode, 2)} ${zigbee.convertToHexString(rate, 2)}"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114301 ${payload}}"])
 }
@@ -445,7 +443,6 @@ void setLevel(BigDecimal level, BigDecimal duration = 0) {
     if (device.currentValue('switch', true) == 'on' || prestaging == false) {
         Integer lvl = newLevel * 2.54
         Integer dur = (duration > 1800 ? 1800 : (duration < 0 ? 0 : duration)) * 10   // Max transition time = 30 min
-
         String command = prestaging == false ? '04' : '00'
         String payload = "${zigbee.convertToHexString(lvl, 2)} ${zigbee.swapOctets(zigbee.convertToHexString(dur, 4))}"
         utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {1143${command} ${payload}}"])
@@ -460,7 +457,7 @@ void setLevel(BigDecimal level, BigDecimal duration = 0) {
 
     // Device is Off: keep the device turned Off, use the OnLevel attribute
     log_debug('Device is turned Off so we pre-stage brightness level for when the device will be turned On')
-    applyOnLevel(newLevel)
+    applyOnLevel newLevel
     utils_sendEvent(name:'level', value:newLevel, descriptionText:"Brightness is ${newLevel}%", type:'digital', isStateChange:true)
 }
 void applyOnLevel(Integer level) {
@@ -507,7 +504,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -574,8 +571,7 @@ void parse(String description) {
                 default: log_warn "Received attribute value: powerOnBehavior=${msg.value}"; return
             }
             powerOnBehavior = newValue
-            device.updateSetting('powerOnBehavior', [value:newValue, type:'enum'])
-        
+            device.updateSetting 'powerOnBehavior', [value:newValue, type:'enum']
             utils_processedZclMessage 'Read Attributes Response', "PowerOnBehavior=${newValue}"
             return
         
@@ -606,7 +602,7 @@ void parse(String description) {
         
             // Clear OnLevel attribute value (if previously set)
             if (turnOnBehavior != 'FIXED_VALUE' && msg.value != 'FF') {
-                setLevel(device.currentValue('level', true))
+                setLevel device.currentValue('level', true)
                 log_debug 'Disabling OnLevel (0xFF)'
                 utils_sendZigbeeCommands zigbee.writeAttribute(0x0008, 0x0011, 0x20, 0xFF)
                 return
@@ -668,7 +664,7 @@ void parse(String description) {
                 String groupId = "${msg.data[pos * 2 + 3]}${msg.data[pos * 2 + 2]}"
                 String groupName = GROUPS.getOrDefault(groupId, "Unknown (${groupId})")
                 log_debug "Found group membership: ${groupName}"
-                groupNames.add(groupName)
+                groupNames.add groupName
             }
             state.joinGrp = groupNames.findAll { !it.startsWith('Unknown') }
             if (state.joinGrp.size() == 0) state.remove 'joinGrp'

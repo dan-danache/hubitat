@@ -32,8 +32,8 @@ metadata {
         capability 'HealthCheck'
         capability 'PowerSource'
 
-        // For firmware: 2.3.089 (117C-1101-23089631)
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC7C', outClusters:'0019,0020,1000', model:'TRADFRI control outlet', manufacturer:'IKEA of Sweden'
+        // For firmware: 2.4.4 (117C-1100-02040004)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57,FC7C,FC85', outClusters:'0019', model:'TRETAKT Smart plug', manufacturer:'IKEA of Sweden'
         
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
@@ -59,7 +59,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -87,6 +86,14 @@ metadata {
             ],
             defaultValue: 'RESTORE_PREVIOUS_STATE',
             required: true
+        )
+        
+        // Inputs for devices.Ikea_E2204
+        input(
+            name: 'childLock', type: 'bool',
+            title: 'Child lock',
+            description: '<small>Lock physical button, safeguarding against accidental operation.</small>',
+            defaultValue: false
         )
         
         // Inputs for capability.ZigbeeBindings
@@ -120,7 +127,7 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
@@ -128,10 +135,18 @@ List<String> updated(boolean auto = false) {
     // Preferences for capability.Switch
     if (powerOnBehavior == null) {
         powerOnBehavior = 'RESTORE_PREVIOUS_STATE'
-        device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
+        device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
     }
     log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
     cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : 0xFF))
+    
+    // Preferences for devices.Ikea_E2204
+    if (childLock == null) {
+        childLock = false
+        device.updateSetting 'childLock', [value:childLock, type:'bool']
+    }
+    log_info "🛠️ childLock = ${childLock}"
+    cmds += zigbee.writeAttribute(0xFC85, 0x0000, 0x10, childLock ? 0x01 : 0x00, [mfgCode:'0x117C'])
     
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, 'healthCheck'
@@ -147,7 +162,7 @@ List<String> updated(boolean auto = false) {
             cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 00 ${utils_payload joinGroup} ${Integer.toHexString(groupName.length()).padLeft(2, '0')}${groupName.bytes.encodeHex()}}"  // Join group
         }
     
-        device.updateSetting('joinGroup', [value:'----', type:'enum'])
+        device.updateSetting 'joinGroup', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}"  // Get groups membership
     }
 
@@ -163,7 +178,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -187,7 +202,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -234,6 +249,9 @@ void refresh(boolean auto = false) {
     // Refresh for capability.Switch
     cmds += zigbee.readAttribute(0x0006, 0x0000) // OnOff
     cmds += zigbee.readAttribute(0x0006, 0x4003) // PowerOnBehavior
+    
+    // Refresh for devices.Ikea_E2204
+    cmds += zigbee.readAttribute(0xFC85, 0x0000, [mfgCode:'0x117C'] ) // ChildLock
     
     // Refresh for capability.ZigbeeGroups
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}"  // Get groups membership
@@ -296,7 +314,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -359,8 +377,7 @@ void parse(String description) {
                 default: log_warn "Received attribute value: powerOnBehavior=${msg.value}"; return
             }
             powerOnBehavior = newValue
-            device.updateSetting('powerOnBehavior', [value:newValue, type:'enum'])
-        
+            device.updateSetting 'powerOnBehavior', [value:newValue, type:'enum']
             utils_processedZclMessage 'Read Attributes Response', "PowerOnBehavior=${newValue}"
             return
         
@@ -370,6 +387,21 @@ void parse(String description) {
             return
         case { contains it, [clusterInt:0x0006, commandInt:0x04] }: // Write Attribute Response
         case { contains it, [clusterInt:0x0006, commandInt:0x06, isClusterSpecific:false, direction:'01'] }: // Configure Reporting Command
+            return
+        
+        // Events for devices.Ikea_E2204
+        // ===================================================================================================================
+        
+        // Read Attributes: ChildLock
+        case { contains it, [clusterInt:0xFC85, commandInt:0x01, attrInt:0x0000] }:
+            childLock = msg.value == '01'
+            device.updateSetting 'childLock', [value:childLock, type:'bool']
+            utils_processedZclMessage 'Read Attributes Response', "ChildLock=${msg.value}"
+            return
+        
+        // Write Attributes Response
+        case { contains it, [endpointInt:0x01, clusterInt:0xFC85, commandInt:0x04, isClusterSpecific:false, isManufacturerSpecific:true, manufacturerId:'117C'] }:
+            log_info 'Child lock successfully configured!'
             return
         
         // Events for capability.HealthCheck
@@ -416,7 +448,7 @@ void parse(String description) {
                 String groupId = "${msg.data[pos * 2 + 3]}${msg.data[pos * 2 + 2]}"
                 String groupName = GROUPS.getOrDefault(groupId, "Unknown (${groupId})")
                 log_debug "Found group membership: ${groupName}"
-                groupNames.add(groupName)
+                groupNames.add groupName
             }
             state.joinGrp = groupNames.findAll { !it.startsWith('Unknown') }
             if (state.joinGrp.size() == 0) state.remove 'joinGrp'

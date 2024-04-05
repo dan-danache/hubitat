@@ -8,7 +8,7 @@ capability 'Switch'
 {{!--------------------------------------------------------------------------}}
 {{# @fields }}
 
-// Fields for devices.E2006
+// Fields for devices.Ikea_E2006
 @Field static final List<String> SUPPORTED_FAN_SPEEDS = [
     'auto', 'low', 'medium-low', 'medium', 'medium-high', 'high', 'off'
 ]
@@ -16,7 +16,7 @@ capability 'Switch'
 {{!--------------------------------------------------------------------------}}
 {{# @attributes }}
 
-// Attributes for devices.E2006
+// Attributes for devices.Ikea_E2006
 attribute 'airQuality', 'enum', ['good', 'moderate', 'unhealthy for sensitive groups', 'unhealthy', 'hazardous']
 attribute 'filterUsage', 'number'
 attribute 'pm25', 'number'
@@ -25,14 +25,14 @@ attribute 'auto', 'enum', ['on', 'off']
 {{!--------------------------------------------------------------------------}}
 {{# @commands }}
 
-// Commands for devices.E2006
+// Commands for devices.Ikea_E2006
 command 'setSpeed', [[name:'Fan speed*', type:'ENUM', description:'Fan speed to set', constraints:SUPPORTED_FAN_SPEEDS]]
 command 'toggle'
 {{/ @commands }}
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
-// Inputs for devices.E2006
+// Inputs for devices.Ikea_E2006
 input(
     name: 'pm25ReportDelta', type: 'enum',
     title: 'Sensor report frequency',
@@ -63,7 +63,7 @@ input(
 input(
     name: 'childLock', type: 'bool',
     title: 'Child lock',
-    description: '<small>Lock physical controls on the device.</small>',
+    description: '<small>Lock physical controls, safeguarding against accidental operation.</small>',
     defaultValue: false
 )
 input(
@@ -76,7 +76,7 @@ input(
 {{!--------------------------------------------------------------------------}}
 {{# @implementation }}
 
-// Implementation for devices.E2006
+// Implementation for devices.Ikea_E2006
 void on() {
     if (device.currentValue('switch', true) == 'on') return
     log_debug 'Sending On command'
@@ -171,17 +171,17 @@ private List pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_q
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
-// Preferences for devices.E2006
+// Preferences for devices.Ikea_E2006
 if (pm25ReportDelta == null) {
     pm25ReportDelta = '03'
-    device.updateSetting('pm25ReportDelta', [value:pm25ReportDelta, type:'enum'])
+    device.updateSetting 'pm25ReportDelta', [value:pm25ReportDelta, type:'enum']
 }
 log_info "🛠️ pm25ReportDelta = +/- ${pm25ReportDelta} μg/m3"
 cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7D 0x0004 0x21 0x0000 0x0258 {${pm25ReportDelta}} {117C}"
 
 if (filterLifeTime == null) {
     filterLifeTime = '180'
-    device.updateSetting('filterLifeTime', [value:filterLifeTime, type:'enum'])
+    device.updateSetting 'filterLifeTime', [value:filterLifeTime, type:'enum']
 }
 log_info "🛠️ filterLifeTime = ${filterLifeTime} days"
 cmds += zigbee.writeAttribute(0xFC7D, 0x0002, 0x23, Integer.parseInt(filterLifeTime) * 1440, [mfgCode:'0x117C'])
@@ -189,14 +189,14 @@ cmds += zigbee.readAttribute(0xFC7D, 0x0000, [mfgCode:'0x117C'])  // Also trigge
 
 if (childLock == null) {
     childLock = false
-    device.updateSetting('childLock', [value:childLock, type:'bool'])
+    device.updateSetting 'childLock', [value:childLock, type:'bool']
 }
 log_info "🛠️ childLock = ${childLock}"
 cmds += zigbee.writeAttribute(0xFC7D, 0x0005, 0x10, childLock ? 0x01 : 0x00, [mfgCode:'0x117C'])
 
 if (panelIndicator == null) {
     panelIndicator = true
-    device.updateSetting('panelIndicator', [value:panelIndicator, type:'bool'])
+    device.updateSetting 'panelIndicator', [value:panelIndicator, type:'bool']
 }
 log_info "🛠️ panelIndicator = ${panelIndicator}"
 cmds += zigbee.writeAttribute(0xFC7D, 0x0003, 0x10, panelIndicator ? 0x00 : 0x01, [mfgCode:'0x117C'])
@@ -221,7 +221,7 @@ cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7D 0x0007 0x20 0x0000 0x0000
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}
 
-// Refresh for devices.E2006
+// Refresh for devices.Ikea_E2006
 cmds += zigbee.readAttribute(0xFC7D, 0x0000, [mfgCode: '0x117C']) // FilterRunTime
 cmds += zigbee.readAttribute(0xFC7D, 0x0001, [mfgCode: '0x117C']) // ReplaceFilter
 cmds += zigbee.readAttribute(0xFC7D, 0x0002, [mfgCode: '0x117C']) // FilterLifeTime
@@ -233,7 +233,7 @@ cmds += zigbee.readAttribute(0xFC7D, 0x0006, [mfgCode: '0x117C']) // FanMode
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E2006
+// Events for devices.Ikea_E2006
 // ===================================================================================================================
 
 // Report/Read Attributes: PM25
@@ -245,7 +245,7 @@ case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0004] }:
     if (pm25 == 0xFFFF) return
 
     utils_sendEvent name:'pm25', value:pm25, unit:'μg/m³', descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m³", type:type
-    List aqi = pm25Aqi(pm25)
+    List aqi = pm25Aqi pm25
     utils_sendEvent name:'airQualityIndex', value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
     utils_sendEvent name:'airQuality', value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "PM25Measurement=${pm25} μg/m³"
@@ -323,14 +323,14 @@ case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0002] }:
         utils_sendZigbeeCommands(zigbee.writeAttribute(0xFC7D, 0x0002, 0x23, lifeTimeDays * 1440, [mfgCode:'0x117C']))
     }
     filterLifeTime = "${filterLifeTime}"
-    device.updateSetting('filterLifeTime', [value:filterLifeTime, type:'enum'])
+    device.updateSetting 'filterLifeTime', [value:filterLifeTime, type:'enum']
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "FilterLifeTime=${msg.value} (${lifeTimeDays} days)"
     return
 
 // Read Attributes: DisablePanelLights
 case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0003] }:
     panelIndicator = msg.value == '00'
-    device.updateSetting('panelIndicator', [value:panelIndicator, type:'bool'])
+    device.updateSetting 'panelIndicator', [value:panelIndicator, type:'bool']
     utils_processedZclMessage 'Read Attributes Response', "DisablePanelLights=${msg.value}"
     return
 
@@ -338,7 +338,7 @@ case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0003] }:
 case { contains it, [clusterInt:0xFC7D, commandInt:0x0A, attrInt:0x0005] }:
 case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0005] }:
     childLock = msg.value == '01'
-    device.updateSetting('childLock', [value:childLock, type:'bool'])
+    device.updateSetting 'childLock', [value:childLock, type:'bool']
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ChildLock=${msg.value}"
     return
 

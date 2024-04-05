@@ -1,7 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E2134
+// Configuration for devices.Ikea_E2134
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0400 {${device.zigbeeId}} {}" // Illuminance Measurement cluster
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0400 0x0000 0x18 0x0000 0x4650 {01} {}" // Report Illuminance/MeasuredValue (uint16) at least every 5 hours (Δ = 0)
 
@@ -11,7 +11,7 @@ cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0406 0x0000 
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E2134
+// Events for devices.Ikea_E2134
 // ===================================================================================================================
 
 // Report/Read Attributes Reponse: Occupancy/MeasuredValue

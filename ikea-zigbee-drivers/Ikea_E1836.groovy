@@ -59,7 +59,6 @@ metadata {
             </div>
             '''
         )
-
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
@@ -120,7 +119,7 @@ List<String> updated(boolean auto = false) {
 
     if (logLevel == null) {
         logLevel = '1'
-        device.updateSetting('logLevel', [value:logLevel, type:'enum'])
+        device.updateSetting 'logLevel', [value:logLevel, type:'enum']
     }
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
@@ -128,7 +127,7 @@ List<String> updated(boolean auto = false) {
     // Preferences for capability.Switch
     if (powerOnBehavior == null) {
         powerOnBehavior = 'RESTORE_PREVIOUS_STATE'
-        device.updateSetting('powerOnBehavior', [value:powerOnBehavior, type:'enum'])
+        device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
     }
     log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
     cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : 0xFF))
@@ -147,7 +146,7 @@ List<String> updated(boolean auto = false) {
             cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 00 ${utils_payload joinGroup} ${Integer.toHexString(groupName.length()).padLeft(2, '0')}${groupName.bytes.encodeHex()}}"  // Join group
         }
     
-        device.updateSetting('joinGroup', [value:'----', type:'enum'])
+        device.updateSetting 'joinGroup', [value:'----', type:'enum']
         cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}"  // Get groups membership
     }
 
@@ -163,7 +162,7 @@ List<String> updated(boolean auto = false) {
 // Handler method for scheduled job to disable debug logging
 void logsOff() {
     log_info '⏲️ Automatically reverting log level to "Info"'
-    device.updateSetting('logLevel', [value:'2', type:'enum'])
+    device.updateSetting 'logLevel', [value:'2', type:'enum']
 }
 
 // Helpers for capability.HealthCheck
@@ -187,7 +186,7 @@ void configure(boolean auto = false) {
 
     // Apply preferences first
     List<String> cmds = []
-    cmds += updated(true)
+    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -296,7 +295,7 @@ void updateFirmware() {
     if (device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
     }
-    utils_sendZigbeeCommands(zigbee.updateFirmware())
+    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -359,8 +358,7 @@ void parse(String description) {
                 default: log_warn "Received attribute value: powerOnBehavior=${msg.value}"; return
             }
             powerOnBehavior = newValue
-            device.updateSetting('powerOnBehavior', [value:newValue, type:'enum'])
-        
+            device.updateSetting 'powerOnBehavior', [value:newValue, type:'enum']
             utils_processedZclMessage 'Read Attributes Response', "PowerOnBehavior=${newValue}"
             return
         
@@ -416,7 +414,7 @@ void parse(String description) {
                 String groupId = "${msg.data[pos * 2 + 3]}${msg.data[pos * 2 + 2]}"
                 String groupName = GROUPS.getOrDefault(groupId, "Unknown (${groupId})")
                 log_debug "Found group membership: ${groupName}"
-                groupNames.add(groupName)
+                groupNames.add groupName
             }
             state.joinGrp = groupNames.findAll { !it.startsWith('Unknown') }
             if (state.joinGrp.size() == 0) state.remove 'joinGrp'

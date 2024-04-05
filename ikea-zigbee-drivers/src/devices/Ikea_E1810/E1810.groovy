@@ -1,7 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @configure }}
 
-// Configuration for devices.E1810
+// Configuration for devices.Ikea_E1810
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0005 {${device.zigbeeId}} {}" // Scenes cluster
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
@@ -9,7 +9,7 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E1810
+// Events for devices.Ikea_E1810
 // ===================================================================================================================
 
 // Button Prev/Next was pressed

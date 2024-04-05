@@ -1,7 +1,7 @@
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
-// Inputs for devices.E2013
+// Inputs for devices.Ikea_E2013
 input(
     name: 'swapOpenClosed', type: 'bool',
     title: 'Invert contact state',
@@ -13,17 +13,17 @@ input(
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
-// Preferences for devices.E2013
+// Preferences for devices.Ikea_E2013
 if (swapOpenClosed == null) {
     swapOpenClosed = false
-    device.updateSetting('swapOpenClosed', [value:swapOpenClosed, type:'bool'])
+    device.updateSetting 'swapOpenClosed', [value:swapOpenClosed, type:'bool']
 }
 log_info "🛠️ swapOpenClosed = ${swapOpenClosed}"
 {{/ @updated }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.E2013
+// Events for devices.Ikea_E2013
 // ===================================================================================================================
 
 // Report/Read Attributes Reponse: ZoneStatus
