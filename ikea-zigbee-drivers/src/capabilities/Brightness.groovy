@@ -90,26 +90,26 @@ command 'shiftLevel', [[name:'Direction*', type:'ENUM', constraints: ['up', 'dow
 // Implementation for capability.Brightness
 void setLevel(BigDecimal level, BigDecimal duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
-    log_debug "Setting brightness level to ${newLevel}% during ${duration} seconds"
     Integer lvl = newLevel * 2.54
-    Integer dur = (duration > 1800 ? 1800 : (duration < 0 ? 0 : duration)) * 10 // Max transition time = 30 min
+    Integer dur = (duration == null || duration < 0) ? 0 : (duration > 1800 ? 1800 : duration) // Max transition time = 30 min
+    log_debug "🎬 Setting brightness level to ${newLevel}% during ${dur} seconds"
     String command = prestaging == false ? '04' : '00'
-    String payload = "${utils_payload lvl, 2} ${utils_payload dur, 4}"
+    String payload = "${utils_payload lvl, 2} ${utils_payload dur * 10, 4}"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {1143${command} ${payload}}"])
 }
 void startLevelChange(String direction) {
-    log_debug "Starting brightness level change ${direction}wards with a rate of ${levelChangeRate}% / second"
+    log_debug "🎬 Starting brightness level change ${direction}wards with a rate of ${levelChangeRate}% / second"
     Integer mode = direction == 'up' ? 0x00 : 0x01
     Integer rate = Integer.parseInt(levelChangeRate) * 2.54
     String payload = "${utils_payload mode, 2} ${utils_payload rate, 2}"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114301 ${payload}}"])
 }
 void stopLevelChange() {
-    log_debug 'Stopping brightness level change'
+    log_debug '🎬 Stopping brightness level change'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114303}"])
 }
 void shiftLevel(String direction) {
-    log_debug "Shifting brightness level ${direction} by ${levelStep}%"
+    log_debug "🎬 Shifting brightness level ${direction} by ${levelStep}%"
     Integer mode = direction == 'up' ? 0x00 : 0x01
     Integer stepSize = Integer.parseInt(levelStep) * 2.54
     String payload = "${utils_payload mode, 2} ${utils_payload stepSize, 2} 0000"

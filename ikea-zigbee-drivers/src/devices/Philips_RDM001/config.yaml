@@ -4,7 +4,7 @@ device:
   image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Philips_RDM001.webp
   links:
   - name: device details
-    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#philips-hue-wall-switch-module-rmd001
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#philips-hue-wall-switch-module-rdm001
   - name: community page
     url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 

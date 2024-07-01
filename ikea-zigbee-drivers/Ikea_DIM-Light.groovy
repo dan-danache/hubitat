@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = 'IKEA Dimmable Light'
-@Field static final String DRIVER_VERSION = '5.0.0'
+@Field static final String DRIVER_VERSION = '5.0.1'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -66,7 +66,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_DIM-Light.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Dimmable Light <small>v5.0.0</small><br>
+                IKEA Dimmable Light <small>v5.0.1</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#dimmable-light" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -189,7 +189,7 @@ void installed() {
 
 // Called when the "Save Preferences" button is clicked
 List<String> updated(boolean auto = false) {
-    log_info "Saving preferences${auto ? ' (auto)' : ''} ..."
+    log_info "🎬 Saving preferences${auto ? ' (auto)' : ''} ..."
     List<String> cmds = []
 
     unschedule()
@@ -300,7 +300,7 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -352,7 +352,7 @@ private void autoConfigure() {
 
 // capability.Refresh
 void refresh(boolean auto = false) {
-    log_warn "Refreshing device state${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -373,22 +373,22 @@ void refresh(boolean auto = false) {
 
 // Implementation for capability.Switch
 void on() {
-    log_debug 'Sending On command'
+    log_debug '🎬 Sending On command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114301}"])
 }
 void off() {
-    log_debug 'Sending Off command'
+    log_debug '🎬 Sending Off command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114300}"])
 }
 
 void toggle() {
-    log_debug 'Sending Toggle command'
+    log_debug '🎬 Sending Toggle command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114302}"])
 }
 
 void onWithTimedOff(BigDecimal onTime = 1) {
     Integer delay = onTime < 1 ? 1 : (onTime > 6500 ? 6500 : onTime)
-    log_debug 'Sending OnWithTimedOff command'
+    log_debug '🎬 Sending OnWithTimedOff command'
     Integer dur = delay * 10
     String payload = "00 ${utils_payload dur, 4} 0000"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])
@@ -397,26 +397,26 @@ void onWithTimedOff(BigDecimal onTime = 1) {
 // Implementation for capability.Brightness
 void setLevel(BigDecimal level, BigDecimal duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
-    log_debug "Setting brightness level to ${newLevel}% during ${duration} seconds"
     Integer lvl = newLevel * 2.54
-    Integer dur = (duration > 1800 ? 1800 : (duration < 0 ? 0 : duration)) * 10 // Max transition time = 30 min
+    Integer dur = (duration == null || duration < 0) ? 0 : (duration > 1800 ? 1800 : duration) // Max transition time = 30 min
+    log_debug "🎬 Setting brightness level to ${newLevel}% during ${dur} seconds"
     String command = prestaging == false ? '04' : '00'
-    String payload = "${utils_payload lvl, 2} ${utils_payload dur, 4}"
+    String payload = "${utils_payload lvl, 2} ${utils_payload dur * 10, 4}"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {1143${command} ${payload}}"])
 }
 void startLevelChange(String direction) {
-    log_debug "Starting brightness level change ${direction}wards with a rate of ${levelChangeRate}% / second"
+    log_debug "🎬 Starting brightness level change ${direction}wards with a rate of ${levelChangeRate}% / second"
     Integer mode = direction == 'up' ? 0x00 : 0x01
     Integer rate = Integer.parseInt(levelChangeRate) * 2.54
     String payload = "${utils_payload mode, 2} ${utils_payload rate, 2}"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114301 ${payload}}"])
 }
 void stopLevelChange() {
-    log_debug 'Stopping brightness level change'
+    log_debug '🎬 Stopping brightness level change'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0008 {114303}"])
 }
 void shiftLevel(String direction) {
-    log_debug "Shifting brightness level ${direction} by ${levelStep}%"
+    log_debug "🎬 Shifting brightness level ${direction} by ${levelStep}%"
     Integer mode = direction == 'up' ? 0x00 : 0x01
     Integer stepSize = Integer.parseInt(levelStep) * 2.54
     String payload = "${utils_payload mode, 2} ${utils_payload stepSize, 2} 0000"
@@ -427,7 +427,7 @@ void shiftLevel(String direction) {
 void ping() {
     log_warn 'ping ...'
     utils_sendZigbeeCommands(zigbee.readAttribute(0x0000, 0x0000))
-    log_debug 'Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
+    log_debug '🎬 Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
     runIn 5, 'pingExecute'
 }
 void pingExecute() {
