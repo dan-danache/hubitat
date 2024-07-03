@@ -336,21 +336,6 @@ void appButtonHandler(String buttonName) {
     state.buttonName = buttonName
 }
 
-void addNewDevice() {
-    log.info "Adding device: ${app.getSetting('dev_0')}, ${app.getSetting('att_0')}"
-    if (app.getSetting('dev_0') == null || app.getSetting('att_0') == null) return
-
-    int position = 1
-    while (app.getSetting("dev_${position}")) position++
-
-    app.updateSetting "dev_${position}", '--'
-    app.updateSetting "att_${position}", '--'
-
-    // Cleanup
-    app.removeSetting 'dev_0'
-    app.removeSetting 'att_0'
-}
-
 Map changelog() {
     dynamicPage (
         name: 'changelog',
