@@ -7,7 +7,7 @@ capability 'TemperatureMeasurement'
 
 // Configuration for capability.Temperature
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0000 0x0258 {6400} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 1°C)
+cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0000 0x0258 {3200} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 0.5°C)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}
@@ -32,7 +32,7 @@ case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0000] }:
     }
 
     String temperature = convertTemperatureIfNeeded(Integer.parseInt(msg.value, 16) / 100, 'C', 0)
-    utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature} °${location.temperatureScale}", type:type
+    utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
     return
 

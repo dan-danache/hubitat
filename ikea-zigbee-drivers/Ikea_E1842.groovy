@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.Field
 
 @Field static final String DRIVER_NAME = 'IKEA Knycklan Water Valve Receiver (E1842)'
-@Field static final String DRIVER_VERSION = '5.0.0'
+@Field static final String DRIVER_VERSION = '5.0.1'
 
 // Fields for capability.IAS
 import hubitat.zigbee.clusters.iaszone.ZoneStatus
@@ -58,7 +58,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1842.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Knycklan Water Valve Receiver (E1842) <small>v5.0.0</small><br>
+                IKEA Knycklan Water Valve Receiver (E1842) <small>v5.0.1</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#knycklan-water-valve-receiver-e1842" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -110,7 +110,7 @@ void installed() {
 
 // Called when the "Save Preferences" button is clicked
 List<String> updated(boolean auto = false) {
-    log_info "Saving preferences${auto ? ' (auto)' : ''} ..."
+    log_info "🎬 Saving preferences${auto ? ' (auto)' : ''} ..."
     List<String> cmds = []
 
     unschedule()
@@ -176,7 +176,7 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -231,7 +231,7 @@ private void autoConfigure() {
 
 // capability.Refresh
 void refresh(boolean auto = false) {
-    log_warn "Refreshing device state${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -255,22 +255,22 @@ void refresh(boolean auto = false) {
 
 // Implementation for capability.Switch
 void on() {
-    log_debug 'Sending On command'
+    log_debug '🎬 Sending On command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114301}"])
 }
 void off() {
-    log_debug 'Sending Off command'
+    log_debug '🎬 Sending Off command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114300}"])
 }
 
 void toggle() {
-    log_debug 'Sending Toggle command'
+    log_debug '🎬 Sending Toggle command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114302}"])
 }
 
 void onWithTimedOff(BigDecimal onTime = 1) {
     Integer delay = onTime < 1 ? 1 : (onTime > 6500 ? 6500 : onTime)
-    log_debug 'Sending OnWithTimedOff command'
+    log_debug '🎬 Sending OnWithTimedOff command'
     Integer dur = delay * 10
     String payload = "00 ${utils_payload dur, 4} 0000"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])
@@ -280,7 +280,7 @@ void onWithTimedOff(BigDecimal onTime = 1) {
 void ping() {
     log_warn 'ping ...'
     utils_sendZigbeeCommands(zigbee.readAttribute(0x0000, 0x0000))
-    log_debug 'Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
+    log_debug '🎬 Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
     runIn 5, 'pingExecute'
 }
 void pingExecute() {

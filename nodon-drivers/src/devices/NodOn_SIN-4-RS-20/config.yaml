@@ -1,0 +1,29 @@
+device:
+  model: NodOn Roller Shutter Relay Switch (SIN-4-RS-20)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/nodon-drivers/NodOn_SIN-4-RS-20.groovy
+  image: https://dan-danache.github.io/hubitat/nodon-drivers/img/NodOn_SIN-4-RS-20.webp
+  links:
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/nodon-drivers/#nodon-roller-shutter-relay-switch-sin-4-rs-20
+  - name: community page
+    url: https://community.hubitat.com/t/release-nodon-drivers/123853
+
+  fingerprints:
+  - firmwares: 3.0.0-1.3.0 (128B-0109-00010300)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0102,1000', outClusters:'0003,0019,0102', model:'SIN-4-RS-20', manufacturer:'NodOn', controllerType:'ZGB'
+
+  capabilities:
+    - file: src/capabilities/WindowShade.groovy
+    - file: src/devices/NodOn_SIN-4-RS-20/SIN-4-RS-20.groovy
+    - file: src/capabilities/PushableButton.groovy
+      params:
+        buttons:
+        - { id: 'UP',  name: '▲',  number: 1 }
+        - { id: 'DOWN',  name: '▼',  number: 2 }
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 3600     # report device as offline if no message was received in the last 60 minutes (device should report On/Off status every 10 minutes)
+    - file: src/capabilities/PowerSource.groovy
+    - file: src/capabilities/FirmwareUpdate.groovy

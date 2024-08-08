@@ -4,7 +4,7 @@ device:
   image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_WS-Light.webp
   links:
   - name: device details
-    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#ws-light
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#white-spectrum-light
   - name: community page
     url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 

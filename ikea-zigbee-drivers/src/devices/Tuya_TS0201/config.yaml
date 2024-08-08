@@ -1,0 +1,25 @@
+device:
+  model: Tuya Temperature and Humidity Sensor (TS0201)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Tuya_TS0201.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Tuya_TS0201.webp
+  links:
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tuya-temperature-and-humidity-sensor-ts0201
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
+
+  fingerprints:
+  - firmwares: Unknown
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0402,0405', outClusters:'0019,000A', model:'TS0201', manufacturer:'_TZ2000_a476raq2'
+
+  capabilities:
+    - name: Sensor
+    - file: src/capabilities/Temperature.groovy
+    - file: src/capabilities/RelativeHumidity.groovy
+    - file: src/capabilities/Battery.groovy
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage every 5 hours)
+    - file: src/capabilities/PowerSource.groovy

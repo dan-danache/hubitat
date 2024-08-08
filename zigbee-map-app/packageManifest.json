@@ -1,10 +1,10 @@
 {
     "packageName": "Zigbee Map",
-    "version": "2.1.0",
-    "releaseNotes": "v2.1.0\n - Change \"poor\" link quality color from yellow to violet - @Horseflesh\n - Change \"good\" link quality LQI interval from [150 - 200) to [130 - 200)",
+    "version": "2.2.0",
+    "releaseNotes": "v2.2.0\n - Add \"Advanced Zigbee pairing\" functionality",
     "minimumHEVersion": "2.3.8.117",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2025-05-16",
+    "dateReleased": "2025-07-01",
     "documentationLink": "https://dan-danache.github.io/hubitat/zigbee-map-app/",
     "communityLink": "https://community.hubitat.com/t/release-zigbee-map-app/133888",
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
@@ -16,7 +16,7 @@
             "id": "11ba8718-86f0-4461-ae21-8627001d3e8e",
             "name": "zigbee-neighbors.html",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/zigbee-neighbors.html",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.0/zigbee-map-app/zigbee-neighbors.html",
             "required": true,
             "oauth": false,
             "description": "Visualize the topology and connectivity of your Zigbee network."
@@ -24,7 +24,7 @@
             "id": "585dd5c6-b406-4600-913a-04de0815f5cd",
             "name": "zigbee-routes.html",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/zigbee-routes.html",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.0/zigbee-map-app/zigbee-routes.html",
             "required": true,
             "oauth": false,
             "description": "Visualize the topology and connectivity of your Zigbee network."
@@ -32,7 +32,7 @@
             "id": "3068da27-d333-4439-a496-88d98a45c206",
             "name": "mem-cpu-history.html",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/mem-cpu-history.html",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.0/zigbee-map-app/mem-cpu-history.html",
             "required": true,
             "oauth": false,
             "description": "Visualize hub memory and processor usage history."
@@ -41,7 +41,7 @@
     "apps": [{
         "id": "c2e67d9b-d56f-4865-9419-14a93cbe94d0",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/zigbee-map.groovy",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.0/zigbee-map-app/zigbee-map.groovy",
         "name": "Zigbee Map",
         "description": "Visualize the topology and connectivity of your Zigbee network.",
         "oauth": true,
@@ -50,7 +50,7 @@
     "drivers": [{
         "id": "6394c6a8-73db-49d2-b4d1-3a00427aed2f",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/zigbee-map-helper.groovy",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.0/zigbee-map-app/zigbee-map-helper.groovy",
         "name": "Zigbee Map Helper",
         "description": "Helper driver for the Zigbee Map application.",
         "required": true

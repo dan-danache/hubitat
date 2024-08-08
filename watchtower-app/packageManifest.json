@@ -1,0 +1,40 @@
+{
+    "packageName": "Watchtower",
+    "version": "1.1.0",
+    "releaseNotes": "v1.1.0\n - Add option to set charts y-axis scale to \"auto\" or \"fixed\" - @marktheknife",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2024-07-31",
+    "documentationLink": "https://dan-danache.github.io/hubitat/watchtower-app/",
+    "communityLink": "https://community.hubitat.com/t/release-watchtower-app/134375",
+    "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "category": "Utility",
+    "tags": [ "Tools & Utilities" , "Dashboards", "Monitoring"],
+    "apps": [{
+        "id": "0c00f8aa-8de9-4c3c-993f-16e3243f96e5",
+        "namespace": "dandanache",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.1.0/watchtower-app/watchtower.groovy",
+        "name": "Watchtower",
+        "description": "Data-driven insights for a smarter home",
+        "oauth": true,
+        "required": true
+    }],
+    "files": [{
+        "id": "516aff72-a2b5-43a3-b40b-ca64a5e25bf7",
+        "name": "watchtower.html",
+        "namespace": "dandanache",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.1.0/watchtower-app/watchtower.html",
+        "required": true,
+        "oauth": false,
+        "description": "Watchtower Dashboard"
+    },{
+        "id": "67ca419a-6d2c-4fa7-81ff-99e0da16571e",
+        "name": "watchtower.js",
+        "namespace": "dandanache",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.1.0/watchtower-app/watchtower.js",
+        "required": true,
+        "oauth": false,
+        "description": "Watchtower Dashboard"
+    }]
+}

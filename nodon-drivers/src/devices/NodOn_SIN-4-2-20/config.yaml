@@ -1,0 +1,31 @@
+device:
+  model: NodOn Lighting Relay Switch (SIN-4-2-20)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/nodon-drivers/NodOn_SIN-4-2-20.groovy
+  image: https://dan-danache.github.io/hubitat/nodon-drivers/img/NodOn_SIN-4-2-20.webp
+  links:
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/nodon-drivers/#nodon-lighting-relay-switch-sin-4-2-20
+  - name: community page
+    url: https://community.hubitat.com/t/release-nodon-drivers/123853
+
+  fingerprints:
+  - firmwares: 128B-0102-00010102
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0007,0008,1000,FC57', outClusters:'0003,0006,0019', model:'SIN-4-2-20', manufacturer:'NodOn', controllerType:'ZGB'
+
+  capabilities:
+    - file: src/capabilities/MultiRelay.groovy
+      params:
+        endpoints: ['0x01', '0x02']
+    - file: src/devices/NodOn_SIN-4-2-20/SIN-4-2-20.groovy
+    - file: src/capabilities/PushableButton.groovy
+      params:
+        buttons:
+        - { id: 'SWITCH_1',  name: 'Switch 1',  number: 1 }
+        - { id: 'SWITCH_2',  name: 'Switch 2',  number: 2 }
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 3600     # report device as offline if no message was received in the last 60 minutes (device should report On/Off status every 10 minutes)
+    - file: src/capabilities/PowerSource.groovy
+    - file: src/capabilities/FirmwareUpdate.groovy

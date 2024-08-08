@@ -134,23 +134,23 @@ cmds += zigbee.readAttribute(0x0300, [0x0000, 0x0001, 0x0008]) // CurrentHue, Cu
 // Events for capability.ColorControl
 // ===================================================================================================================
 
-// Report/Read Attributes Reponse: CurrentHue
+// Report/Read Attributes Response: CurrentHue
 case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0300, commandInt:0x01, attrInt:0x0000] }:
 
-// Report/Read Attributes Reponse: CurrentSaturation
+// Report/Read Attributes Response: CurrentSaturation
 case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0001] }:
 case { contains it, [clusterInt:0x0300, commandInt:0x01, attrInt:0x0001] }:
 
-// Report/Read Attributes Reponse: ColorMode
+// Report/Read Attributes Response: ColorMode
 case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0008] }:
 case { contains it, [clusterInt:0x0300, commandInt:0x01, attrInt:0x0008] }:
 
-// Report/Read Attributes Reponse: EnhancedColorMode
+// Report/Read Attributes Response: EnhancedColorMode
 case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x4001] }:
 case { contains it, [clusterInt:0x0300, commandInt:0x01, attrInt:0x4001] }:
 
-// Report Attributes Reponse: EnhancedCurrentHue
+// Report Attributes Response: EnhancedCurrentHue
 case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x4000] }:
     processMultipleColorAttributes msg, type
     return
@@ -159,8 +159,8 @@ case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x4000] }:
 case { contains it, [clusterInt:0x0300, commandInt:0x07] }:
     utils_processedZclMessage 'Configure Reporting Response', "data=${msg.data}"
     return
-case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0003] }: // Report Attribute Current X
-case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0004] }: // Report Attribute Current Y
+case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0003] }: // Report Attributes Response: CurrentX
+case { contains it, [clusterInt:0x0300, commandInt:0x0A, attrInt:0x0004] }: // Report Attributes Response: CurrentY
 case { contains it, [clusterInt:0x0300, commandInt:0x04] }: // Write Attribute Response (0x04)
     return
 {{/ @events }}

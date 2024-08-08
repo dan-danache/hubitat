@@ -32,7 +32,7 @@ case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0000] }:
     }
 
     Integer humidity = Math.round(Integer.parseInt(msg.value, 16) / 100)
-    utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity} %", type:type
+    utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity}%", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RelativeHumidity=${msg.value}"
     return
 

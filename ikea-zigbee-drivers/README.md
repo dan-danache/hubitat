@@ -43,6 +43,7 @@ Devices from other vendors (not in HPM):
 * [Philips Hue Dimmer Switch (RWL022)](#philips-hue-dimmer-switch-rwl022)
 * [Schneider Wiser UFH (CCTFR6600)](#schneider-wiser-ufh-cctfr6600)
 * [Swann One Key Fob (SWO-KEF1PA)](#swann-one-key-fob-swo-kef1pa)
+* [Tuya Temperature and Humidity Sensor (TS0201)](#tuya-temperature-and-humidity-sensor-ts0201)
 
 Advanced features:
 * [Zigbee Bindings](Zigbee_Bindings.md)
@@ -99,6 +100,7 @@ Also includes the 10W and 30W LED drivers.
 * **Zigbee Group Membership**: The device can be a member of Zigbee groups. This allows for efficient management of multiple devices.
 
 #### Tested devices
+
 | Type           | Name                            |
 |----------------|---------------------------------|
 | LED2103G5      | Tradfri Bulb E27 WW Globe 806lm |
@@ -638,7 +640,7 @@ This device offers a range of features:
 * **Particulate Matter Sensor**: Provides data for particulate matter less than 2.5 microns (PM 2.5).
 * **US AQI Score Calculation**: Calculates the US Air Quality Index (AQI) score based on the PM 2.5 value.
 * **Sensirion VOC Index**: Provides a Sensirion Volatile Organic Compounds (VOC) Index that ranges from 1 to 500, offering a quantified measure of the VOCs present in the surrounding air.
-* **Temperature and Humidity Measurements**: Provide standard measurements of the current temperature and the amount of moisture in the air, respectively.
+* **Temperature and Humidity Measurements**: Provide standard measurements of the current temperature and the amount of moisture in the air.
 * **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
 * **Device State Refresh**: Refreshes the device state on demand for real-time status updates.
 
@@ -951,6 +953,19 @@ This device is extremely chatty as it polls the Hubitat hub for the status of ea
 
 #### Pairing Instructions
 Unknown
+
+### Tuya Temperature and Humidity Sensor (TS0201)
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Tuya_TS0201.webp" style="width: 200px"> |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Tuya_TS0201.groovy` |
+| Since version | `5.0.0` |
+
+#### Features
+* **Temperature and Humidity Measurements**: Provide standard measurements of the current temperature and the amount of moisture in the air.
+* **Battery Report**: Provides a percentage-based report on the current battery level.
+* **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
 
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)
