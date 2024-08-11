@@ -12,9 +12,10 @@ export class DashboardGrid extends LitElement {
             border-radius: 5px;
             box-shadow: 0 0 0.3em var(--shadow-color);
         }
-        :host(.embedded) .grid-stack-item-content {
-            box-shadow: none;
+        .grid-stack-item[gs-id^="tr-"] .grid-stack-item-content {
             border: none;
+            box-shadow: none;
+            overflow: hidden;
         }
         .panel-container {
             width: 100%;
@@ -22,14 +23,18 @@ export class DashboardGrid extends LitElement {
             position: relative;
             background-color: var(--bg-color-darker);
         }
+        .grid-stack-item[gs-id^="tr-"] .panel-container {
+            background-color: transparent;
+        }
         .panel-title {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translate(-50%, 0);
             background-color: transparent;
+            color: var(--text-color-darker);
             text-align: center;
-            padding: 0.2em 1em;
+            padding: 0.1em 1em 0.2em 1em;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -38,6 +43,7 @@ export class DashboardGrid extends LitElement {
         .grid-stack:not([mobile-view]) .panel-container:hover .panel-title {
             cursor: move;
             background-color: var(--bg-color);
+            color: var(--text-color);
             box-shadow: 0 0 0.3em var(--shadow-color);
             border: 1px var(--border-color) solid;
             border-radius: 0 0 5px 5px;
@@ -165,7 +171,7 @@ export class DashboardGrid extends LitElement {
                 <div class="panel-title">${config.title || '&nbsp' }</div>
             </div>
         `
-        this.grid.addWidget({w, h, x, y, config, content})
+        this.grid.addWidget({w, h, x, y, config, content, id:`${config.noBorder === true ? 'tr-' : ''}${crypto.randomUUID()}`})
     }
 
     compact() {

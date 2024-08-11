@@ -20,7 +20,7 @@ import com.hubitat.app.DeviceWrapper
 import com.hubitat.hub.domain.Event
 
 @Field static final String APP_NAME = 'Watchtower'
-@Field static final String APP_VERSION = '1.1.0'
+@Field static final String APP_VERSION = '1.2.0'
 @Field static final def URL_PATTERN = ~/^https?:\/\/[^\/]+(.+)/
 @Field static final String APP_ICON = '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'
 @Field static final String MASKABLE_ICON = 'iVBORw0KGgoAAAANSUhEUgAAAgAAAAIABAMAAAAGVsnJAAAAElBMVEVHcExxpQBxpQBwpQBxpgCAvACY5M8+AAAABXRSTlMAJ7Ti/ZKd2DUAAANgSURBVHja7d1BctowGIZhAxcgkANAwwEo4+wbW75AY93/Kl22ixJJaQnw8zx7zTCadz5WHnUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwB8WT+esuwew6dN5476L7iXN+bw5fe9i26b8sRS7gUXKJWPoIXiecsl87ALrc9nQxbWYctm87sJaVV3ALvAE5BpvXVgHF5AfewVfH/0Cplzj/dEvYFSAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQq42wI2L306ZzztwxewSanwME3sApbFh2l2oQtY9OUD68gFrGoepolcwCGXDdEKaH+YJm4By6oLOMYqINjDNO0FtF/AKVgB7Q/TxC3gUHdncQt4zTXGWAW0X8D86AXMj15AUoANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUMAFFD5m+bYOvwHbNH0gpX3wAjblj1mibUDrxyxD6AK2Uy6Zd5E3oM9lb8EKaP+YJfAGrKouYBe3gOdcYT7G3YBDrvEWq4D2n3aKuwFTrjEEK6D9AsJuwGLKNX6GLWBxSwXMCghwAUE3YFDAl2yAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmzArReQ7uSdode6aNqPvIe6gKH9RbPxTt4aO1zqyHDrr819/shz5ZErqPtpx/YjP+7kAla5wrz7x0cql5VHbvV/MLUfmdefOXINffs6HS515E7eHe5W7UeWFUeO3c2+PN1+ZFx/5sh1bGvfHv9teaEjV7uBaT4f5pz2fz0yNR7ZFI9cz+alT+eMp6f/dOSpcAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAu/cLBQBL1l75RF4AAAAASUVORK5CYII='
@@ -30,73 +30,86 @@ import com.hubitat.hub.domain.Event
 @Field static final Map SUPPORTED_ATTRIBUTES = [
     hubCPU: [min:0, max:50, unit:'%', probe:{ device, state, events, begin, end -> state.hubCPU ?: '0' }],
     hubRAM: [min:0, unit:'MB free', probe:{ device, state, events, begin, end -> state.hubRAM ?: '0' }],
-    hubTemperature: [min:0, unit:'°', probe:{ device, state, events, begin, end -> state.hubTemperature ?: '0' }],
+    hubTemperature: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> state.hubTemperature ?: '0' }],
     hubDatabaseSize: [min:0, unit:'MB', probe:{ device, state, events, begin, end -> state.hubDatabaseSize ?: '0' }],
 
     acceleration: [min:0, max:100, unit:'% active', probe:{ device, state, events, begin, end -> calc5minValue(device, 'acceleration', ['active'], events, begin, end) }],
-    airQualityIndex: [min:0, max:500, unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'airQualityIndex', events) }],
-    amperage: [min:0, unit:'A', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'amperage', events) }],
+    airQualityIndex: [min:0, max:500, unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'airQualityIndex', events, begin) }],
+    amperage: [min:0, unit:'A', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'amperage', events, begin) }],
     battery: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> "${device.currentValue('battery') ?: 0}" }],
     camera: [min:0, max:100, unit:'% on', probe:{ device, state, events, begin, end -> calc5minValue(device, 'camera', ['on'], events, begin, end) }],
-    carbonDioxide: [min:0, unit:'ppm', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'carbonDioxide', events) }],
+    carbonDioxide: [min:0, unit:'ppm', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'carbonDioxide', events, begin) }],
     contact: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'contact', ['open'], events, begin, end) }],
-    coolingSetpoint: [min:0, unit:'°', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'coolingSetpoint', events) }],
+    coolingSetpoint: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'coolingSetpoint', events, begin) }],
     door: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'door', ['open'], events, begin, end) }],
     energy: [min:0, unit:'kWh', probe:{ device, state, events, begin, end -> calc5minIncrease(device, 'energy', state) }],
     filterStatus: [min:0, max:100, unit:'% normal', probe:{ device, state, events, begin, end -> "${device.currentValue('filterStatus')}" == 'normal' ? 100 : 0 }],
-    frequency: [unit:'Hz', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'frequency', events) }],
-    goal: [min:0, unit:'steps', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'goal', events) }],
-    heatingSetpoint: [min:0, unit:'°', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'heatingSetpoint', events) }],
-    humidity: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'humidity', events) }],
-    illuminance: [min:0, unit:'lx', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'illuminance', events) }],
+    frequency: [unit:'Hz', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'frequency', events, begin) }],
+    goal: [min:0, unit:'steps', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'goal', events, begin) }],
+    heatingSetpoint: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'heatingSetpoint', events, begin) }],
+    humidity: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'humidity', events, begin) }],
+    illuminance: [min:0, unit:'lx', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'illuminance', events, begin) }],
     lock: [unit:'% locked', probe:{ device, state, events, begin, end -> calc5minValue(device, 'lock', ['locked'], events, begin, end) }],
-    lqi: [min:0, max:255, unit:'lqi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'lqi', events) }],
+    lqi: [min:0, max:255, unit:'lqi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'lqi', events, begin) }],
     motion: [min:0, max:100, unit:'% active', probe:{ device, state, events, begin, end -> calc5minValue(device, 'motion', ['active'], events, begin, end) }],
     naturalGas: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'naturalGas', ['detected'], events, begin, end) }],
     networkStatus: [min:0, max:100, unit:'% online', probe:{ device, state, events, begin, end -> calc5minValue(device, 'networkStatus', ['online'], events, begin, end) }],
-    pH: [unit:'pH', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'ph', events) }],
-    power: [min:0, unit:'W', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'power', events) }],
+    pH: [unit:'pH', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'ph', events, begin) }],
+    power: [min:0, unit:'W', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'power', events, begin) }],
     presence: [min:0, max:100, unit:'% present', probe:{ device, state, events, begin, end -> calc5minValue(device, 'presence', ['present'], events, begin, end) }],
-    pressure: [min:0, unit:'psi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pressure', events) }],
-    rate: [min:0, unit:'LPM', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rate', events) }],
-    rssi: [min:0, max:255, unit:'rssi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rssi', events) }],
+    pressure: [min:0, unit:'psi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pressure', events, begin) }],
+    rate: [min:0, unit:'LPM', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rate', events, begin) }],
+    rssi: [min:0, max:255, unit:'rssi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rssi', events, begin) }],
     securityKeypad: [min:0, max:100, unit:'% armed', probe:{ device, state, events, begin, end -> calc5minValue(device, 'securityKeypad', ['armed home', 'armed away'], events, begin, end) }],
     sessionStatus: [min:0, max:100, unit:'% running', probe:{ device, state, events, begin, end -> calc5minValue(device, 'sessionStatus', ['running'], events, begin, end) }],
     shock: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'shock', ['detected'], events, begin, end) }],
     sleeping: [min:0, max:100, unit:'% sleeping', probe:{ device, state, events, begin, end -> calc5minValue(device, 'sleeping', ['sleeping'], events, begin, end) }],
     smoke: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'smoke', ['detected'], events, begin, end) }],
     sound: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'sound', ['detected'], events, begin, end) }],
-    soundPressureLevel: [unit:'dB', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'soundPressureLevel', events) }],
-    steps: [unit:'steps', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'steps', events) }],
+    soundPressureLevel: [unit:'dB', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'soundPressureLevel', events, begin) }],
+    steps: [unit:'steps', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'steps', events, begin) }],
     'switch': [min:0, max:100, unit:'% on', probe:{ device, state, events, begin, end -> calc5minValue(device, 'switch', ['on'], events, begin, end) }],
     tamper: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'tamper', ['detected'], events, begin, end) }],
-    temperature: [min:0, unit:'°', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'temperature', events) }],
+    temperature: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'temperature', events, begin) }],
     transportStatus: [min:0, max:100, unit:'% playing', probe:{ device, state, events, begin, end -> calc5minValue(device, 'transportStatus', ['playing'], events, begin, end) }],
     valve: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'valve', ['open'], events, begin, end) }],
     water: [min:0, max:100, unit:'% wet', probe:{ device, state, events, begin, end -> calc5minValue(device, 'water', ['wet'], events, begin, end) }],
     windowBlind: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'windowBlind', ['opening', 'partially open', 'open'], events, begin, end) }],
     windowShade: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'windowShade', ['opening', 'partially open', 'open'], events, begin, end) }],
-    voltage: [min:0, unit:'V', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'voltage', events) }],
+    voltage: [min:0, unit:'V', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'voltage', events, begin) }],
 
     // Non-standard attributes
-    pm25: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm25', events) }],
-    vocIndex: [unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'vocIndex', events) }],
+    cloudiness: [unit:'%', min:0, max:100, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'cloudiness', events, begin) }],
+    healthStatus: [min:0, max:100, unit:'% online', probe:{ device, state, events, begin, end -> calc5minValue(device, 'healthStatus', ['online'], events, begin, end) }],
+    pm10: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm10', events, begin) }],
+    pm25: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm25', events, begin) }],
+    vocIndex: [unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'vocIndex', events, begin) }],
+    windDirection: [unit:'°', min:0, max:360, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windDirection', events, begin) }],
+    windGust: [unit:'km/h', min:0, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windGust', events, begin) }],
+    windSpeed: [unit:'km/h', min:0, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windSpeed', events, begin) }],
 ]
 
 @CompileStatic
 static String calc5minValue(DeviceWrapper device, String attribute, List<String> onValues, List<Event> events, long beginTimestamp, long endTimestamp) {
-    String currentValue = device.currentValue(attribute)
+    String currentValue = device.currentValue(attribute)?.toString()
     if (currentValue == null) return '0'
+
+    // Short-circuit all the time calculations if nothing happened in the past 5 minutes
+    if (events.size() == 0) return onValues.contains(currentValue) ? '100' : '0'
+
     long onTime = 0
     long lastOnTimestamp = beginTimestamp
     for (int i = 0; i < events.size(); i++) {
         Event event = events.get(i)
         if (event.name != attribute || !event.isStateChange) continue
+
+        long eventTimeStamp = event.getDate().getTime()
+        if (eventTimeStamp < beginTimestamp) continue
         if (onValues.contains(event.value)) {
-            lastOnTimestamp = event.getDate().getTime()
+            lastOnTimestamp = eventTimeStamp
             continue
         } else {
-            onTime += event.getDate().getTime() - lastOnTimestamp
+            onTime += eventTimeStamp - lastOnTimestamp
         }
     }
     if (onValues.contains(currentValue)) onTime += endTimestamp - lastOnTimestamp
@@ -114,7 +127,7 @@ static String calc5minIncrease(DeviceWrapper device, String attribute, Map state
 }
 
 @CompileStatic
-static String calc5minAverage(DeviceWrapper device, String attribute, List<Event> events) {
+static String calc5minAverage(DeviceWrapper device, String attribute, List<Event> events, long beginTimestamp) {
     String currentValue = device.currentValue(attribute)
     if (currentValue == null) return '0'
     BigDecimal sum = BigDecimal.ZERO
@@ -122,6 +135,8 @@ static String calc5minAverage(DeviceWrapper device, String attribute, List<Event
     for (int i = 0; i < events.size(); i++) {
         Event event = events.get(i)
         if (event.name != attribute || !event.isStateChange) continue
+        long eventTimeStamp = event.getDate().getTime()
+        if (eventTimeStamp < beginTimestamp) continue
         sum += new BigDecimal(event.value)
         count++
     }
@@ -160,15 +175,10 @@ def updated() {
 def refresh() {
     log.info "${app.getLabel()} has been refreshed"
 }
-private void debug(message) {
-    if (logEnable) log.debug "${APP_NAME} ▸ ${message}"
-}
-private void info(message) {
-    log.info "${APP_NAME} ▸ ${message}"
-}
-private void warn(message) {
-    log.warn "${APP_NAME} ▸ ${message}"
-}
+private void debug(message) { if (logEnable) log.debug "${APP_NAME} ▸ ${message}" }
+private void info(message) { log.info "${APP_NAME} ▸ ${message}" }
+private void warn(message) { log.warn "${APP_NAME} ▸ ${message}" }
+private void error(message) { log.error "${APP_NAME} ▸ ${message}" }
 
 // ===================================================================================================================
 // Button handler
@@ -591,7 +601,8 @@ Map settings() {
                 <style>
                     .mdl-cell > div { white-space:normal !important }
                     ul { margin:0; padding-left:1em }
-                    code { background:#e7e7e7; padding:.1rem .4rem; border-radius:.2rem }
+                    code { background:rgba(0, 0, 0, .1); padding:.1rem .4rem; border-radius:.2rem }
+                    aside { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: .5em 1em; }
                 </style>
             '''
         }
@@ -633,22 +644,45 @@ Map settings() {
                 width: 6,
             )
         }
+        section('Advanced settings', hideable:true, hidden:false) {
+            input(name:'collectDisable', type:'bool', title:'Disable data collection (that runs every 5 minutes)', defaultValue:false, submitOnChange:true)
+            if (collectDisable) {
+                paragraph '<aside><b>Caution</b>: Data collection has been disabled, and no new data points will be added to the <code>wt_${device_id}_5m.csv</code> data files. As a result, data aggregation will also be affected, as there won’t be any new data points available for the aggregation process.</aside>'
+            }
+            input(name:'aggregateDisable', type:'bool', title:'Disable data aggregation for 1 hour, 1 day, and 1 week intervals', defaultValue:false, submitOnChange:true)
+            if (aggregateDisable) {
+                paragraph '<aside><b>Caution</b>: Data aggregation has been disabled, and no new data points will be added to the <code>wt_${device_id}_1h.csv</code>, <code>wt_${device_id}_1d.csv</code>, and <code>wt_${device_id}_1w.csv</code> data files.</aside>'
+            }
+        }
     }
 }
 
 Map changelog() {
     dynamicPage(name:'changelog', title:'Change log', install:false, uninstall:false) {
-        section('v1.1.0 - 2024-08-08', hideable:true, hidden:false) {
+        section('v1.2.0 - 2024-08-11', hideable:true, hidden:false) {
             paragraph '''\
                 <ul>
-                    <li>Add option to set charts y-axis scale to "auto" or "fixed" - @marktheknife</li>
+                    <li><b>Fixed</b>: Ignore device events happening earlier than needed when collecting 5m values - @iEnam
+                    <li><b>Fixed</b>: Continue collecting data for other devices even when encountering an error
+                    <li><b>Changed</b>: Desaturate dark theme colors
+                    <li><b>Added</b>: Iframe tile: add options to hide tile border and to disable auto-refresh
+                    <li><b>Added</b>: Add non-standard attributes support: cloudiness, healthStatus, pm10, windDirection, windGust, windSpeed
+                    <li><b>Added</b>: Add option to disable data collection and/or aggregation - @PPz
+                    <li><b>Added</b>: Add option to initiate on-demand data collection - @PPz
+                </ul>
+            '''
+        }
+        section('v1.1.0 - 2024-08-08', hideable:true, hidden:true) {
+            paragraph '''\
+                <ul>
+                    <li><b>Added</b>: Add option to set charts y-axis scale to "auto" or "fixed" - @marktheknife
                 </ul>
             '''
         }
         section('v1.0.0 - 2024-07-31', hideable:true, hidden:true) {
             paragraph '''\
                 <ul>
-                    <li>Initial release</li>
+                    <li>Initial release
                 </ul>
                 <style>
                     .mdl-cell > div { white-space:normal !important }
@@ -792,7 +826,7 @@ def buildDashboardURL(String dashboardName) {
 // ===================================================================================================================
 
 void collectHubMetrics() {
-    debug 'Start saving hub metrics to state (to be collected in 1 minute) ...'
+    if (logEnable) debug 'Start saving hub metrics to state (to be collected in 1 minute) ...'
     state.remove 'hubTemperature'
     state.remove 'hubDatabaseSize'
     state.remove 'hubRAM'
@@ -817,40 +851,46 @@ void fetchHubUrl(String path, Closure func) {
 }
 
 void collectDeviceMetrics() {
+    if (collectDisable == true) return
     ZonedDateTime now = ZonedDateTime.now(ZoneId.of(location.timeZone.ID)).withSecond(0).withNano(0)
-    debug "Collecting metrics: now=${now}, epoch=${now.toEpochSecond()}, dow=${now.getDayOfWeek()}, hour=${now.getHour()}, min=${now.getMinute()}"
+    if (logEnable) debug "Collecting device metrics: now=${now}, epoch=${now.toEpochSecond()}, dow=${now.getDayOfWeek()}, hour=${now.getHour()}, min=${now.getMinute()}"
     collectDeviceConfiguration().each { conf ->
         DeviceWrapper device = conf[1]
         List<String> attrs = conf[2]
         String deviceId = device?.id ?: '0'
 
-        update5MinData(now, device, attrs)
-
+        try { update5MinData(now, device, attrs) } catch(Exception ex) { error "Failed to update5MinData for device #${deviceId}: ${ex.getMessage()}" }
+        if (aggregateDisable == true) return
+        
         if (now.getMinute() != 0) return
-        update1HourData(now, deviceId, attrs)
+        try { update1HourData(now, deviceId, attrs) } catch(Exception ex) { error "Failed to update1HourData for device #${deviceId}: ${ex.getMessage()}" }
 
         if (now.getHour() != 0) return
-        update1DayData(now, deviceId, attrs)
+        try { update1DayData(now, deviceId, attrs) } catch(Exception ex) { error "Failed to update1DayData for device #${deviceId}: ${ex.getMessage()}" }
 
         if (now.getDayOfWeek() != DayOfWeek.MONDAY) return
-        update1WeekData(now, deviceId, attrs)
+        try { update1WeekData(now, deviceId, attrs) } catch(Exception ex) { error "Failed to update1WeekData for device #${deviceId}: ${ex.getMessage()}" }
     }
 }
 
-void update5MinData(ZonedDateTime now, DeviceWrapper device, List<String> attrs) {
+void update5MinData(ZonedDateTime now, DeviceWrapper device, List<String> attrs, int lookbackMinutes = 5) {
     String deviceId = device?.id ?: '0'
-    Date beginDate = Date.from(now.minusMinutes(5).toInstant())
-    List<Event> events = device?.eventsSince(beginDate) ?: []
-    debug "Updating 5 min metrics for device #${deviceId}, events=${events} ..."
+    Date beginDate = Date.from(now.minusMinutes(lookbackMinutes).toInstant())
+    List<Event> events = lookbackMinutes == 0 ? [] : (device?.eventsSince(beginDate) ?: []).sort { it.date }
+    if (logEnable) debug "Updating 5 min metrics for device #${deviceId}, events=${events.collect { "${it.name}=${it.value}@${it.date}" }} ..."
 
     // Compute and save a new CSV record
     List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-    attrs.each { newCsvRecord.add(SUPPORTED_ATTRIBUTES[it].probe(device, state, events, beginDate.getTime(), now.toInstant().toEpochMilli())) }
+    attrs.each {
+        String value = SUPPORTED_ATTRIBUTES[it].probe(device, state, events, beginDate.getTime(), now.toInstant().toEpochMilli())
+        if (value.startsWith('-')) warn "${deviceId}: ${it} = ${value}"
+        newCsvRecord.add(value)
+    }
     appendDataRecord("wt_${deviceId}_5m.csv", newCsvRecord, attrs, conf_5minMaxLines ?: 864)
 }
 
 void update1HourData(ZonedDateTime now, String deviceId, List<String> attrs) {
-    debug "Updating 1 hour metrics device #${deviceId} ..."
+    if (logEnable) debug "Updating 1 hour metrics device #${deviceId} ..."
 
     // Compute averages from lower interval file
     String lowerFileName = "wt_${deviceId}_5m.csv"
@@ -873,7 +913,7 @@ void update1HourData(ZonedDateTime now, String deviceId, List<String> attrs) {
 }
 
 void update1DayData(ZonedDateTime now, String deviceId, List<String> attrs) {
-    debug "Updating 1 day metrics device #${deviceId} ..."
+    if (logEnable) debug "Updating 1 day metrics device #${deviceId} ..."
 
     // Compute averages from lower interval file
     String lowerFileName = "wt_${deviceId}_5m.csv"
@@ -896,7 +936,7 @@ void update1DayData(ZonedDateTime now, String deviceId, List<String> attrs) {
 }
 
 void update1WeekData(ZonedDateTime now, String deviceId, List<String> attrs) {
-    debug "Updating 1 week metrics device #${deviceId} ..."
+    if (logEnable) debug "Updating 1 week metrics device #${deviceId} ..."
 
     // Compute averages from lower interval file
     String lowerFileName = "wt_${deviceId}_1h.csv"
@@ -923,7 +963,7 @@ void update1WeekData(ZonedDateTime now, String deviceId, List<String> attrs) {
 // ===================================================================================================================
 
 void appendDataRecord(String fileName, List<String> csvRecord, List<String> attrs, Long maxLines) {
-    debug "appendDataRecord(fileName=${fileName}, csvRecord=${csvRecord}, attrs=${attrs}, maxLines=${maxLines})"
+    if (logEnable) debug "appendDataRecord(fileName=${fileName}, csvRecord=${csvRecord}, attrs=${attrs}, maxLines=${maxLines})"
     List<String> csvLines = []
     csvLines.add("timestamp,${ attrs.join(',') }")
     csvLines.addAll(loadDataLines(fileName, maxLines - 1))
@@ -1000,14 +1040,15 @@ mappings {
     path('/watchtower.csv') { action:[GET:'getDashboardCsvMapping']}
     path('/icon.png') { action:[GET:'getIconMapping']}
     path('/app.webmanifest') { action:[GET:'getAppManifestMapping']}
-    path('/grid-layout.json') { action:[GET:'getGridLayoutMapping', PUT:'setGridLayoutMapping']}
+    path('/grid-layout.json') { action:[GET:'getGridLayoutMapping', PUT:'putGridLayoutMapping']}
     path('/monitored-devices.json') { action:[GET:'getMonitoredDevicesMapping']}
     path('/supported-attributes.json') { action:[GET:'getSupportedAttributesMapping']}
     path("/hub-info.json") { action:[GET:'getHubInfoMapping']}
+    path("/collect-device-metrics") { action:[GET:'getCollectDeviceMetricsMapping']}
 }
 
 def getDashboardHtmlMapping() {
-    debug "Proxying watchtower.html to ${request.HOST} (${request.requestSource})"
+    if (logEnable) debug "Proxying watchtower.html to ${request.HOST} (${request.requestSource})"
     if (params.name == null) throw new RuntimeException('Missing "name" query param')
     return render(status:200, contentType:'text/html',
         data: new String(downloadHubFile('watchtower.html'), 'UTF-8')
@@ -1017,7 +1058,7 @@ def getDashboardHtmlMapping() {
 }
 
 def getDashboardJsMapping() {
-    debug "Proxying watchtower.js to ${request.HOST} (${request.requestSource})"
+    if (logEnable) debug "Proxying watchtower.js to ${request.HOST} (${request.requestSource})"
     // if (request.requestSource == 'cloud') return render(status:301,
     //     headers: [location:'https://dan-danache.github.io/hubitat/watchtower-app/watchtower.js']
     // )
@@ -1025,7 +1066,7 @@ def getDashboardJsMapping() {
 }
 
 def getDashboardCsvMapping() {
-    debug "Proxying CSV data file: device=${params.device}, precision=${params.precision}"
+    if (logEnable) debug "Proxying CSV data file: device=${params.device}, precision=${params.precision}"
     if (params.device == null) throw new RuntimeException('Missing "device" query param')
     if (params.precision == null) throw new RuntimeException('Missing "precision" query param')
     return render(status:200, contentType:'text/csv',
@@ -1038,7 +1079,7 @@ def getIconMapping() {
 }
 
 def getAppManifestMapping() {
-    debug "Returning PWA manifest for dashboard: ${params.name}"
+    if (logEnable) debug "Returning PWA manifest for dashboard: ${params.name}"
     if (params.name == null) throw new RuntimeException('Missing "name" query param')
     return render(status:200, contentType:'application/manifest+json',
         data: """\
@@ -1061,15 +1102,15 @@ def getAppManifestMapping() {
             "categories": ["utilities"],
             "display": "standalone",
             "orientation": "any",
-            "theme_color": "${params.theme == 'dark' ? "#002b36" : "#eee8d5"}",
-            "background_color": "${params.theme == 'dark' ? "#002b36" : "#eee8d5"}"
+            "theme_color": "${params.theme == 'dark' ? "#1b1b1b" : "#eee8d5"}",
+            "background_color": "${params.theme == 'dark' ? "#1b1b1b" : "#eee8d5"}"
         }
         """
     )
 }
 
 def getGridLayoutMapping() {
-    debug "Returning grid layout for dashboard: ${params.name}"
+    if (logEnable) debug "Returning grid layout for dashboard: ${params.name}"
     if (params.name == null) throw new RuntimeException('Missing "name" query param')
 
     String stateEntryName = "g.${params.name}"
@@ -1078,8 +1119,8 @@ def getGridLayoutMapping() {
     return render(status:200, contentType:'application/json', data:layout)
 }
 
-def setGridLayoutMapping() {
-    debug "Saving grid layout for dashboard: ${params.name}"
+def putGridLayoutMapping() {
+    if (logEnable) debug "Saving grid layout for dashboard: ${params.name}"
     if (params.name == null) throw new RuntimeException('Missing "name" query param')
 
     String stateEntryName = "g.${params.name}"
@@ -1094,23 +1135,25 @@ def saveGridLayout(data) {
 }
 
 def getMonitoredDevicesMapping() {
-    debug 'Returning monitored devices list'
+    if (logEnable) debug 'Returning monitored devices list'
     List devices = collectDeviceConfiguration().collect { return [id:it[1]?.id ?: '0', name:it[1]?.displayName ?: HUB_NAME, attrs:it[2]] }
     return render(status:200, contentType:'application/json', data:new JsonBuilder(devices).toString())
 }
 
 def getSupportedAttributesMapping() {
-    debug 'Returning supported attributes list'
+    if (logEnable) debug 'Returning supported attributes list'
     Map attributes = SUPPORTED_ATTRIBUTES.collectEntries{ key, val -> [key, val.findAll { k, v -> k != 'probe' }] }
-    attributes.coolingSetpoint.unit = "°${location.temperatureScale}"
-    attributes.heatingSetpoint.unit = "°${location.temperatureScale}"
-    attributes.temperature.unit = "°${location.temperatureScale}"
-    attributes.hubTemperature.unit = "°${location.temperatureScale}"
+    if (location.temperatureScale == 'F') { // https://www.urbandictionary.com/define.php?term=Retard%20Unit
+        attributes.each { key, val ->
+            if (val.unit == '°C') val.unit = '°F'
+            if (val.unit == 'km/h') val.unit = 'mph'
+        }
+    }
     return render(status:200, contentType:'application/json', data:new JsonBuilder(attributes).toString())
 }
 
 def getHubInfoMapping() {
-    debug 'Returning Hub information'
+    if (logEnable) debug 'Returning Hub information'
     return render(status:200, contentType:'application/json', data: """\
         {
             "name": "${location.hub.name}",
@@ -1121,4 +1164,18 @@ def getHubInfoMapping() {
         }
         """
     )
+}
+
+def getCollectDeviceMetricsMapping() {
+    ZonedDateTime now = ZonedDateTime.now(ZoneId.of(location.timeZone.ID)).withNano(0)
+    int lookbackMinutes = params.lookbackMinutes ? Integer.parseInt(params.lookbackMinutes) : 0
+    lookbackMinutes = lookbackMinutes < 0 ? 0 : (lookbackMinutes > 30 ? 30 : lookbackMinutes)
+    if (logEnable) debug "Collecting device metrics (on-demand): lookback=${lookbackMinutes}min now=${now}, epoch=${now.toEpochSecond()}"
+    collectDeviceConfiguration().each { conf ->
+        DeviceWrapper device = conf[1]
+        List<String> attrs = conf[2]
+        String deviceId = device?.id ?: '0'
+        try { update5MinData(now, device, attrs, lookbackMinutes) } catch(Exception ex) { error "Failed to collect metrics for device #${deviceId}: ${ex.getMessage()}" }
+    }
+    return render(status:200, contentType:'application/json', data:'{"status": "Done"}')
 }

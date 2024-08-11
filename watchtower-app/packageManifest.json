@@ -1,10 +1,10 @@
 {
     "packageName": "Watchtower",
-    "version": "1.1.0",
-    "releaseNotes": "v1.1.0\n - Add option to set charts y-axis scale to \"auto\" or \"fixed\" - @marktheknife",
+    "version": "1.2.0",
+    "releaseNotes": "v1.2.0\n - Fixed: Ignore device events happening earlier than needed when collecting 5m values - @iEnam\n - Changed: Desaturate dark theme colors\n - Fixed: Continue collecting data for other devices even when encountering an error\n - Added: Iframe tile: add options to hide tile border and to disable auto-refresh\n Added: - Add non-standard attributes support: cloudiness, healthStatus, pm10, windDirection, windGust, windSpeed\n - Added: Add option to disable data collection and/or aggregation - @PPz\n - Add option to initiate on-demand data collection - @PPz",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2024-07-31",
+    "dateReleased": "2024-00-11",
     "documentationLink": "https://dan-danache.github.io/hubitat/watchtower-app/",
     "communityLink": "https://community.hubitat.com/t/release-watchtower-app/134375",
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
@@ -14,7 +14,7 @@
     "apps": [{
         "id": "0c00f8aa-8de9-4c3c-993f-16e3243f96e5",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.1.0/watchtower-app/watchtower.groovy",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.2.0/watchtower-app/watchtower.groovy",
         "name": "Watchtower",
         "description": "Data-driven insights for a smarter home",
         "oauth": true,
@@ -24,7 +24,7 @@
         "id": "516aff72-a2b5-43a3-b40b-ca64a5e25bf7",
         "name": "watchtower.html",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.1.0/watchtower-app/watchtower.html",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.2.0/watchtower-app/watchtower.html",
         "required": true,
         "oauth": false,
         "description": "Watchtower Dashboard"
@@ -32,7 +32,7 @@
         "id": "67ca419a-6d2c-4fa7-81ff-99e0da16571e",
         "name": "watchtower.js",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.1.0/watchtower-app/watchtower.js",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.2.0/watchtower-app/watchtower.js",
         "required": true,
         "oauth": false,
         "description": "Watchtower Dashboard"

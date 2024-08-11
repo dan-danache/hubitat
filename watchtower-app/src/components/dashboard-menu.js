@@ -83,6 +83,7 @@ export class DashboardMenu extends LitElement {
             left: 50%;
             transform: translateX(-50%);
             user-select: none;
+            font-size: .75rem;
         }
     `;
 
@@ -132,7 +133,7 @@ export class DashboardMenu extends LitElement {
                     <hr>
                     <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
                 `}
-                <aside>v1.1.0</aside>
+                <aside>v1.2.0</aside>
             </nav>
         `;
     }
@@ -158,6 +159,7 @@ export class DashboardMenu extends LitElement {
 
     saveDashboard() {
         this.dispatchEvent(new CustomEvent('save', { detail: {
+            theme: this.theme,
             refresh: this.refreshInterval,
             yScale: this.yScale,
         }}))
@@ -185,7 +187,7 @@ export class DashboardMenu extends LitElement {
         document.documentElement.setAttribute('data-theme', this.theme)
 
         const params = new URLSearchParams(window.location.search)
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme == 'dark' ? '#002b36' : '#eee8d5')
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme == 'dark' ? '#1b1b1b' : '#eee8d5')
         document.querySelector('link[rel="manifest"]').setAttribute(
             'href',
             `./app.webmanifest?access_token=${params.get('access_token')}&name=${encodeURIComponent(params.get('name'))}&theme=${theme}`

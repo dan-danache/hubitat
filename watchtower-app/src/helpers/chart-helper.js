@@ -13,7 +13,7 @@ export class ChartHelper {
                 maintainAspectRatio: false,
                 onResize: chart => ChartHelper.updateChartType(chart),
                 animation: { duration: 0, onComplete: ({ initial, chart }) => (initial ? ChartHelper.updateChartType(chart) : undefined) },
-                layout: { padding: { top: 20, bottom: 3 }},
+                layout: { padding: { top: 25, bottom: 4 }},
                 stacked: false,
                 pointStyle: false,
                 scales: {

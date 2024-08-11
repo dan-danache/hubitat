@@ -54,14 +54,16 @@ export class WatchtowerApp extends LitElement {
     render() {
         return this.halt !== false ? nothing : html`
             <dashboard-grid name=${this.name} class="${this.embedded ? 'embedded' : nothing}"></dashboard-grid>
-            <dashboard-menu
-                @add=${this.showAddDialog}
-                @compact=${this.compactPanels}
-                @changeRefreshInterval=${this.changeRefreshInterval}
-                @changeYScale=${this.changeYScale}
-                @save=${this.saveDashboard}
-            ></dashboard-menu>
-            <dashboard-add-dialog @done=${this.addDashboardPanel}></dashboard-add-dialog>
+            ${this.embedded === true ? nothing: html`
+                <dashboard-menu
+                    @add=${this.showAddDialog}
+                    @compact=${this.compactPanels}
+                    @changeRefreshInterval=${this.changeRefreshInterval}
+                    @changeYScale=${this.changeYScale}
+                    @save=${this.saveDashboard}
+                ></dashboard-menu>
+                <dashboard-add-dialog @done=${this.addDashboardPanel}></dashboard-add-dialog>
+            `}
         `
     }
 

@@ -26,12 +26,12 @@
         <link rel="shortcut icon" href="./icon.png?access_token=${access_token}" />
         <style>
             :root {
-                --Base03: #002b36; /* background tones (dark) */
-                --Base02: #073642; /* -- */
-                --Base01: #586e75; /* content tones */
-                --Base00: #657b83; /* -- */
-                --Base0: #839496;  /* -- */
-                --Base1: #93a1a1;  /* -- */
+                --Base03: #1b1b1b; /* background tones (dark) */
+                --Base02: #242424; /* -- */
+                --Base01: #666666; /* content tones */
+                --Base00: #747474; /* -- */
+                --Base0: #8c8c8c;  /* -- */
+                --Base1: #9a9a9a;  /* -- */
                 --Base2: #eee8d5;  /* background tones (white) */
                 --Base3: #fdf6e3;  /* -- */
                 --Yellow: #b58900; /* accent tones */
@@ -81,6 +81,9 @@
             body.embedded {
                 background-color: transparent;
                 padding: 0;
+                position: relative;
+                inset: -5px;
+                overflow: hidden;
             }
             a { text-decoration: none; color: var(--Blue) }
 

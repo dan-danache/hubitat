@@ -137,9 +137,9 @@ The following dashboard tile types are currently supported:
 
    ![Text tile](img/tile-text.png)
 
-- **Iframe** - This tile type renders an embedded website from a specified URL. The iframe contents are refreshed according to the configured auto-refresh interval.
+- **Iframe** - This tile type renders an embedded web page from a specified URL.
 
-   Example usage: load a widget from another location.
+   Example usage: load a widget (clock, weather, video feed, etc.) from another location.
 
    ![Iframe tile](img/tile-iframe.png)
 
@@ -195,6 +195,28 @@ Dashboards can be configured to use a light or dark theme. You can change the th
 
 ![Dark theme](img/theme-dark.png)
 
+
+## Advanced Usage
+
+### Disable Automatic Data Collection
+
+Although **strongly discouraged**, you have the option to disable data collection and data aggregation processes (which run as scheduled tasks on the hub) from the **Settings** screen.
+
+![Advanced settings](img/advanced-settings.png)
+
+### On-demand Data Collection
+
+The data collection process runs automatically every 5 minutes. To initiate on-demand data collection (e.g., from Rule Machine) for all configured devices, execute the following HTTP GET request against your hub's IP address:
+
+```
+GET /apps/api/${app_id}/collect-device-metrics?access_token=${access_token}&lookbackMinutes=${lookbackMinutes}
+```
+
+| Parameter       | Format           | Description                                                                                                        |
+|-----------------|------------------|--------------------------------------------------------------------------------------------------------------------|
+| app_id          | number, required | Watchtower app ID. Get this from the URL when the app is opened in Hubitat.                                        |
+| access_token    | string, required | Watchtower app Access Token. Get this from the URL when you load a Watchtower dashboard.                           |
+| lookbackMinutes | number, optional | How far back in time to look for device events when calculating the current data point (min=0, max=30, default=0). |
 
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)
