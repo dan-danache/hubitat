@@ -397,7 +397,7 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
                 <${c.type} config='${JSON.stringify(c).replace(/'/g,"&apos;")}' class="panel empty spinner"></${c.type}>
                 <div class="panel-title">${c.title||"&nbsp"}</div>
             </div>
-        `;this.grid.addWidget({w:m,h:C,x:H,y:X,config:c,content:W,id:`${c.noBorder===!0?"tr-":""}${crypto.randomUUID()}`})}compact(){this.grid.compact()}getPanelsConfig(){return this.grid.engine.nodes.map(c=>{let m=c.el.querySelector(".panel");return{w:c.w,h:c.h,x:c.x,y:c.y,config:m.decorateConfig(c.config)}})}};var Vn=class P extends ke{static styles=Xe`
+        `;this.grid.addWidget({w:m,h:C,x:H,y:X,config:c,content:W,id:`${c.noBorder===!0?"tr-":""}${this.randomUUID()}`})}randomUUID(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){var m=Math.random()*16|0,C=c=="x"?m:m&3|8;return C.toString(16)})}compact(){this.grid.compact()}getPanelsConfig(){return this.grid.engine.nodes.map(c=>{let m=c.el.querySelector(".panel");return{w:c.w,h:c.h,x:c.x,y:c.y,config:m.decorateConfig(c.config)}})}};var Vn=class P extends ke{static styles=Xe`
         ul {
             margin: 0;
             padding: 0;
