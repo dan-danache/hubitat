@@ -2,13 +2,9 @@
 
 *Data-driven insights for a smarter home.*
 
-Watchtower is a Hubitat application designed to monitor and record device attributes at various time resolutions, ensuring efficient long-term data retention.
+Watchtower is the all-in-one app for long-term smart home monitoring and data visualization.
 
-Watchtower captures high-resolution data every five minutes, which then degrades into hourly, daily, and weekly averages. This method allows users to maintain a comprehensive historical record of their smart devices' performance without overwhelming storage capacities.
-
-Users can configure which devices and attributes to monitor, and the application automatically reads and stores these values in CSV files, making it easy to access and analyze the collected data.
-
-In addition to robust data collection, Watchtower offers customizable dashboards for visualizing device metrics. Dashboards can render various types of tiles, such as device charts, attribute comparisons, hub details, text/HTML, and iframes.
+Staying true to Hubitat's core value, the application works 100% locally, without any dependence on the Internet or cloud services. Plus, you **don't have** to fiddle with extra hardware like Raspberry Pi or NAS, or configure and maintain complex software like Docker containers, Prometheus, InfluxDB, Grafana, etc. Just install the Watchtower app on your Hubitat hub, and it seamlessly handles the rest.
 
 ## Installation
 
@@ -36,7 +32,7 @@ The following time resolution are used:
 
 ### How it Works
 
-1. **Every 5 minutes**: The application calculates the 5-minutes value for all configured device attributes and stores this data in the File Manager using CSV files named `wt_${device_id}_5m.csv`, one file per configured device. Only devices configured in the application's **Devices** screen are queried.
+1. **Every 5 minutes**: The application calculates the 5-minutes value for all configured device attributes and stores this data in the **File Manager** using CSV files named `wt_${device_id}_5m.csv`, one file per configured device. Only devices configured in the application's **Devices** screen are queried.
 
 1. **At the start of every hour**: The application reads the data from each device's `wt_${device_id}_5m.csv` file, selects records from the last hour, calculates the averages, and saves them in CSV files named `wt_${device_id}_1h.csv`.
 
@@ -45,8 +41,6 @@ The following time resolution are used:
 1. **At midnight every Sunday**: The application reads the data from each device's `wt_${device_id}_1h.csv` file, selects records from the last week (Monday 00:00 - Sunday 23:59), calculates the averages, and saves them in CSV files named `wt_${device_id}_1w.csv`.
 
 **Note**: To maintain a fixed file size, old records are discarded during each save, as specified in the **Settings** screen.
-
-
 
 ## Usage
 

@@ -149,7 +149,7 @@ definition(
     namespace: 'dandanache',
     author: 'Dan Danache',
     description: 'Data-Driven Insights for a Smarter Home',
-    documentationLink: 'https://community.hubitat.com/t/release-watchtower-app/141505',
+    documentationLink: 'https://community.hubitat.com/t/release-watchtower-long-term-metrics-app/141505',
     importUrl: 'https://raw.githubusercontent.com/dan-danache/hubitat/main/watchtower-app/watchtower.groovy',
     category: 'Utility',
     singleInstance: true,
