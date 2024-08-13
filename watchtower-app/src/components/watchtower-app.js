@@ -105,7 +105,7 @@ export class WatchtowerApp extends LitElement {
             This file is part of the Watchtower application.
 
             To load or create a Watchtower dashboard, please got to:
-            • Apps -> Watchtower -> Dashbaords
+            • Apps -> Watchtower -> Dashboards
 
             Error Code: #${errCode}
         `)

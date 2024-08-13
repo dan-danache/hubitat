@@ -28,7 +28,7 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
             This file is part of the Watchtower application.
 
             To load or create a Watchtower dashboard, please got to:
-            \u2022 Apps -> Watchtower -> Dashbaords
+            \u2022 Apps -> Watchtower -> Dashboards
 
             Error Code: #${c}
         `)}applyMobileView(){this.gridElm.applyMobileView(this.mobileView),this.menuElm.applyMobileView(this.mobileView)}async saveDashboard(c){let m={...c.detail,panels:this.gridElm.getPanelsConfig()};console.info("Saving dashboard to Hubitat",this.name,m),await ei.saveGridLayout(this.name,m)}showAddDialog(){this.dialogElm.setAttribute("open",!0)}compactPanels(){this.gridElm.compact()}addDashboardPanel(c){this.gridElm.addPanel(c.detail)}changeRefreshInterval(c){let m=parseInt(c.detail);this.gridElm.setRefreshInterval(m)}changeYScale(c){this.gridElm.setYScale(c.detail)}};var Wn=class extends ke{static styles=Xe`
@@ -144,7 +144,7 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
                     <hr>
                     <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
                 `}
-                <aside>v1.2.0</aside>
+                <aside>v1.2.1</aside>
             </nav>
         `}connectedCallback(){super.connectedCallback(),window.addEventListener("keydown",c=>c.key==="Escape"&&(this.open=!this.open)),window.addEventListener("touchstart",c=>this.touchStart(c)),window.addEventListener("touchend",c=>this.touchEnd(c))}applyMobileView(c){this.mobileView=c}addTile(){this.dispatchEvent(new CustomEvent("add"))}compactTiles(){this.dispatchEvent(new CustomEvent("compact"))}saveDashboard(){this.dispatchEvent(new CustomEvent("save",{detail:{theme:this.theme,refresh:this.refreshInterval,yScale:this.yScale}}))}changeRefreshInterval(c){this.refreshInterval=c.target.value,this.dispatchEvent(new CustomEvent("changeRefreshInterval",{detail:this.refreshInterval}))}changeTheme(c){this.setTheme(c.target.value)}changeYScale(c){this.yScale=c.target.value,this.dispatchEvent(new CustomEvent("changeYScale",{detail:this.yScale}))}setTheme(c){this.theme=c,this.dispatchEvent(new CustomEvent("changeTheme",{detail:this.theme})),document.documentElement.setAttribute("data-theme",this.theme);let m=new URLSearchParams(window.location.search);document.querySelector('meta[name="theme-color"]').setAttribute("content",c=="dark"?"#1b1b1b":"#eee8d5"),document.querySelector('link[rel="manifest"]').setAttribute("href",`./app.webmanifest?access_token=${m.get("access_token")}&name=${encodeURIComponent(m.get("name"))}&theme=${c}`)}touchStart(c){this.startX=c.changedTouches[0].clientX}touchEnd(c){if(this.startX==null)return;let m=c.changedTouches[0].clientX,C=m-this.startX;if(!this.open&&this.startX<30&&C>50){this.open=!0;return}this.open&&m<30&&C<-50&&(this.open=!1)}};var Bn=class P extends ke{static styles=Xe`
         :host {
@@ -317,10 +317,14 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
 
         .grid-stack { min-height: 100% }
         .grid-stack-item-content {
+            background-color: var(--bg-color-darker);
             color: var(--text-color);
-            border: 1px var(--border-color) solid;
+            border: 1px transparent solid;
             border-radius: 5px;
-            box-shadow: 0 0 0.3em var(--shadow-color);
+            box-shadow: 0 0 5px var(--shadow-color);
+        }
+        .grid-stack-item-content:hover {
+            border-color: var(--border-color);
         }
         .grid-stack-item[gs-id^="tr-"] .grid-stack-item-content {
             border: none;
@@ -331,9 +335,8 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
             width: 100%;
             height: 100%;
             position: relative;
-            background-color: var(--bg-color-darker);
         }
-        .grid-stack-item[gs-id^="tr-"] .panel-container {
+        .grid-stack-item[gs-id^="tr-"] .grid-stack-item-content {
             background-color: transparent;
         }
         .panel-title {
@@ -344,7 +347,7 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
             background-color: transparent;
             color: var(--text-color-darker);
             text-align: center;
-            padding: 0.1em 1em 0.2em 1em;
+            padding: 0.2em 1em 0.2em 1em;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;

@@ -7,10 +7,14 @@ export class DashboardGrid extends LitElement {
 
         .grid-stack { min-height: 100% }
         .grid-stack-item-content {
+            background-color: var(--bg-color-darker);
             color: var(--text-color);
-            border: 1px var(--border-color) solid;
+            border: 1px transparent solid;
             border-radius: 5px;
-            box-shadow: 0 0 0.3em var(--shadow-color);
+            box-shadow: 0 0 5px var(--shadow-color);
+        }
+        .grid-stack-item-content:hover {
+            border-color: var(--border-color);
         }
         .grid-stack-item[gs-id^="tr-"] .grid-stack-item-content {
             border: none;
@@ -21,9 +25,8 @@ export class DashboardGrid extends LitElement {
             width: 100%;
             height: 100%;
             position: relative;
-            background-color: var(--bg-color-darker);
         }
-        .grid-stack-item[gs-id^="tr-"] .panel-container {
+        .grid-stack-item[gs-id^="tr-"] .grid-stack-item-content {
             background-color: transparent;
         }
         .panel-title {
@@ -34,7 +37,7 @@ export class DashboardGrid extends LitElement {
             background-color: transparent;
             color: var(--text-color-darker);
             text-align: center;
-            padding: 0.1em 1em 0.2em 1em;
+            padding: 0.2em 1em 0.2em 1em;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
