@@ -129,4 +129,18 @@ export class DatastoreHelper {
             alert(ex.message)
         }
     }
+
+    static async fetchHubData() {
+        try {
+            const response = await fetch(new Request('/hub2/hubData'), { cache: 'no-store' })
+            if (!response.ok) {
+                throw new Error(`DatastoreHelper.fetchHubData() - HTTP error, status = ${response.status}`)
+            }
+            const text = await response.text()
+            return JSON.parse(text)
+        } catch (ex) {
+            console.error(ex)
+            alert(ex.message)
+        }
+    }
 }

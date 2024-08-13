@@ -15,13 +15,11 @@ export class HubInfoPanel extends LitElement {
             color: var(--text-color-darker);
             table-layout: fixed;
         }
-
         table tr:first-child td {
             height: 20px;
             padding: 0;
             border: 0;
         }
-
         table td {
             border-top: 1px var(--bg-color) solid;
             padding: 0 0.5em;
@@ -29,15 +27,20 @@ export class HubInfoPanel extends LitElement {
             white-space: nowrap;
             text-overflow: ellipsis;
         }
-
         table tr td:first-child {
             text-align: right;
             font-weight: bold;
+        }
+        a {
+            text-decoration: none;
+            color: red;
+            line-height: 1em;
         }
     `;
 
     static properties = {
         hubInfo: { type: Object, state: true },
+        hubData: { type: Object, state: true },
         mobileView: { type: Boolean, state: true },
     }
 
@@ -46,9 +49,9 @@ export class HubInfoPanel extends LitElement {
             <table>
                 <tbody>
                     <tr><td colspan="3"></td></tr>
-                    <tr><td>Name</td><td colspan="2">${this.hubInfo.name}</td></tr>
-                    <tr><td>IP</td><td colspan="2">${this.hubInfo.ip}</td></tr>
-                    <tr><td>FW Ver</td><td colspan="2">${this.hubInfo.fw}</td></tr>
+                    <tr><td>Name</td><td colspan="2">${this.hubData.name}${this.hubData.alerts.runAlertsCounter === 0 ? nothing : html` <a href="/alerts" target="_blank" title="${this.hubData.alerts.runAlertsCounter} alerts">🚨</a>`}</td></tr>
+                    <tr><td>IP</td><td colspan="2">${this.hubData.ipAddress}</td></tr>
+                    <tr><td>FW Ver</td><td colspan="2">${this.hubData.version}${this.hubData.alerts.platformUpdateAvailable === false ? nothing : html` <a href="/hub/platformUpdate" target="_blank" title="Platform update available">🚩</a>`}</td></tr>
                     <tr><td>Model</td><td colspan="2">${this.hubInfo.model}</td></tr>
                     <tr><td>Reboot</td><td colspan="2">${this.hubInfo.reboot}</td></tr>
                 </tbody>
@@ -63,11 +66,11 @@ export class HubInfoPanel extends LitElement {
 
     async refresh() {
         this.hubInfo = await DatastoreHelper.fetchHubInfo()
-        //const lastRestart = dayjs().subtract(this.hubInfo.uptime, 'seconds')
+        this.hubData = await DatastoreHelper.fetchHubData()
         const adapter = new Chart._adapters._date({timeZone: 'UTC'});
         const lastReboot = adapter.add(new Date(), -this.hubInfo.uptime, 'second');
         this.hubInfo.reboot = adapter.format(lastReboot, 'Pp').replace(',', '')
-        setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
+        setTimeout(() => this.classList.remove('empty', 'spinner'), 100)
     }
 
     decorateConfig(config) {
