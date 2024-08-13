@@ -7,6 +7,7 @@ export class DashboardGrid extends LitElement {
 
         .grid-stack { min-height: 100% }
         .grid-stack-item-content {
+            box-sizing: border-box;
             background-color: var(--bg-color-darker);
             color: var(--text-color);
             border: 1px transparent solid;

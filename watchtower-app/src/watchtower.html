@@ -66,6 +66,8 @@
                 --tooltip-bg-color: var(--Base2);
                 --tooltip-text-color: var(--Base02);
             }
+            *, *::before, *::after { box-sizing: border-box }
+            * { margin: 0 }
             html { height: 100%; -webkit-text-size-adjust: 100%; scrollbar-width:thin }
             body {
                 min-height: 100%;
@@ -76,13 +78,15 @@
                 background-color: var(--bg-color);
                 color: var(--text-color);
                 cursor: default;
-                width: 100%;
+                width: 100vw;
+                display: block;
             }
             body.embedded {
                 background-color: transparent;
                 padding: 0;
                 position: relative;
                 inset: -5px;
+                width: calc(100vw + 9px);
                 overflow: hidden;
             }
             a { text-decoration: none; color: var(--Blue) }

@@ -317,6 +317,7 @@ Note: ".grid-stack" is required for proper CSS styling and drag/drop, and is the
 
         .grid-stack { min-height: 100% }
         .grid-stack-item-content {
+            box-sizing: border-box;
             background-color: var(--bg-color-darker);
             color: var(--text-color);
             border: 1px transparent solid;
