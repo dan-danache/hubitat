@@ -1,6 +1,18 @@
 import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
 import { DatastoreHelper } from '../helpers/datastore-helper.js';
 
+const FIELDS = {
+    a: { label: 'Name', render: (hubInfo, hubData) => html`${hubData.name}${hubData.alerts.runAlertsCounter === 0 ? nothing : html` <a href="/alerts" target="_blank" title="${hubData.alerts.runAlertsCounter} alerts">🚨</a>`}` },
+    b: { label: 'Model', render: (hubInfo, hubData) => html`${hubInfo.model}` },
+    c: { label: 'IP', render: (hubInfo, hubData) => html`${hubData.ipAddress}` },
+    d: { label: 'Fw Ver', render: (hubInfo, hubData) => html`${hubData.version}${hubData.alerts.platformUpdateAvailable === false ? nothing : html` <a href="/hub/platformUpdate" target="_blank" title="Platform update available">🚩</a>`}` },
+    e: { label: 'CPU', render: (hubInfo, hubData) => html`${hubInfo.cpu}` },
+    f: { label: 'RAM', render: (hubInfo, hubData) => html`${hubInfo.ram}` },
+    g: { label: 'Temp', render: (hubInfo, hubData) => html`${hubInfo.temp}` },
+    h: { label: 'DB Size', render: (hubInfo, hubData) => html`${hubInfo.db}` },
+    i: { label: 'Reboot', render: (hubInfo, hubData) => html`${hubInfo.reboot}` },
+}
+
 export class HubInfoPanel extends LitElement {
     static styles = css`
         :host {
@@ -21,7 +33,7 @@ export class HubInfoPanel extends LitElement {
             border: 0;
         }
         table td {
-            border-top: 1px var(--bg-color) solid;
+            border-top: 1px color-mix(in srgb, var(--text-color-darker), transparent 80%) solid;
             padding: 0 0.5em;
             overflow: hidden;
             white-space: nowrap;
@@ -39,21 +51,21 @@ export class HubInfoPanel extends LitElement {
     `;
 
     static properties = {
+        config: { type: Object, reflect: true },
         hubInfo: { type: Object, state: true },
         hubData: { type: Object, state: true },
         mobileView: { type: Boolean, state: true },
     }
 
     render() {
-        return this.hubInfo === undefined ? nothing: html`
+        return this.hubInfo === undefined || this.hubData === undefined ? nothing: html`
             <table>
                 <tbody>
                     <tr><td colspan="3"></td></tr>
-                    <tr><td>Name</td><td colspan="2">${this.hubData.name}${this.hubData.alerts.runAlertsCounter === 0 ? nothing : html` <a href="/alerts" target="_blank" title="${this.hubData.alerts.runAlertsCounter} alerts">🚨</a>`}</td></tr>
-                    <tr><td>IP</td><td colspan="2">${this.hubData.ipAddress}</td></tr>
-                    <tr><td>FW Ver</td><td colspan="2">${this.hubData.version}${this.hubData.alerts.platformUpdateAvailable === false ? nothing : html` <a href="/hub/platformUpdate" target="_blank" title="Platform update available">🚩</a>`}</td></tr>
-                    <tr><td>Model</td><td colspan="2">${this.hubInfo.model}</td></tr>
-                    <tr><td>Reboot</td><td colspan="2">${this.hubInfo.reboot}</td></tr>
+                    ${Object.entries(FIELDS).map(([key, val]) => {
+                        if (!this.config?.info?.includes(key)) return ''
+                        return html`<tr><td>${val.label}</td><td colspan="2">${val.render(this.hubInfo, this.hubData)}</td>`
+                    })}
                 </tbody>
             </table>
         `;
@@ -80,8 +92,27 @@ export class HubInfoPanel extends LitElement {
 
 export class HubInfoPanelConfig extends LitElement {
 
+    static properties = {
+        info: { type: Array, state: true },
+    }
+
+    constructor() {
+        super()
+        this.info = []
+    }
+
     render() {
-        return html``
+        return html`
+            <section>
+                <label>Select details to display:</label>
+                ${Object.entries(FIELDS).map(([key, val]) => {
+                    return html`<label><input value="${key}" type="checkbox"
+                        ?required=${this.info.length == 0}
+                        @change=${this.onFieldSelect}
+                    > ${val.label}</label>`
+                })}
+            </section>
+        `
     }
 
     createRenderRoot() {
@@ -93,7 +124,13 @@ export class HubInfoPanelConfig extends LitElement {
         setTimeout(() => this.dispatchEvent(new CustomEvent('suggestTitle', { detail: 'Hub Information' })), 200)
     }
 
+    onFieldSelect(event) {
+        console.log('onFieldSelect', event.target.value, event.target.checked)
+        if (event.target.checked) this.info = this.info.concat([event.target.value])
+        else this.info = this.info.filter(item => item !== event.target.value)
+    }
+
     decorateConfig(config) {
-        return config
+        return { ...config, info: this.info.join('') }
     }
 }

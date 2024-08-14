@@ -659,10 +659,11 @@ Map settings() {
 
 Map changelog() {
     dynamicPage(name:'changelog', title:'Change log', install:false, uninstall:false) {
-        section('v1.3.0 - 2024-08-11', hideable:true, hidden:false) {
+        section('v1.3.0 - 2024-08-15', hideable:true, hidden:false) {
             paragraph '''\
                 <ul>
                     <li><b>Added</b>: Hub Info tile: add platform update available and alerts notifications - @amithalp
+                    <li><b>Changed</b>: Hub Info tile: add more hub details and make the widget configurable - @amithalp
                     <li><b>Fixed</b>: Fix Iframe tile margins - @amithalp
                 </ul>
             '''
@@ -1168,7 +1169,11 @@ def getHubInfoMapping() {
             "ip": "${location.hub.localIP}",
             "uptime": ${location.hub.uptime.toLong()},
             "model": "${getHubVersion()}",
-            "fw": "${location.hub.firmwareVersionString}"
+            "fw": "${location.hub.firmwareVersionString}",
+            "cpu": "${state.hubCPU ?: '--'}%",
+            "ram": "${state.hubRAM ?: '--'} MB free",
+            "temp": "${state.hubTemperature ?: '--'}°${location.temperatureScale}",
+            "db": "${state.hubDatabaseSize ?: '--'} MB"
         }
         """
     )

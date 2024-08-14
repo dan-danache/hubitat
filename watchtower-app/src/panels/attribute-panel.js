@@ -219,7 +219,7 @@ export class AttributePanelConfig extends LitElement {
                 <label>Select devices (at least one):</label>
                 ${devices.map(device => {
                     return html`<label><input value="${device.id}" type="checkbox"
-                        required=${this.devs.length == 0 ? 'yes' : nothing}
+                        ?required=${this.devs.length == 0}
                         @change=${this.onDeviceSelect}
                     > ${device.name}</label>`
                 })}
