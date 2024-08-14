@@ -66,7 +66,7 @@ export class DashboardMenu extends LitElement {
             display: block;
             width: 100%;
             margin-bottom: 5px;
-            padding: .5em;
+            height: 30px;
             background-color: var(--bg-color-darker);
             color: var(--text-color);
             border: 1px var(--border-color) solid;
@@ -74,7 +74,7 @@ export class DashboardMenu extends LitElement {
         }
         select:focus, button:focus {
             outline: 1px var(--Blue) solid;
-            border-color: var(--Blue)
+            border-color: var(--Blue);
         }
         aside {
             color: var(--text-color-darker);
@@ -85,6 +85,49 @@ export class DashboardMenu extends LitElement {
             user-select: none;
             font-size: .75rem;
         }
+        form {
+            border: 1px solid grey;
+            padding: 0;
+            background-color: var(--bg-color-darker);
+            color: var(--text-color);
+            border: 1px var(--border-color) solid;
+            border-radius: 5px;
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        form input[type="text"] {
+            box-sizing: border-box;
+            border: none;
+            color: var(--text-color);
+            background-color: transparent;
+            padding-right: 30px;
+            padding-left: 5px;
+            width: 100%;
+            height: 28px;
+        }
+        form input:focus {
+            outline: none;
+        }
+        form:focus-within {
+            border-color: var(--Blue);
+            outline: 1px solid var(--Blue); 
+        }
+        form:invalid {
+            border-color: var(--Red);
+            outline: 1px solid var(--Red);
+        }
+        form input[type="submit"] {
+            border: none;
+            color: var(--text-color);
+            background-color: transparent;
+            position: absolute;
+            top: 50%;
+            right: 0px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 30px;
+        }
     `;
 
     static properties = {
@@ -92,6 +135,7 @@ export class DashboardMenu extends LitElement {
         refreshInterval: { type: String, state: true },
         theme: { type: String, state: true },
         yScale: { type: String, state: true },
+        cellHeight: { type: Number, state: true },
         mobileView: { type: Boolean, state: true }
     }
 
@@ -101,6 +145,7 @@ export class DashboardMenu extends LitElement {
         this.refreshInterval = '0'
         this.theme = 'light'
         this.yScale = 'auto'
+        this.cellHeight = 206
     }
 
     render() {
@@ -129,6 +174,14 @@ export class DashboardMenu extends LitElement {
                     <option value="auto">auto</option>
                     <option value="fixed">fixed</option>
                 </select>
+                <label>Cell height</label>
+                <form @submit=${this.changeCellHeight}>
+                    <input type="text" name="cellHeight" autocomplete="off"
+                        pattern="[1-3][0-9]{2}"
+                        .value="${this.cellHeight}"
+                    >
+                    <input type="submit" value="↩" title="Apply cell height">
+                </form>
                 ${this.mobileView ? nothing: html`
                     <hr>
                     <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
@@ -162,6 +215,7 @@ export class DashboardMenu extends LitElement {
             theme: this.theme,
             refresh: this.refreshInterval,
             yScale: this.yScale,
+            cellHeight: this.cellHeight,
         }}))
     }
 
@@ -177,6 +231,12 @@ export class DashboardMenu extends LitElement {
     changeYScale(event) {
         this.yScale = event.target.value
         this.dispatchEvent(new CustomEvent('changeYScale', { detail: this.yScale }))
+    }
+    changeCellHeight(event) {
+        event.preventDefault()
+        const formProps = Object.fromEntries(new FormData(event.target))
+        this.cellHeight = parseInt(formProps.cellHeight)
+        this.dispatchEvent(new CustomEvent('changeCellHeight', { detail: this.cellHeight }))
     }
 
     setTheme(theme) {

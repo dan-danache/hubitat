@@ -58,8 +58,9 @@ export class WatchtowerApp extends LitElement {
                 <dashboard-menu
                     @add=${this.showAddDialog}
                     @compact=${this.compactPanels}
-                    @changeRefreshInterval=${this.changeRefreshInterval}
-                    @changeYScale=${this.changeYScale}
+                    @changeRefreshInterval=${this.applyRefreshInterval}
+                    @changeYScale=${this.applyYScale}
+                    @changeCellHeight=${this.applyCellHeight}
                     @save=${this.saveDashboard}
                 ></dashboard-menu>
                 <dashboard-add-dialog @done=${this.addDashboardPanel}></dashboard-add-dialog>
@@ -81,6 +82,7 @@ export class WatchtowerApp extends LitElement {
         const refreshInterval = layout.refresh ? parseInt(layout.refresh) : 0
         const theme = layout.theme === 'dark' ? 'dark' : 'light'
         const yScale = layout.yScale == 'fixed' ? 'fixed' : 'auto'
+        const cellHeight = layout.cellHeight ? parseInt(layout.cellHeight) : 206
 
         // Show menu if dashboard contains no panels
         if (layout.panels.length === 0) this.menuElm.open = true
@@ -90,10 +92,12 @@ export class WatchtowerApp extends LitElement {
         this.gridElm.init(layout.panels)
         this.gridElm.setRefreshInterval(refreshInterval)
         this.gridElm.setYScale(yScale)
+        this.gridElm.setCellHeight(cellHeight)
 
         // Update menu
         this.menuElm.refreshInterval = refreshInterval
         this.menuElm.yScale = yScale
+        this.menuElm.cellHeight = cellHeight
         this.menuElm.setTheme(theme)
 
         // Apply mobile view
@@ -137,12 +141,16 @@ export class WatchtowerApp extends LitElement {
         this.gridElm.addPanel(event.detail)
     }
 
-    changeRefreshInterval(event) {
+    applyRefreshInterval(event) {
         const refreshInterval = parseInt(event.detail)
         this.gridElm.setRefreshInterval(refreshInterval)
     }
 
-    changeYScale(event) {
+    applyYScale(event) {
         this.gridElm.setYScale(event.detail)
+    }
+
+    applyCellHeight(event) {
+        this.gridElm.setCellHeight(event.detail)
     }
 }

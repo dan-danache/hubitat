@@ -168,6 +168,10 @@ export class DashboardGrid extends LitElement {
         this.renderRoot.querySelectorAll('device-panel, attribute-panel').forEach(panel => panel.setYScale(yScale))
     }
 
+    setCellHeight(cellHeight) {
+        this.grid.cellHeight(cellHeight, true)
+    }
+
     addPanel(config, w = 2, h = 1, x = undefined, y = undefined) {
         const content = `
             <div class="panel-container">

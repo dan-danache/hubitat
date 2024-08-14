@@ -663,6 +663,7 @@ Map changelog() {
             paragraph '''\
                 <ul>
                     <li><b>Added</b>: Hub Info tile: add platform update available and alerts notifications - @amithalp
+                    <li><b>Added</b>: Add option to configure grid cell height
                     <li><b>Changed</b>: Hub Info tile: add more hub details and make the widget configurable - @amithalp
                     <li><b>Fixed</b>: Fix Iframe tile margins - @amithalp
                 </ul>

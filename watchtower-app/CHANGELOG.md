@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] - 2024-08-15
 ### Added
 - Hub Info tile: add platform update available and alerts notifications - `@amithalp`
+- Add option to configure grid cell height
 
 ### Changed
 - Hub Info tile: add more hub details and make the widget configurable - `@amithalp`
