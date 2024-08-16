@@ -1,6 +1,16 @@
 import '../vendor/vendor.min.js'
 import { ColorHelper } from './color-helper.js'
 
+const positioners = Chart.Tooltip.positioners
+positioners.custom = function(elements, eventPosition) {
+    const pos = positioners.nearest(elements, eventPosition)
+    if (pos === false) return false
+    const chartArea = this.chart.chartArea
+    if (pos.y < chartArea.top + 25) { pos.yAlign = 'top'; pos.xAlign = pos.x < (chartArea.left + chartArea.right) / 2 ? 'left' : 'right' }
+    else if (pos.y > chartArea.bottom - 25) { pos.yAlign = 'bottom'; pos.xAlign = pos.x < (chartArea.left + chartArea.right) / 2 ? 'left' : 'right' }
+    return pos
+}
+
 export class ChartHelper {
     static defaultConfig(mobileView) {
         const colors = ColorHelper.colors()
@@ -51,7 +61,8 @@ export class ChartHelper {
                         titleColor: colors.TextColor,
                         bodyColor: colors.TextColorDarker,
                         borderColor: colors.BorderColor,
-                        borderWidth: 1
+                        borderWidth: 1,
+                        position: 'custom'
                     },
                     decimation: { enabled: true, algorithm: 'lttb' },
                     zoom: {

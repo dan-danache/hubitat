@@ -1,10 +1,10 @@
 {
     "packageName": "Watchtower",
-    "version": "1.3.0",
-    "releaseNotes": "v1.3.0\n - Added: Hub Info tile: add platform update available and alerts notifications - @amithalp\n - Added: Add option to configure grid cell height\n - Changed: Hub Info tile: add more hub details and make the widget configurable - @amithalp\n - Fixed: Fix Iframe tile margins - @amithalp",
+    "version": "1.3.1",
+    "releaseNotes": "v1.3.1\n - Fixed: Fix situations where tooltip is obscured by the time resolution picker or the chart title - @an39511",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2024-08-15",
+    "dateReleased": "2024-08-16",
     "documentationLink": "https://dan-danache.github.io/hubitat/watchtower-app/",
     "communityLink": "https://community.hubitat.com/t/release-watchtower-long-term-metrics-app/141505",
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
@@ -14,7 +14,7 @@
     "apps": [{
         "id": "0c00f8aa-8de9-4c3c-993f-16e3243f96e5",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.3.0/watchtower-app/watchtower.groovy",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.3.1/watchtower-app/watchtower.groovy",
         "name": "Watchtower",
         "description": "Data-driven insights for a smarter home",
         "oauth": true,
@@ -24,7 +24,7 @@
         "id": "516aff72-a2b5-43a3-b40b-ca64a5e25bf7",
         "name": "watchtower.html",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.3.0/watchtower-app/watchtower.html",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.3.1/watchtower-app/watchtower.html",
         "required": true,
         "oauth": false,
         "description": "Watchtower Dashboard"
@@ -32,7 +32,7 @@
         "id": "67ca419a-6d2c-4fa7-81ff-99e0da16571e",
         "name": "watchtower.js",
         "namespace": "dandanache",
-        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.3.0/watchtower-app/watchtower.js",
+        "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.3.1/watchtower-app/watchtower.js",
         "required": true,
         "oauth": false,
         "description": "Watchtower Dashboard"

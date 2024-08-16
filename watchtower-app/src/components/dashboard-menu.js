@@ -186,7 +186,7 @@ export class DashboardMenu extends LitElement {
                     <hr>
                     <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
                 `}
-                <aside>v1.3.0</aside>
+                <aside>v1.3.1</aside>
             </nav>
         `;
     }
