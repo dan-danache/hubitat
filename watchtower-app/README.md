@@ -8,6 +8,7 @@ Staying true to Hubitat's core value, the application works 100% locally, withou
 
 ## Installation
 
+### Install using HPM
 To install the Watchtower app using the Hubitat Package Manager (and receive automatic updates), follow these steps:
 
 1. Go to the **Apps** menu in the Hubitat interface.
@@ -18,6 +19,44 @@ To install the Watchtower app using the Hubitat Package Manager (and receive aut
 1. Choose **Watchtower by Dan Danache** and click **Next**.
 1. Read the license agreement and click **Next**.
 1. Wait for the installation to complete and click **Next**.
+
+### Manual install
+
+#### Add application code
+
+1. Go to the **Apps code** menu entry in the Hubitat interface.
+1. Click the **+ New app** button in the top right.
+1. Click the **Import** button in the top right.
+1. Insert the following URL: `https://raw.githubusercontent.com/dan-danache/hubitat/main/watchtower-app/watchtower.groovy`
+1. Click **Import** the **OK** when prompted.
+1. Click the **Save** button in the top right.
+1. Click the **OAuth** button in the top right.
+1. Click the **Enable OAuth in App** button.
+1. Click the **Update** button in the bottom right.
+
+#### Add dashboard resource files
+
+1. Download the [watchtower.html](https://raw.githubusercontent.com/dan-danache/hubitat/main/watchtower-app/watchtower.html) file from GitHub on your Desktop.
+1. Download the [watchtower.js](https://raw.githubusercontent.com/dan-danache/hubitat/main/watchtower-app/watchtower.js) file from GitHub on your Desktop.
+1. Go to the **Settings** menu entry in the Hubitat interface.
+1. Select **File Manager** from the list.
+1. Click the **+ Choose** button.
+1. Locate and select the **watchtower.html** file from your Desktop.
+1. Click the **Upload** button.
+1. Click the **+ Choose** button.
+1. Locate and select the **watchtower.js** file from your Desktop.
+1. Click the **Upload** button.
+
+#### Create application instance
+
+1. Go to the **Apps** menu entry in the Hubitat interface.
+1. Click the **+ Add user app** button in the top right.
+1. Select **Watchtower x.y.z** from the list.
+
+#### Start the application
+
+1. Go to the **Apps** menu entry in the Hubitat interface.
+1. Select **Watchtower x.y.z** from the apps list.
 
 ## Metrics Collection
 
