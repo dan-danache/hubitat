@@ -28,7 +28,7 @@ To install the Watchtower app using the Hubitat Package Manager (and receive aut
 1. Click the **+ New app** button in the top right.
 1. Click the **Import** button in the top right.
 1. Insert the following URL: `https://raw.githubusercontent.com/dan-danache/hubitat/main/watchtower-app/watchtower.groovy`
-1. Click **Import** the **OK** when prompted.
+1. Click **Import** and then **OK** when prompted.
 1. Click the **Save** button in the top right.
 1. Click the **OAuth** button in the top right.
 1. Click the **Enable OAuth in App** button.
