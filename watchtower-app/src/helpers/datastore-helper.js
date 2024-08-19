@@ -91,8 +91,8 @@ export class DatastoreHelper {
 
             lines.forEach(line => {
                 const vals = line.split(',')
-                data.attr1.push({x: parseInt(vals[0] * 1000), y: parseInt(vals[attr1Idx])})
-                if (attr2Idx !== 0) data.attr2.push({x: parseInt(vals[0] * 1000), y: parseInt(vals[attr2Idx])})
+                data.attr1.push({x: parseInt(vals[0] * 1000), y: parseFloat(vals[attr1Idx])})
+                if (attr2Idx !== 0) data.attr2.push({x: parseInt(vals[0] * 1000), y: parseFloat(vals[attr2Idx])})
             })
             return data
 
