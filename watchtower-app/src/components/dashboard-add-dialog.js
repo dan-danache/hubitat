@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing, unsafeHTML } from '../vendor/vendor.min.js';
+import { html, css, LitElement, unsafeHTML } from '../vendor/vendor.min.js';
 
 export class DashboardAddDialog extends LitElement {
     static styles = css`
@@ -182,7 +182,7 @@ export class DashboardAddDialog extends LitElement {
                             </select>
                         </section>
                         <section>
-                            ${this.type ? this.renderPanelConfig() : nothing}
+                            ${this.type ? this.renderPanelConfig() : ''}
                         </section>
                     </section>
                     <footer>

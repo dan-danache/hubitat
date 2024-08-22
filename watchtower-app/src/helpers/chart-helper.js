@@ -1,5 +1,11 @@
 import '../vendor/vendor.min.js'
 import { ColorHelper } from './color-helper.js'
+import ToggleScaleVisibilityPlugin from '../plugins/toggle-scale-visibility.js'
+import CrosshairPlugin from '../plugins/crosshair.js'
+
+// Register custom plugins
+Chart.register(ToggleScaleVisibilityPlugin)
+Chart.register(CrosshairPlugin)
 
 const positioners = Chart.Tooltip.positioners
 positioners.custom = function(elements, eventPosition) {
@@ -17,6 +23,7 @@ export class ChartHelper {
         return {
             type: 'line',
             options: {
+                events: ['mousedown', 'mousemove', 'mouseup', 'mouseout', 'click', 'touchstart', 'touchmove', 'touchend'],
                 parsing: false,
                 normalized: true,
                 responsive: true,
@@ -62,97 +69,38 @@ export class ChartHelper {
                         bodyColor: colors.TextColorDarker,
                         borderColor: colors.BorderColor,
                         borderWidth: 1,
-                        position: 'custom'
+                        position: 'custom',
+                        //mode: 'interpolate',
+                        intersect: false,
                     },
-                    decimation: { enabled: true, algorithm: 'lttb' },
-                    zoom: {
-                        pan: { enabled: mobileView !== true, mode: 'x' },
-                        zoom: {
-                            wheel: { enabled: true },
-                            pinch: { enabled: mobileView !== true },
-                            mode: 'x',
-                            onZoomComplete: ({ chart }) => ChartHelper.updateChartType(chart)
+                    crosshair: {
+                        line: {
+                            color: colors.Red,
+                            width: 1
                         },
-                        limits: { x: { min: 'original', max: 'original' }},
+                        zoom: { zoomButtonText: '◀•••▶' },
+                        callbacks: { afterZoom: start => this.updateChartType(start.chart) }
                     }
                 }
-            },
-            plugins: [ ChartHelper.crosshairPlugin(), ChartHelper.toggleScaleVisibilityPlugin() ]
-        }
-    }
-
-    static crosshairPlugin() {
-        const colors = ColorHelper.colors()
-        return {
-            id: 'crosshair',
-            afterInit: (chart) => {
-                chart.crosshair = {
-                    x: 0,
-                    y: 0
-                }
-            },
-            afterEvent: (chart, args) => {
-                const { inChartArea } = args
-                const { type, x, y } = args.event
-
-                chart.crosshair = { x, y, draw: inChartArea }
-                chart.draw()
-            },
-            beforeDatasetsDraw: (chart) => {
-                const { ctx } = chart
-                const { top, bottom, left, right } = chart.chartArea
-                const { x, y, draw } = chart.crosshair
-                if (!draw) return
-
-                ctx.save()
-                ctx.beginPath()
-                ctx.lineWidth = 1
-                ctx.strokeStyle = colors.TextColor
-                ctx.setLineDash([2, 2])
-                ctx.moveTo(x, bottom)
-                ctx.lineTo(x, top)
-                ctx.stroke()
-                ctx.restore()
-            }
-        }
-    }
-
-    static toggleScaleVisibilityPlugin() {
-        return {
-            id: 'toggleScaleVisibility',
-            afterEvent: (chart, event) => {
-                const evt = event.event;
-                if (event.inChartArea === true || evt.type !== 'click' || chart.data.datasets.length === 1) return
-                const { x, y } = evt
-                const scale = Object.entries(chart.scales)
-                    .filter(([key, value]) => key !== 'y' && value.axis === 'y' && value.top < y && value.bottom > y && value.left < x && value.right > x)
-                    .map(entry => entry[0])
-                if (scale.length === 0) return
-                const datasets = chart.data.datasets
-                const yAxisID = scale[0]
-                const index = datasets.findIndex(dataset => dataset.yAxisID == yAxisID)
-
-                if (chart.getVisibleDatasetCount() === 1) {
-                    datasets.forEach((_, idx) => chart.setDatasetVisibility(idx, true))
-                } else {
-                    datasets.forEach((_, idx) => chart.setDatasetVisibility(idx, idx !== index))
-                }
-                chart.update('none')
             }
         }
     }
 
     static updateChartType(chart) {
+        //console.log('1. updateChartType')
         if (chart.scales.x === undefined || chart.data.datasets[0] === undefined) return
         const min = chart.scales.x.min
         const max = chart.scales.x.max
         const data = chart.data.datasets[0].data
-        const visibleDatapoints = chart.getZoomLevel() <= 1 ? data.length : data.filter(point => point.x >= min && point.x <= max).length
+        const visibleDatapoints = data.filter(point => point.x >= min && point.x <= max).length
+        //console.log('2. visibleDatapoints', visibleDatapoints)
 
         const chartType = chart.width / visibleDatapoints > 30 ? 'bar' : 'line'
+        //console.log('3. chartType', chartType)
         chart.options.scales.x.offset = chartType == 'bar'
         if (chart.config.type != chartType) {
             chart.config.type = chartType
+            //console.log('4. updating')
             chart.update('none')
         }
     }
@@ -161,5 +109,17 @@ export class ChartHelper {
         return (camelCase[0].toUpperCase() + camelCase.slice(1))
             .replace(/([A-Z])(?=[A-Z][a-z])|([a-z])(?=[A-Z])/g, '$& ')
             .replace('Hub ', '')
+    }
+
+    static setupZoomPan(canvas, chart) {
+        const old = chart.crosshair.reset
+        chart.crosshair.reset = () => {
+            console.log('reset() called')
+            old()
+        }
+        canvas.addEventListener('keydown', event => {
+            if (event.keyCode === 37) chart.crosshair.panZoom('left')
+            else if(event.keyCode === 39) chart.crosshair.panZoom('right')
+        })
     }
 }

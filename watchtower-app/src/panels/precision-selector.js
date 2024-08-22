@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 
 export class PrecisionSelector extends LitElement {
     static styles = css`
@@ -51,7 +51,7 @@ export class PrecisionSelector extends LitElement {
     render() {
         return html`
             <nav><ul>
-                ${Object.entries(PrecisionSelector.precisions).map(([key, val]) => html`<li @click=${this.selectPrecision} data-selected=${this.precision == key ? 'true' : nothing} inert=${this.precision == key ? 'true' : nothing} title="${val}">${key}</li>`)}
+                ${Object.entries(PrecisionSelector.precisions).map(([key, val]) => html`<li @click=${this.selectPrecision} ?data-selected=${this.precision == key} ?inert=${this.precision == key} title="${val}">${key}</li>`)}
             </ul></nav>
         `;
     }

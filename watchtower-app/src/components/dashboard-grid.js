@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 
 export class DashboardGrid extends LitElement {
     static styles = css`
@@ -82,7 +82,7 @@ export class DashboardGrid extends LitElement {
 
     render() {
         return html`
-            <div class="grid-stack spinner" mobile-view=${this.mobileView ? 'true' : nothing}></div>
+            <div class="grid-stack spinner" ?mobile-view=${this.mobileView}></div>
         `;
     }
 

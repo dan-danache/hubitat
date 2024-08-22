@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 import { DatastoreHelper } from '../helpers/datastore-helper.js'
 
 export class WatchtowerApp extends LitElement {
@@ -52,9 +52,9 @@ export class WatchtowerApp extends LitElement {
     }
 
     render() {
-        return this.halt !== false ? nothing : html`
-            <dashboard-grid name=${this.name} class="${this.embedded ? 'embedded' : nothing}"></dashboard-grid>
-            ${this.embedded === true ? nothing: html`
+        return this.halt !== false ? '' : html`
+            <dashboard-grid name=${this.name} class="${this.embedded ? 'embedded' : ''}"></dashboard-grid>
+            ${this.embedded === true ? '' : html`
                 <dashboard-menu
                     @add=${this.showAddDialog}
                     @compact=${this.compactPanels}

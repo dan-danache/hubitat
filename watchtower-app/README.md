@@ -196,23 +196,13 @@ When you move your mouse over a chart, the time resolution picker is displayed a
 
 Changing the time resolution updates the source of the graph data points. For example, selecting the "1h" resolution loads chart data from the `wt_${device_id}_1h.csv` file in the File Manager.
 
-### Charts Zoom and Pan
-The zoom and pan functionality allows you to interact with charts displaying multiple data points over time.
+### Chart Zoom
 
-#### Zooming In and Out
+The zoom functionality allows you to interact with charts displaying multiple data points over time. To zoom in on a specific chart area, simply select it using your mouse. To return to the full dataset view, click the **Reset Zoom** button (◀•••▶) in the top right corner.
 
-- **Zoom In**: Scroll up with the mouse wheel to magnify the chart, focusing on specific data points or intervals.
+On mobile devices, start by tapping the chart briefly, then immediately drag the desired chart area to zoom in.
 
-- **Zoom Out**: Scroll down with the mouse wheel to broaden the view, encompassing a larger time range or dataset.
-
-#### Panning (Horizontal Movement)
-Panning enables you to explore different time periods within the same chart:
-
-- **Left Panning**: Click, hold, and drag the chart to the left to view later data points or shift the view to the future.
-
-- **Right Panning**: Click, hold, and drag the chart to the right to reveal earlier data points or shift the view to the past.
-
-These interactive features enhance your ability to dynamically analyze data. Experiment with zooming and panning to uncover insights within your charts!
+![Chart Zoom](img/zoom.png)
 
 ### Line vs Bar Charts
 Charts will automatically switch between line and bar types based on the number of data points visible. When fewer data points are displayed (e.g., when zoomed in or when time resolution is changed), the chart switches to a bar type for better visibility. When more data points are available, a line chart is more suitable for data analysis.

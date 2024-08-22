@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 
 import { DatastoreHelper } from '../helpers/datastore-helper.js';
 import { ColorHelper } from '../helpers/color-helper.js'
@@ -36,6 +36,20 @@ export class AttributePanel extends LitElement {
             width: 100%;
             text-align: center;
         }
+        .reset-zoom {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            border: none;
+            background-color: var(--Blue);
+            color: var(--Base3);
+            border-radius: 0 0 0 5px;
+            padding: 5px 10px;
+            line-height: 1rem;
+            z-index: 100;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
     `
 
     static properties = {
@@ -49,21 +63,28 @@ export class AttributePanel extends LitElement {
         return html`
             <canvas></canvas>
             <precision-selector @change=${this.changePrecision} .precision=${this.config.precision}></precision-selector>
-            ${ this.nodata === true ? html`<aside>No data yet</aside>` : nothing}
+            ${ this.nodata === true ? html`<aside>No data yet</aside>` : '' }
         `;
     }
 
     updated(changedProperties) {
         if (changedProperties.mobileView == this.mobileView) return
-        this.chart.options.plugins.zoom.pan.enabled = !this.mobileView
-        this.chart.options.plugins.zoom.zoom.pinch.enabled = !this.mobileView
     }
 
     async connectedCallback() {
         super.connectedCallback()
-
         if (this.config.precision === undefined) this.config.precision = '5m'
+    }
 
+    async firstUpdated() {
+        const canvas = this.renderRoot.querySelector('canvas')
+        this.chart = new Chart(canvas, ChartHelper.defaultConfig(this.mobileView))
+        this.chart.canvas.style.touchAction = 'pan-y'
+        ChartHelper.setupZoomPan(canvas, this.chart)
+        await this.initChart()
+    }
+
+    async initChart() {
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
         const monitoredDevices = await DatastoreHelper.fetchMonitoredDevices()
         const data = await DatastoreHelper.fetchAttributeData(this.config.attr, this.config.devs, this.config.precision)
@@ -112,20 +133,16 @@ export class AttributePanel extends LitElement {
         }
 
         this.chart.data = { datasets }
-        ChartHelper.updateChartType(this.chart)
         this.chart.update('none')
+        ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
 
-    firstUpdated() {
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), ChartHelper.defaultConfig(this.mobileView))
-        this.chart.canvas.style.touchAction = 'pan-y'
-    }
-
     async changePrecision(event) {
+        this.chart.crosshair.resetZoom()
+        this.config.precision = event.detail
         this.config.precision = event.detail
         await this.refresh()
-        this.chart.resetZoom()
     }
 
     async refresh() {
@@ -178,7 +195,7 @@ export class AttributePanelConfig extends LitElement {
         return html`
             <label for="device">Select attribute to chart:</label>
             ${this.attributes ? this.renderAttributesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
-            ${this.attr ? this.renderDevicesSelect() : nothing }
+            ${this.attr ? this.renderDevicesSelect() : '' }
         `
     }
 

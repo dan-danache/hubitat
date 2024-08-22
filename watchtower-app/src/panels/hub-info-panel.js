@@ -1,11 +1,11 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 import { DatastoreHelper } from '../helpers/datastore-helper.js';
 
 const FIELDS = {
-    a: { label: 'Name', render: (hubInfo, hubData) => html`${hubData.name}${hubData.alerts.runAlertsCounter === 0 ? nothing : html` <a href="/alerts" target="_blank" title="${hubData.alerts.runAlertsCounter} alerts">🚨</a>`}` },
+    a: { label: 'Name', render: (hubInfo, hubData) => html`${hubData.name}${hubData.alerts.runAlertsCounter === 0 ? '' : html` <a href="/alerts" target="_blank" title="${hubData.alerts.runAlertsCounter} alerts">🚨</a>`}` },
     b: { label: 'Model', render: (hubInfo, hubData) => html`${hubInfo.model}` },
     c: { label: 'IP', render: (hubInfo, hubData) => html`${hubData.ipAddress}` },
-    d: { label: 'Fw Ver', render: (hubInfo, hubData) => html`${hubData.version}${hubData.alerts.platformUpdateAvailable === false ? nothing : html` <a href="/hub/platformUpdate" target="_blank" title="Platform update available">🚩</a>`}` },
+    d: { label: 'Fw Ver', render: (hubInfo, hubData) => html`${hubData.version}${hubData.alerts.platformUpdateAvailable === false ? '' : html` <a href="/hub/platformUpdate" target="_blank" title="Platform update available">🚩</a>`}` },
     e: { label: 'CPU', render: (hubInfo, hubData) => html`${hubInfo.cpu}` },
     f: { label: 'RAM', render: (hubInfo, hubData) => html`${hubInfo.ram}` },
     g: { label: 'Temp', render: (hubInfo, hubData) => html`${hubInfo.temp}` },
@@ -58,7 +58,7 @@ export class HubInfoPanel extends LitElement {
     }
 
     render() {
-        return this.hubInfo === undefined || this.hubData === undefined ? nothing: html`
+        return this.hubInfo === undefined || this.hubData === undefined ? '' : html`
             <table>
                 <tbody>
                     <tr><td colspan="3"></td></tr>

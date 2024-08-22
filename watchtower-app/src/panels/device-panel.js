@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 
 import { DatastoreHelper } from '../helpers/datastore-helper.js';
 import { ColorHelper } from '../helpers/color-helper.js'
@@ -36,6 +36,20 @@ export class DevicePanel extends LitElement {
             width: 100%;
             text-align: center;
         }
+        .reset-zoom {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            border: none;
+            background-color: var(--Blue);
+            color: var(--Base3);
+            border-radius: 0 0 0 5px;
+            padding: 5px 10px;
+            line-height: 1rem;
+            z-index: 100;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
     `;
 
     static properties = {
@@ -47,23 +61,30 @@ export class DevicePanel extends LitElement {
 
     render() {
         return html`
-            <canvas></canvas>
+            <canvas tabindex='1'></canvas>
             <precision-selector @change=${this.changePrecision} .precision=${this.config.precision}></precision-selector>
-            ${ this.nodata === true ? html`<aside>No data yet</aside>` : nothing}
+            ${ this.nodata === true ? html`<aside>No data yet</aside>` : '' }
         `;
     }
 
     updated(changedProperties) {
         if (changedProperties.mobileView == this.mobileView) return
-        this.chart.options.plugins.zoom.pan.enabled = !this.mobileView
-        this.chart.options.plugins.zoom.zoom.pinch.enabled = !this.mobileView
     }
 
     async connectedCallback() {
         super.connectedCallback()
-
         if (this.config.precision === undefined) this.config.precision = '5m'
+    }
 
+    async firstUpdated() {
+        const canvas = this.renderRoot.querySelector('canvas')
+        this.chart = new Chart(canvas, ChartHelper.defaultConfig(this.mobileView))
+        this.chart.canvas.style.touchAction = 'pan-y'
+        ChartHelper.setupZoomPan(canvas, this.chart)
+        await this.initChart()
+    }
+
+    async initChart() {
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
         const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.precision)
         const colors = ColorHelper.colors()
@@ -90,7 +111,7 @@ export class DevicePanel extends LitElement {
                 text: `${datasets[0].label} ${supportedAttributes[this.config.attr1].unit}`,
                 color: colors.Green
             },
-            ticks: { color: colors.TextColorDarker },
+            ticks: { color: colors.TextColorDarker, precision: 0 },
             grid: { color: colors.TextColorDarker + '33' },
         }
         this.attr1Min = supportedAttributes[this.config.attr1].min
@@ -122,7 +143,7 @@ export class DevicePanel extends LitElement {
                     text: `${datasets[1].label} ${supportedAttributes[this.config.attr2].unit}`,
                     color: colors.Blue
                 },
-                ticks: { color: colors.TextColorDarker },
+                ticks: { color: colors.TextColorDarker, precision: 0 },
                 grid: { drawOnChartArea: false },
             }
             this.attr2Min = supportedAttributes[this.config.attr2].min
@@ -134,20 +155,15 @@ export class DevicePanel extends LitElement {
         }
 
         this.chart.data = { datasets }
-        ChartHelper.updateChartType(this.chart)
         this.chart.update('none')
+        ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
 
-    firstUpdated() {
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), ChartHelper.defaultConfig(this.mobileView))
-        this.chart.canvas.style.touchAction = 'pan-y'
-    }
-
     async changePrecision(event) {
+        this.chart.crosshair.resetZoom()
         this.config.precision = event.detail
         await this.refresh()
-        this.chart.resetZoom()
     }
 
     async refresh() {
@@ -160,7 +176,7 @@ export class DevicePanel extends LitElement {
         this.chart.config.type = data.attr1.length < 10 ? 'bar' : 'line'
         this.chart.update('none')
         ChartHelper.updateChartType(this.chart)
-        this.classList.remove('spinner')
+        setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
 
     decorateConfig(config) {
@@ -211,7 +227,7 @@ export class DevicePanelConfig extends LitElement {
         return html`
             <label for="device">Select device:</label>
             ${this.devices ? this.renderDevicesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
-            ${this.attributes ? this.renderAttributesSelect() : nothing }
+            ${this.attributes ? this.renderAttributesSelect() : '' }
         `
     }
 
@@ -254,7 +270,7 @@ export class DevicePanelConfig extends LitElement {
                     )}
                 </select>
             </section>
-            ${ this.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : nothing }
+            ${ this.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
         `
     }
 

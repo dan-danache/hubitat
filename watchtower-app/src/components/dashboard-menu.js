@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from '../vendor/vendor.min.js';
+import { html, css, LitElement } from '../vendor/vendor.min.js';
 
 export class DashboardMenu extends LitElement {
     static styles = css`
@@ -119,7 +119,7 @@ export class DashboardMenu extends LitElement {
         }
         form input[type="submit"] {
             border: none;
-            color: var(--text-color);
+            color: var(--text-color-darker);
             background-color: transparent;
             position: absolute;
             top: 50%;
@@ -151,7 +151,7 @@ export class DashboardMenu extends LitElement {
     render() {
         return html`
             <nav>
-                ${this.mobileView ? nothing : html`
+                ${this.mobileView ? '' : html`
                     <button @click=${this.addTile} title="Add a new dashboard tile"><b>+</b> Add dashboard tile</button>
                     <button @click=${this.compactTiles} title="Re-order dashboard tiles to fill any empty space">⋮⋮⋮ Compact space</button>
                     <hr>
@@ -180,13 +180,13 @@ export class DashboardMenu extends LitElement {
                         pattern="[1-3][0-9]{2}"
                         .value="${this.cellHeight}"
                     >
-                    <input type="submit" value="↩" title="Apply cell height">
+                    <input type="submit" value="➤" title="Apply cell height">
                 </form>
-                ${this.mobileView ? nothing: html`
+                ${this.mobileView ? '' : html`
                     <hr>
                     <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
                 `}
-                <aside>v1.3.2</aside>
+                <aside>v1.4.0</aside>
             </nav>
         `;
     }
