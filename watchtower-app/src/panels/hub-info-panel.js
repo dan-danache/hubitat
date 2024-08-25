@@ -2,7 +2,7 @@ import { html, css, LitElement } from '../vendor/vendor.min.js';
 import { DatastoreHelper } from '../helpers/datastore-helper.js';
 
 const FIELDS = {
-    a: { label: 'Name', render: (hubInfo, hubData) => html`${hubData.name}${hubData.alerts.runAlertsCounter === 0 ? '' : html` <a href="/alerts" target="_blank" title="${hubData.alerts.runAlertsCounter} alerts">🚨</a>`}` },
+    a: { label: 'Name', render: (hubInfo, hubData) => html`${hubData.name}${hubData.alerts.runAlertsCounter - (hubData.alerts.platformUpdateAvailable ? 1 : 0) === 0 ? '' : html` <a href="/alerts" target="_blank" title="Click to see hub alerts">🚩</a>`}` },
     b: { label: 'Model', render: (hubInfo, hubData) => html`${hubInfo.model}` },
     c: { label: 'IP', render: (hubInfo, hubData) => html`${hubData.ipAddress}` },
     d: { label: 'Fw Ver', render: (hubInfo, hubData) => html`${hubData.version}${hubData.alerts.platformUpdateAvailable === false ? '' : html` <a href="/hub/platformUpdate" target="_blank" title="Platform update available">🚩</a>`}` },
