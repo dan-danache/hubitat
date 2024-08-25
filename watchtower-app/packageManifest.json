@@ -1,7 +1,7 @@
 {
     "packageName": "Watchtower",
     "version": "1.4.1",
-    "releaseNotes": "v1.4.1\n - Fixed: Fix \"Max records with 5 min accuracy\" settings",
+    "releaseNotes": "v1.4.1\n - Fixed: Fix \"Max records with 5 min accuracy\" settings - @bobbles",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
     "dateReleased": "2024-08-25",

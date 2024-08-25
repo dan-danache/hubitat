@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.1] - 2024-08-25
 ### Fixed
-- Fix "Max records with 5 min accuracy" settings
+- Fix "Max records with 5 min accuracy" settings - `@bobbles`
 
 ## [1.4.0] - 2024-08-22
 ### Changed

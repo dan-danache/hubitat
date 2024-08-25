@@ -664,7 +664,7 @@ Map changelog() {
         section('v1.4.1 - 2024-08-25', hideable:true, hidden:false) {
             paragraph '''\
                 <ul>
-                    <li><b>Fixed</b>: Fix "Max records with 5 min accuracy" settings
+                    <li><b>Fixed</b>: Fix "Max records with 5 min accuracy" settings - @bobbles
                 </ul>
             '''
         }
