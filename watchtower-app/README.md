@@ -81,6 +81,34 @@ The following time resolution are used:
 
 **Note**: To maintain a fixed file size, old records are discarded during each save, as specified in the **Settings** screen.
 
+### Handling attribute values for powered-off devices
+
+Certain mains-powered devices, such as light bulbs or air purifiers, can be turned off. When these devices are off, the values of other attributes remain unchanged, which can lead to invalid data being recorded. To prevent this, the following attributes will be recorded as **null** when the device has a **switch** attribute set to **off**:
+
+**Standard attributes**:
+
+- airQualityIndex
+- amperage (A)
+- carbonDioxide (ppm)
+- humidity (%)
+- illuminance (lx)
+- level (%)
+- pH (pH)
+- power (W)
+- rate (LPM)
+- temperature (°C or °F)
+- ultravioletIndex
+
+**Custom attributes**:
+
+- cloudiness (%)
+- pm10 (μg/m3)
+- pm25 (μg/m3)
+- vocIndex
+- windDirection (°)
+- windGust (km/h or mph)
+- windSpeed (km/h or mph)
+
 ## Usage
 
 To use the Watchtower app, follow these steps:

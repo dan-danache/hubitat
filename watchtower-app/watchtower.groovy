@@ -20,7 +20,7 @@ import com.hubitat.app.DeviceWrapper
 import com.hubitat.hub.domain.Event
 
 @Field static final String APP_NAME = 'Watchtower'
-@Field static final String APP_VERSION = '1.4.1'
+@Field static final String APP_VERSION = '1.5.0'
 @Field static final def URL_PATTERN = ~/^https?:\/\/[^\/]+(.+)/
 @Field static final String APP_ICON = 'iVBORw0KGgoAAAANSUhEUgAAAgAAAAIABAMAAAAGVsnJAAAAJ1BMVEVHcEyAugB6tACAuwB5sgB/uwB4sgB/uwB2rQCAvABypgB3rgCAvADOha9yAAAADHRSTlMAGTtVbYaeudPl8vuPQkR9AAAV4UlEQVR42uzWMWsUQRjG8WfmLv2ht3ftBI3XLkQ8061BUMHiFkEs0mwlgTS5gFpsIRfstjMkCPtxkt0sPB9KMjuFg50w7sK8v2ZgmuE/uwwvhBBCCCGEEEIIIYQQQvyzJx+/fjlGtOYlyTYFsI8I6U8k2RqoF1UBKEQmqVz/vOxy4NAgKuotH3SpWvM+w+PPkfVPyr4/02dsU/WmNWvEJKlp5UnNxhxUrXlJg3gs2CvWZPO8ZGtW7AyisWTv4tQutp/n8X3/m+qP/t3TVwhgko63v2PvPl2Q16csEEKSY2QS+ro0IbuKO4SRXGBU9mp6uuxhp+YtoF/vI4Dk2mA8pn/19zvtDLokf5gQZ96kGAtd0dNtJrVdU9tPfkcA+luGcVAlfXmfzY3rb2YIQf/KgUcY3gl95+5Gdm40DjYMLZlDHWJoR/Rt1ZldbzGp3I8QyrO6gPqAYS3pu1Qn7B9A9zQWCEcfDH4DU/qu8M4NAq5/G/j8AvoYw9ElPXc4opW7/ksEluRQGM57eprZitbW9V8huEWO4azoac2C1k+vP7DlZiwPQJfu0Wrmff/dDP/DKhvJBLiZ1r+ZsX/WtoEwjuPfk2x5vQ6N3E2FQtF2dKohg0oDbSGDQ2m7eIihzZQhspt/4CUt3jTJQxa9HMeyQS8qnLCHC3iz7vR5Bz94nnueeyqtfGc1P3yJWvEATPyi0jYnxfZBwBLxS7o5ARgWu4nwZ1sHEdZ41xLrvMIcgK8uq9qN/fzgn7tugPLtqKo9usj/yfkKvFHfqtraRX6OJ64bYDwwToKlwiIPr0ipCUcNsDDrYa2wyftPWCXUfkisCMwH4PWLfsCueMKolGh+7uIIdFIY+RMsE7MzL1tSixMsiI3888xtfujoLTxFE7eSxvlmA5jlcIYDYSnDbed1cstXwE3mPj8MlgxWEm2gaFjPSPxiHuLIKBWXOZqY0yyRVXvluCLulV8M0YKURr2p9nrCHf9RHq0jtK/S2g5oKiMc6uYcL9G8BeDRkONqrwSn4qHIUrR+AmJoYQSaUtwStzLYRGgXwJFsfASalrjW2TUBnRTEGITkwLrVPmuJc3EisnO0jxLCCMYc2KzaZ4h74oaglADePxBTCKLmdiBTTht0HjjN0cIEegomlgpgRTvEyisUgLgG/gp6igMKWzgBTWJO/wmtm0Dve8S0oTOA6YGW8N9fMRuyc/GBUFkogBVtIeZ3sluyE/xWYmrhF6RojfAu5/SKnZ+f6SsOpN/SCWC636hn6uyeRWogjAP4f5LN5ezGQ2EDFuEUdWGLcCoopDgVwSLFInIgWAQ8C2GLLCoqbHMHIsIVzvrW7KfJbjYb+H8omcB1t4WXWZj5ddMl8Mw8b34tpZDQgreH4hRmiDkvVktYJOASg+LT1a9oHR2hH285AHJYJePI+xvNohNoveNcnG43BSxgF581ovc8aGJoD56hL7dZBDYxLDPkRPxNF8MZNP9lIibbLAInsI03b2T/mPeaGNq9p7gjtxcAK9hnQCV+Z4t0hlaQeBN0Nt7YBNpH6BB4yYNGovUGd9DVjhMv4LmISvzKFqlCK0y8eFuDoBiwNASi+7y1lhLaezxDN73NNaC1IfAzK6dFD1o/DkboJN08BrM2BAY3+agWeXs87dgVe5tToL0h4M3S1by4Da0v+/EWlkE1rOXpENgnV37eHguhttAH57DXgCe+GpKjI2gHeGi+CKpgMY9r+WqPXO6M0Apy40XQIWw25GTnZEgmH4HWB9PLkCWs5rPG5z2yjJ7E0HZjwzkwgd0yFmGRstmrFDShzObABSwXsBbffFKlXyS0u2YnQQlsN2YeFSnrHgtovdzkIGAB64WsxB+fLMY1Wscmn8AE1hNnPBzkr1mFzKGF0twTuIQDIi691Q75+KzCpQkHa4BzHpmk+RkXEQ8NtwEVnJCy7NUpuc/S8Cx0BCcEZDz+Tqq0kddMTkJWcMSUs12S6+sswhiXcYMXKeCIiM1VkiymladwGXNeYA1XCFJlJKtdxs+lsWGwgjNS1iFJPp6rsDBVBDQSzgjIFyRZpivx29RGvIRDpqymJJvrTIaJoVFQAodEZEtNq0CZWYdUcIkgW3XEk09mJgEFnJKSrTesoxH+z65lObBTN7sY86A0cQMUHHNGtgZUr6SBRjCG5uAz+JNVmHe/AUu4xidbqyn3S/yPzKptUPe1xpTqXecb0Eg45wrPrbO8axVUwj3eJb8/c7cK3PwnTccbsIIbNsfyqFsn/AP/2juf5ziKK473/FiNltJhwQJFjg5rmxQ4NYdN7ECZ2sMa20VR2YP44WDIHJQYlxO8B5FgFw57UFJFQmwd5JBAUjUHDA6pknXhEELJOngj7a4WvT+K4gaj+U7PTk9rpp/2Wxw4qKztN59+7/tet2bNEO7peiKtfGACDN8DQ6Vp6I4wU16GLOaCPsjwPZB+F88DE2D8HugrNELbwlR5Yz9FS78Nth6Nkx7IrLFX4eneAbN/eBCv9ctCg4JxzWBT8w6orG8REe3Rt/rO/xLtbX4m8tf0uIVwVe8OsG4R1qaGjtMe08y4mnfA0S1K0Oe6euL0xbyqeQfcpiR93dI0F0q/kECvC3I2KFF3tb4BdzfjiVCOO+ARSta/9cxG07vhiuY+4MeUrK/1vv1mLdOtgBWRn34uC0BNqxmUJ4FAcyd8TRaAulYzOJL+rO5Z0G1ZABp6C2EjQwq4oyEhQe21hNZCuJYhBbQ0BECzEcCPdXv8FDASxhMgQuwE5C5gWxhIAJ6KNMZuBJYZEFDFy5E3AnUGBLhpZwJtUASNIwAngeG4lyN7ggEBop2OaAdcjjafgCoa7sjHgTUWBLjpkPbBzTjzCRBhqhV1gA82nwARAKalnVCLCQELabJaBfhgDgRU0vRDVZACOBBgpfH2TZACOBAguin6oS5wARwIEL7cCtngRIQHAdPyfmgKpABDCFC3QlXQCPAgwApxf4dbwSWTCcBWKH0OrPMhQPjQ3WEfOBSMCPBkJz0VcD2YCwF4KoRz4AonAvBUCPfCLbMJwL1uLWUvLFgR4EsMbghsEBsCpkFDiOeBPV4EuKAhxPPAZV4EWKC+42PRBgMCgNOrpRkGjAQDAsASW2mM8EAwI2AmMQsCH8iJgCmwNlQEVrgR4AC6URFocSNAJOW3GXAoxoQA+WWpJuiFWRHQTPA4HXA1xmwCMOYP5Z1AjxEB8iujNpgH8iLAwRu8AowwLwIs3OpPgyLAiwDRhc93ARQBXgSINtzhTVAEmBGwAMtABxQBZgRU4QMOwTSEGQEVNO+zQCfAjQAbdQMuKALcCBBogR4YB3EjQHQB4lUwEmdHQBskOR+Mg9gR4IOpWJuiesiTgCp4xB1QBdkR4IFNHoIqyI4AN+L1sQ2o8yTAiq+DDqiCTAgArDeSpgFDwYUAbAQWk3zQDkcCsBGYATaAIQF+bKX3gQ1gSMBM5CEjH7TMlQAvss2RD1rkSkAlkujRp6pzJcCJLfVgGsCMAOyEbPAWcWYEYCfkgMshzAjATqgCfBBLAoKYUucBH8SEAPxSITwQ6zEiAFvBHnbCa5wIwFYQO+ElvgRMx2S6JjCCLAmYiql1AUXV4EgAHop1gRNmQgD2wjgAojQEPHY8Vsdy9cIhcMLFE2C/tbker68yk7IfdAtMBIsnwL61BQO13lL/BA3UC/VLQsBzW4T1eW7NgANagcIJcDYSf3Ipr2bABa1A4QQcpUTdU58Lo2awVw4CrlGiNvM6IPbATLhoAqwNWayUb4qhAKyVggB3QxKrFeVuCHXDy6UgwNuiZH2ifFUOdcNLpSBgmiT6IqeTgQXQDBZNwCMk0aeq7WAfjQNaBRKgMwDRojdAAWhwJAD3w03QDbMhAPfD6Gi0xpWAaOuDBkKCIwF4IBCAC0LMCMD3hTsgAMwIwBORLpiH8CEAH4+CAHAjAN8Yjw/AgCUBeCS0CgLAlYBOtOkJwUiQDwF4JgYCwJsAeQB2mBGAh4Jr8QHYZkCAWgB4E9CMDgWJOwE4AD0QAN4E+NGpKDgXYUCAQgBYExBlPTxkBCyAAPAlAAdg57ATsHPYCegfdgL6h52AQeQzsSYAB6B7eAkYggDwJkAegO1DRkAHBYA/AbsgAMx7gegRUJDHSGz2N7fW4/TBm7WSEIAD0M4hAE+tb8XrweZ/6mUnoKk+FXbvJyzpXtkmQhoC8Jb0TmvxBOAA+GonQ/IbffdKNhWOBmBBOQBHJYuqlfJkCAdgqPCd+mAPlOpsMBqAGeUAbMivdBZPAA5AVfWGiL0h+6RlvR8wApelx82BW5Sse8USgM3obj4BqMgC8N9SERBGAzClek9wShaAL8tEgLUv21Uoqrq+ABRPgL0vAA5F1eBIAA6ATVG1OBPg7rN8FkW1yJmAyn7PS1EtcSbA29/2hRTRMmcCpiOTj7ip6BpXAqLOfxu8SuwhZwIWIgGIm4n1OBPg7z8BaYKTEZ4EtPc/aR9MRXkS0Ins9biBQJ8zAav7s30VTER4EhDzfXIeRbTLmACbKMULBBgT4MRYXhcMBFgSUInp+mzQD7MkYDqyTtAO8iVgJm7yE4J2kCMBfmSrg26ILwHtuPl/G3RDHAnoxvkdHzQDHAkI4w5BF0AzwJAAO7JM4IUHbAlwY0GfAl6YIQFeZO6BvDBbAqqRYoesYJ0rAX6kF0JWsMWVgHbE8EIryJWAbnzL0wFWkB8BoOkFc2F+BNiRVA+t4DZTAipg8jcDnBA7Ajww+wVTQX4ELEQwx06oxpOAJkh0YCjGj4BOzFAcXBHgSUAI1ghmQuwIsCDlATACzAhwQZ4D56P8CPDAjWBwYZofATNwiR5FxZIAH0AObovyIyCAk18bHA4xI2AVz/5DUAdZEWAlXAbsgDrIigAXTL3A387xI8ADWQ7UQX4EzMTYAFwHa/wIaCaMPFwwGGZFQCdmGoAn48v8CAhjsjz+ZD12BDgEpgHgLQLsCJgCTg/0g0N2BMwkev0qKAOGE4C9DuADMMKCgC4AHLVDa9wIwCkOvFKMGQEuKHKwHRowI8ADfMMyMGJGgA8yHC4DDV4EBKAK4jKwzIuAEOCNy0CPFQEOGnfgMtBnRcA0KnG4GxixIsCXmhwfZEEmBHSlNncaZEEeBFiSYw/w7bN8CKjgGzB4KDRgRMA87gTwJYFRjQ8BQYoK3wSDURYEhCC7JZvhNTYEuJL6Bo6It9kQUAUOR5IFd9kQ0AYeV5IFqc6FgBDkQFkWXGZCgJtuWVVghcwnoApyoDQLDpkQ0AQ5UJoFqc6DgBDkQOlglJZYEOCiSY+8I+6xIKCKnqq8Ix6wICBIu68dkAQMJ8AKU2f2EDgBswmopDf4beAEzCZgIX2LNw+cgNkEdNI3+RWQBIwmwALD7pRWaCXXFyu/JwtAI30A7ma6GkM7ybRkmAm4G+lfrX1NFoB6tCZjfZHpRIDuSPMFJkb95erPyXLAGGB9kulEgBblh+gwZ6i/Xv+HlKyv0sd1Dxg6mbmpyf+6GCAD9UsJ1t+JuSd5rJ+BuILdksEH92W8QDes/hUb8se6tyJSb5f/ZfHB8u7Gz1AInY3UT1W8IXuqaWnZu5upCNKitGZkcMNvpN0BQngbqWNl3aYEbabcAR467EnvBLYVv2gpEqwtglr//qK8+wlh/TRbEeyn8o0gaFhPbD6gPdqK+W/zy1okzb53f2sr9mcfrL8kvq+n1x/E/6t7m/dESoXjpvQFynJn9MjVD2L1l8u1fYw98278z17ZD/Us+Gf//HLGYRC1UhhH0BGaqXls69IngV1hrjoon2EFwAwaKRu0dmMmgZ4wVdUMY36XwFTERAVZFhLy2QN2JpSbfPaABwp6sjw+eyAAlk7GDZc9YANTL1OHyx6Yznj/fZ6LFwpAEcxQCGmRwQ7oq3xB9v8Z7IA7Ga6WgwRqhjqZX5A2RWAuZJSc7LXcijGDO+Z1wgqVrElgNmqSugpexiNwPmCQKipu1iLz7bCvVMfaxlsBK1Ry8x6B8bgx8tS8rEWmp8FAsZtpG54GHdV+1jM8Dfrgsyt5IVoyKAUq09skk92gR6gPUOoHqGFqHzRQgMjEpriSR/72ydymuJlHBa9QjP5ozihIPXl1ja2EJ/MZZsyToXMRK8xn59oUo4E5kxD13N0mI3tCaxXbYHU7TH3jhsE0VNhLBiJgdfMrXQtkoB+ey9G8OBSnljEAqNvXwDwE5nJ9YB6BLGBQCRio/XOmITCfs3WbNwwBO8QpMD83SH1zugD6m3pjadBszM1/huMSGdQUBhpg7VCc3jahBGJW1Svhbq2UbbAWVLtEhhySnNEzvvgBxWlUL18GhKCqg2XCUanV1cXpPBnhhk5qG2LboQml0AHHGBpiW84ReaDxPN+m8ufBOa1pyicqb1eIt2lDw0lLWVuCtuY61aRy+8E5AgDoRmC7LBtA+2fzS70J2gAADTEuZSWYO4gMfbKcmwA/nJaG31LSyUBwMA9mntAmKOMGoIaWgXsZJ6ROCADQFmkwdy1IVufgsOxSCWvhmQN8JlNUvjTwBNEBXmYLCKhfK0MC0F+ZHEL6sEwJgIY1jVOnUrmBFylWyzrPnoFGLXHwevrg6/IcIe3WC0uA2ATrz4N44+mXGxZhSxyC+nsBBaCAIc1JKkcpsLsFpWOrS1C/O+BjoGKu8lYI61cHagCKusN3pvgIWEGRjZm1SlCjlwp4/hozIG6KsCEqcv20VEALChjQy3/BA0prtQAGQP0r5pymQoUx4HSpgA0A7BCSxgg4CfBtF9CIA/1aaNLjIRWwAaATx/q90KKnKEFLBU/j9XdG1ouUoA8LmcZgDeq5p/9O4u+rFXMrDWt0VuSq2dXE39YobCKLdVnkqGcpUW8XOJPH+qiRG/6vK6Qc7ZYYa5QTBD8CsBUwjgOuHGp4VsPjV3Df2nw51vW6hsePE0Bxk1msd1RCcOS3BAQcQAGJUCMF9iUCKvJ+AnanWO//JMvyXyC5hvVS/ZkG1kfPj7v810KSa9Qo2x0lrOErtTH2/muUSosCqMDWGGt0Pd1OsH52k6BwAShRMcT6WIqB9eTVkFLqT6Jo4TEN1o1zOG89dhqsXqEAFtgXYQ6unDsmIrJOnL76VwJS6ACKNkRY/7xx5eL58+dPnT7/6sWr7/6LkEp0MwmrEpKiTFo/HlfyXz/WrK4I4BEYgwgweP4gE2rWP8D6GUTAkPqHD+60Cx+7GOCKFSU/eDOoM5ILHz6XWtbrpFXDhii7nmWe/uV6nLTpsjBCs6ua8D8rDJGtJRG8L8GfeSIYvSyM0mw358dfF4bJeiHP3S8p/twheKcmjJT1TEgKAtcMjJJ9SX35ptQ+fLqroo+fF8bryZvcly+n4FK2yvdTwUZHwEkv1vDNuuAjfN6JD1EZyk4Xg93rDNDHJ7+/SAzC6MYrxwR3WScuXL0ZxpwUXjwFFs9Sjx4/cfrChYvf6tVzp44/KiaaaKKJJppoookmmmiiiSaa6MD0DQrj3ghNx49LAAAAAElFTkSuQmCC'
 @Field static final String MASKABLE_ICON = 'iVBORw0KGgoAAAANSUhEUgAAAgAAAAIABAMAAAAGVsnJAAAAElBMVEVHcExxpQBxpQBwpQBxpgCAvACY5M8+AAAABXRSTlMAJ7Ti/ZKd2DUAAANgSURBVHja7d1BctowGIZhAxcgkANAwwEo4+wbW75AY93/Kl22ixJJaQnw8zx7zTCadz5WHnUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwB8WT+esuwew6dN5476L7iXN+bw5fe9i26b8sRS7gUXKJWPoIXiecsl87ALrc9nQxbWYctm87sJaVV3ALvAE5BpvXVgHF5AfewVfH/0Cplzj/dEvYFSAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQq42wI2L306ZzztwxewSanwME3sApbFh2l2oQtY9OUD68gFrGoepolcwCGXDdEKaH+YJm4By6oLOMYqINjDNO0FtF/AKVgB7Q/TxC3gUHdncQt4zTXGWAW0X8D86AXMj15AUoANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUMAFFD5m+bYOvwHbNH0gpX3wAjblj1mibUDrxyxD6AK2Uy6Zd5E3oM9lb8EKaP+YJfAGrKouYBe3gOdcYT7G3YBDrvEWq4D2n3aKuwFTrjEEK6D9AsJuwGLKNX6GLWBxSwXMCghwAUE3YFDAl2yAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmzArReQ7uSdode6aNqPvIe6gKH9RbPxTt4aO1zqyHDrr819/shz5ZErqPtpx/YjP+7kAla5wrz7x0cql5VHbvV/MLUfmdefOXINffs6HS515E7eHe5W7UeWFUeO3c2+PN1+ZFx/5sh1bGvfHv9teaEjV7uBaT4f5pz2fz0yNR7ZFI9cz+alT+eMp6f/dOSpcAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAu/cLBQBL1l75RF4AAAAASUVORK5CYII='
@@ -34,31 +34,34 @@ import com.hubitat.hub.domain.Event
     hubDatabaseSize: [min:0, unit:'MB', probe:{ device, state, events, begin, end -> state.hubDatabaseSize ?: '0' }],
 
     acceleration: [min:0, max:100, unit:'% active', probe:{ device, state, events, begin, end -> calc5minValue(device, 'acceleration', ['active'], events, begin, end) }],
-    airQualityIndex: [min:0, max:500, unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'airQualityIndex', events, begin) }],
-    amperage: [min:0, unit:'A', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'amperage', events, begin) }],
+    airQualityIndex: [min:0, max:500, unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'airQualityIndex', events, begin, true) }],
+    alarm: [min:0, max:100, unit:'% active', probe:{ device, state, events, begin, end -> calc5minValue(device, 'alarm', ['strobe', 'siren', 'both'], events, begin, end) }],
+    amperage: [min:0, unit:'A', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'amperage', events, begin, true) }],
     battery: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> "${device.currentValue('battery') ?: 0}" }],
     camera: [min:0, max:100, unit:'% on', probe:{ device, state, events, begin, end -> calc5minValue(device, 'camera', ['on'], events, begin, end) }],
-    carbonDioxide: [min:0, unit:'ppm', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'carbonDioxide', events, begin) }],
+    carbonDioxide: [min:0, unit:'ppm', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'carbonDioxide', events, begin, true) }],
+    carbonMonoxide: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'carbonMonoxide', ['detected'], events, begin, end) }],
     contact: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'contact', ['open'], events, begin, end) }],
     coolingSetpoint: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'coolingSetpoint', events, begin) }],
-    door: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'door', ['open'], events, begin, end) }],
+    door: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'door', ['open', 'opening'], events, begin, end) }],
     energy: [min:0, unit:'kWh', probe:{ device, state, events, begin, end -> calc5minIncrease(device, 'energy', state) }],
     filterStatus: [min:0, max:100, unit:'% normal', probe:{ device, state, events, begin, end -> "${device.currentValue('filterStatus')}" == 'normal' ? 100 : 0 }],
     frequency: [unit:'Hz', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'frequency', events, begin) }],
     goal: [min:0, unit:'steps', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'goal', events, begin) }],
     heatingSetpoint: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'heatingSetpoint', events, begin) }],
-    humidity: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'humidity', events, begin) }],
-    illuminance: [min:0, unit:'lx', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'illuminance', events, begin) }],
+    humidity: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'humidity', events, begin, true) }],
+    illuminance: [min:0, unit:'lx', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'illuminance', events, begin, true) }],
+    level: [min:0, max:100, unit:'%', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'level', events, begin, true) }],
     lock: [unit:'% locked', probe:{ device, state, events, begin, end -> calc5minValue(device, 'lock', ['locked'], events, begin, end) }],
     lqi: [min:0, max:255, unit:'lqi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'lqi', events, begin) }],
     motion: [min:0, max:100, unit:'% active', probe:{ device, state, events, begin, end -> calc5minValue(device, 'motion', ['active'], events, begin, end) }],
     naturalGas: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'naturalGas', ['detected'], events, begin, end) }],
     networkStatus: [min:0, max:100, unit:'% online', probe:{ device, state, events, begin, end -> calc5minValue(device, 'networkStatus', ['online'], events, begin, end) }],
-    pH: [unit:'pH', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'ph', events, begin) }],
-    power: [min:0, unit:'W', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'power', events, begin) }],
+    pH: [unit:'pH', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'ph', events, begin, true) }],
+    power: [min:0, unit:'W', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'power', events, begin, true) }],
     presence: [min:0, max:100, unit:'% present', probe:{ device, state, events, begin, end -> calc5minValue(device, 'presence', ['present'], events, begin, end) }],
     pressure: [min:0, unit:'psi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pressure', events, begin) }],
-    rate: [min:0, unit:'LPM', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rate', events, begin) }],
+    rate: [min:0, unit:'LPM', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rate', events, begin, true) }],
     rssi: [min:0, max:255, unit:'rssi', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'rssi', events, begin) }],
     securityKeypad: [min:0, max:100, unit:'% armed', probe:{ device, state, events, begin, end -> calc5minValue(device, 'securityKeypad', ['armed home', 'armed away'], events, begin, end) }],
     sessionStatus: [min:0, max:100, unit:'% running', probe:{ device, state, events, begin, end -> calc5minValue(device, 'sessionStatus', ['running'], events, begin, end) }],
@@ -67,11 +70,13 @@ import com.hubitat.hub.domain.Event
     smoke: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'smoke', ['detected'], events, begin, end) }],
     sound: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'sound', ['detected'], events, begin, end) }],
     soundPressureLevel: [unit:'dB', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'soundPressureLevel', events, begin) }],
+    status: [min:0, max:100, unit:'% playing', probe:{ device, state, events, begin, end -> calc5minValue(device, 'status', ['playing'], events, begin, end) }],
     steps: [unit:'steps', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'steps', events, begin) }],
     'switch': [min:0, max:100, unit:'% on', probe:{ device, state, events, begin, end -> calc5minValue(device, 'switch', ['on'], events, begin, end) }],
     tamper: [min:0, max:100, unit:'% detected', probe:{ device, state, events, begin, end -> calc5minValue(device, 'tamper', ['detected'], events, begin, end) }],
-    temperature: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'temperature', events, begin) }],
+    temperature: [min:0, unit:'°C', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'temperature', events, begin, true) }],
     transportStatus: [min:0, max:100, unit:'% playing', probe:{ device, state, events, begin, end -> calc5minValue(device, 'transportStatus', ['playing'], events, begin, end) }],
+    ultravioletIndex: [min:0, unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'ultravioletIndex', events, begin, true) }],
     valve: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'valve', ['open'], events, begin, end) }],
     water: [min:0, max:100, unit:'% wet', probe:{ device, state, events, begin, end -> calc5minValue(device, 'water', ['wet'], events, begin, end) }],
     windowBlind: [min:0, max:100, unit:'% open', probe:{ device, state, events, begin, end -> calc5minValue(device, 'windowBlind', ['opening', 'partially open', 'open'], events, begin, end) }],
@@ -79,20 +84,20 @@ import com.hubitat.hub.domain.Event
     voltage: [min:0, unit:'V', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'voltage', events, begin) }],
 
     // Non-standard attributes
-    cloudiness: [unit:'%', min:0, max:100, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'cloudiness', events, begin) }],
+    cloudiness: [unit:'%', min:0, max:100, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'cloudiness', events, begin, true) }],
     healthStatus: [min:0, max:100, unit:'% online', probe:{ device, state, events, begin, end -> calc5minValue(device, 'healthStatus', ['online'], events, begin, end) }],
-    pm10: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm10', events, begin) }],
-    pm25: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm25', events, begin) }],
-    vocIndex: [unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'vocIndex', events, begin) }],
-    windDirection: [unit:'°', min:0, max:360, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windDirection', events, begin) }],
-    windGust: [unit:'km/h', min:0, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windGust', events, begin) }],
-    windSpeed: [unit:'km/h', min:0, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windSpeed', events, begin) }],
+    pm10: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm10', events, begin, true) }],
+    pm25: [unit:'μg/m3', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'pm25', events, begin, true) }],
+    vocIndex: [unit:'', probe:{ device, state, events, begin, end -> calc5minAverage(device, 'vocIndex', events, begin, true) }],
+    windDirection: [unit:'°', min:0, max:360, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windDirection', events, begin, true) }],
+    windGust: [unit:'km/h', min:0, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windGust', events, begin, true) }],
+    windSpeed: [unit:'km/h', min:0, probe:{ device, state, events, begin, end -> calc5minAverage(device, 'windSpeed', events, begin, true) }],
 ]
 
 @CompileStatic
 static String calc5minValue(DeviceWrapper device, String attribute, List<String> onValues, List<Event> events, long beginTimestamp, long endTimestamp) {
     String currentValue = device.currentValue(attribute)?.toString()
-    if (currentValue == null) return '0'
+    if (currentValue == null) return '-'
 
     // Short-circuit all the time calculations if nothing happened in the past 5 minutes
     if (events.size() == 0) return onValues.contains(currentValue) ? '100' : '0'
@@ -119,7 +124,7 @@ static String calc5minValue(DeviceWrapper device, String attribute, List<String>
 @CompileStatic
 static String calc5minIncrease(DeviceWrapper device, String attribute, Map state) {
     String currentValue = device.currentValue(attribute)
-    if (currentValue == null) return '0'
+    if (currentValue == null) return '-'
     String stateKey = String.format('v.%s_%s', device.getId(), attribute)
     String lastValue = state.get(stateKey) ?: currentValue
     state.put(stateKey, currentValue)
@@ -129,9 +134,10 @@ static String calc5minIncrease(DeviceWrapper device, String attribute, Map state
 }
 
 @CompileStatic
-static String calc5minAverage(DeviceWrapper device, String attribute, List<Event> events, long beginTimestamp) {
+static String calc5minAverage(DeviceWrapper device, String attribute, List<Event> events, long beginTimestamp, boolean nullIfOff = false) {
+    if (nullIfOff == true && device.currentValue('switch') == 'off') return '-'
     String currentValue = device.currentValue(attribute)
-    if (currentValue == null) return '0'
+    if (currentValue == null) return '-'
     BigDecimal sum = BigDecimal.ZERO
     int count = 0
     for (int i = 0; i < events.size(); i++) {
@@ -661,7 +667,16 @@ Map settings() {
 
 Map changelog() {
     dynamicPage(name:'changelog', title:'Change log', install:false, uninstall:false) {
-        section('v1.4.1 - 2024-08-25', hideable:true, hidden:false) {
+        section('v1.5.0 - 2024-08-27', hideable:true, hidden:false) {
+            paragraph '''\
+                <ul>
+                    <li><b>Added</b>: Add support for null (-) values in CSV files
+                    <li><b>Added</b>: Mark some attributes values as null when the device also has a "switch" attribute with value "off"
+                    <li><b>Added</b>: Add attributes support: Alarm/alarm, CarbonMonoxideDetector/carbonMonoxide, Chime/status, AudioVolume/volume, SwitchLevel/level, UltravioletIndex/ultravioletIndex
+                </ul>
+            '''
+        }
+        section('v1.4.1 - 2024-08-25', hideable:true, hidden:true) {
             paragraph '''\
                 <ul>
                     <li><b>Fixed</b>: Fix "Max records with 5 min accuracy" settings - @bobbles
@@ -923,7 +938,8 @@ void update5MinData(ZonedDateTime now, DeviceWrapper device, List<String> attrs,
     List<String> newCsvRecord = ["${now.toEpochSecond()}"]
     attrs.each {
         String value = SUPPORTED_ATTRIBUTES[it].probe(device, state, events, beginDate.getTime(), now.toInstant().toEpochMilli())
-        if (value.startsWith('-')) warn "${deviceId}: ${it} = ${value}"
+        // TODO: Remove me
+        if (value != '-' && value.startsWith('-')) warn "Device #${deviceId}: negative attribute value alert: ${it} = ${value}"
         newCsvRecord.add(value)
     }
     appendDataRecord("wt_${deviceId}_5m.csv", newCsvRecord, attrs, conf_5MinMaxLines ?: 864)
@@ -937,7 +953,7 @@ void update1HourData(ZonedDateTime now, String deviceId, List<String> attrs) {
     Long onlyAfter = now.minusHours(1).toEpochSecond()
     try {
         String lowerFileContents = new String(downloadHubFile(lowerFileName), 'UTF-8')
-        BigDecimal[] averages = computeAverages(lowerFileContents, attrs, onlyAfter)
+        String[] averages = computeAverages(lowerFileContents, attrs, onlyAfter)
         if (averages == null) {
             warn 'Could not compute 1 hour averages'
             return
@@ -945,7 +961,7 @@ void update1HourData(ZonedDateTime now, String deviceId, List<String> attrs) {
 
         // Create and save a new CSV record
         List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-        for (int i = 0; i < averages.length; i++) newCsvRecord.add("${averages[i].setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()}")
+        for (int i = 0; i < averages.length; i++) newCsvRecord.add(averages[i])
         appendDataRecord("wt_${deviceId}_1h.csv", newCsvRecord, attrs, conf_1HourMaxLines ?: 744)
     } catch (NoSuchFileException ex) {
         warn "update1HourData: File not found: ${lowerFileName}"
@@ -960,7 +976,7 @@ void update1DayData(ZonedDateTime now, String deviceId, List<String> attrs) {
     Long onlyAfter = now.minusDays(1).toEpochSecond()
     try {
         String lowerFileContents = new String(downloadHubFile(lowerFileName), 'UTF-8')
-        BigDecimal[] averages = computeAverages(lowerFileContents, attrs, onlyAfter)
+        String[] averages = computeAverages(lowerFileContents, attrs, onlyAfter)
         if (averages == null) {
             warn 'Could not compute 1 day averages'
             return
@@ -968,7 +984,7 @@ void update1DayData(ZonedDateTime now, String deviceId, List<String> attrs) {
 
         // Create and save a new CSV record
         List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-        for (int i = 0; i < averages.length; i++) newCsvRecord.add("${averages[i].setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()}")
+        for (int i = 0; i < averages.length; i++) newCsvRecord.add(averages[i])
         appendDataRecord("wt_${deviceId}_1d.csv", newCsvRecord, attrs, conf_1DayMaxLines ?: 732)
     } catch (NoSuchFileException ex) {
         warn "update1DayData: File not found: ${lowerFileName}"
@@ -983,7 +999,7 @@ void update1WeekData(ZonedDateTime now, String deviceId, List<String> attrs) {
     Long onlyAfter = now.minusWeeks(1).toEpochSecond()
     try {
         String lowerFileContents = new String(downloadHubFile(lowerFileName), 'UTF-8')
-        BigDecimal[] averages = computeAverages(lowerFileContents, attrs, onlyAfter)
+        String[] averages = computeAverages(lowerFileContents, attrs, onlyAfter)
         if (averages == null) {
             warn 'Could not compute 1 week averages'
             return
@@ -991,7 +1007,7 @@ void update1WeekData(ZonedDateTime now, String deviceId, List<String> attrs) {
 
         // Create and save a new CSV record
         List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-        for (int i = 0; i < averages.length; i++) newCsvRecord.add("${averages[i].setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()}")
+        for (int i = 0; i < averages.length; i++) newCsvRecord.add(averages[i])
         appendDataRecord("wt_${deviceId}_1w.csv", newCsvRecord, attrs, conf_1WeekMaxLines ?: 522)
     } catch (NoSuchFileException ex) {
         warn "update1DayData: File not found: ${lowerFileName}"
@@ -1021,7 +1037,7 @@ List<String> loadDataLines(String fileName, Long maxLines) {
 }
 
 @CompileStatic
-BigDecimal[] computeAverages(String fileContents, List<String> attrs, Long onlyAfter) {
+String[] computeAverages(String fileContents, List<String> attrs, Long onlyAfter) {
     if (fileContents == null) return null
 
     String[] fileLines = fileContents.trim().split('\n')
@@ -1035,26 +1051,38 @@ BigDecimal[] computeAverages(String fileContents, List<String> attrs, Long onlyA
     }
 
     // Init result
-    BigDecimal[] retVal = new BigDecimal[attrsCount]
-    for (int i = 0; i < attrsCount; i++) retVal[i] = BigDecimal.ZERO
+    BigDecimal[] sums = new BigDecimal[attrsCount]
+    BigDecimal[] cnts = new BigDecimal[attrsCount]
+    for (int i = 0; i < attrsCount; i++) {
+        sums[i] = BigDecimal.ZERO
+        cnts[i] = BigDecimal.ZERO
+    }
 
-    // Parse only records of interest (starting from the end of the file, and skipping first line) and calculate their sums
-    int onlyAfterRecordsCount = 0
+    // Parse only records of interest (starting from the end of the file, and skipping first line) and calculate their sums and counts
+    boolean foundOnlyDashes = true
     for (int i = fileLines.length - 1; i > 0; i--) {
         String[] rowElements = fileLines[i].split(',')
         if (Long.parseLong(rowElements[0]) <= onlyAfter) break
-        for (int j = 0; j < attrsCount; j++) retVal[j] += new BigDecimal(rowElements[j + 1])
-        onlyAfterRecordsCount++
+        for (int j = 0; j < attrsCount; j++) {
+            if (rowElements[j + 1] == '-') continue
+            sums[j] += new BigDecimal(rowElements[j + 1])
+            cnts[j] += 1
+            foundOnlyDashes = false
+        }
     }
-    debug "Found ${onlyAfterRecordsCount} records of interest"
-    if (onlyAfterRecordsCount == 0) return null
+    debug "Records of interest: sums=${sums}, cnts=${cnts}"
+    if (foundOnlyDashes) return null
 
     // Divide by onlyAfterRecordsCount to get the averages; exception is the 'energy' attribute, that si a counter not a gauge
+    String[] avgs = new String[attrsCount]
     for (int i = 0; i < attrsCount; i++) {
-        if (attrs.get(i) == 'energy') continue
-        retVal[i] = retVal[i] / onlyAfterRecordsCount
+        if (attrs.get(i) == 'energy') {
+            avgs[i] = sums[i].setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+            continue
+        }
+        avgs[i] = cnts[i] == 0 ? '-' : (sums[i] / cnts[i]).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
     }
-    return retVal
+    return avgs
 }
 
 void deleteDataFiles(DeviceWrapper device) {
