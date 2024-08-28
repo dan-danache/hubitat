@@ -16,7 +16,7 @@
         "namespace": "dandanache",
         "location": "https://raw.githubusercontent.com/dan-danache/hubitat/watchtower-app_1.5.0/watchtower-app/watchtower.groovy",
         "name": "Watchtower",
-        "description": "Data-driven insights for a smarter home",
+        "description": "Watchtower is the all-in-one app for long-term smart home monitoring and data visualization. Staying true to Hubitat's core value, the application works 100% locally, with no reliance on the cloud. Plus, there's no need for extra hardware like Raspberry Pi or NAS.",
         "oauth": true,
         "required": true
     }],
