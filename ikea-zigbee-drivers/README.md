@@ -805,7 +805,7 @@ Below you can find the details of each device, including the features and pairin
 | Parameter | Details |
 |-----------|-------------|
 | Product Image | <img src="img/Aqara_DCM-K01.webp" style="width: 200px"> |
-| Product Link | https://www.aqara.com/eu/dual-relay-module-t2/ |
+| Product Link | [Dual Relay Module T2](https://www.aqara.com/eu/dual-relay-module-t2/) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Aqara_DCM-K01.groovy` |
 | Since version | `4.0.0` |
 
@@ -890,7 +890,7 @@ Below you can find the details of each device, including the features and pairin
 | Parameter | Details |
 |-----------|-------------|
 | Product Image | <img src="img/Philips_RWL022.webp" style="width: 200px"> |
-| Product Link | https://www.philips-hue.com/en-gb/p/hue-dimmer-switch--latest-model-/8719514274617 |
+| Product Link | [Philips Hue Dimmer Switch](https://www.philips-hue.com/en-gb/p/hue-dimmer-switch--latest-model-/8719514274617) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RWL022.groovy` |
 | Since version | `4.0.0` |
 
@@ -938,7 +938,7 @@ This device is extremely chatty as it polls the Hubitat hub for the status of ea
 | Parameter | Details |
 |-----------|-------------|
 | Product Image | <img src="img/Swann_SWO-KEF1PA.webp" style="width: 200px"> |
-| Product Link | https://cdn.swann.com/media/wysiwyg/docs/en/Key_Fob_QSG.pdf |
+| Product Link | [Swann One Key Fob](https://cdn.swann.com/media/wysiwyg/docs/en/Key_Fob_QSG.pdf) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Swann_SWO-KEF1PA.groovy` |
 | Since version | `4.0.0` |
 
@@ -975,6 +975,7 @@ Converted from Bluetooth to Zigbee using this [Zigbee 3.0 Firmware](https://gith
 | Parameter | Details |
 |-----------|-------------|
 | Product Image | <img src="img/Xiaomi_LYWSD03MMC.webp" style="width: 200px"> |
+| Product Link | [Mi Temperature And Humidity Monitor 2](https://www.mi.com/my/product/mi-temperature-and-humidity-monitor-2/) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Xiaomi_LYWSD03MMC.groovy` |
 | Since version | `5.1.0` |
 
