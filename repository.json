@@ -72,7 +72,7 @@
             "name": "Lumos",
             "description": "Control lights using motion and contact sensors.",
             "category": "Utility",
-            "tags": [ "Motion Control" , "Control", "Dorrs & Windows", "Lights & Switches"],
+            "tags": [ "Motion Control", "Doors & Windows", "Lights & Switches"],
             "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/lumos-app/packageManifest.json"
         }
     ]
