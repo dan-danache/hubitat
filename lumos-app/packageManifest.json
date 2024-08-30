@@ -10,7 +10,7 @@
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
     "category": "Utility",
-    "tags": [ "Control", "Lights & Switches", "Motion Control" ],
+    "tags": [ "Motion Control", "Doors & Windows", "Lights & Switches"],
     "apps": [{
         "id": "d751ab25-2b06-4611-8c17-feb83161d64a",
         "namespace": "dandanache",

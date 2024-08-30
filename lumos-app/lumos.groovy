@@ -1,10 +1,7 @@
 import groovy.transform.Field
 
-@Field static final String APP_NAME = 'Lumos'
-@Field static final String APP_VERSION = '1.0.0'
-
 definition (
-    name: "${APP_NAME} ${APP_VERSION}",
+    name: "Lumos 1.0.0",
     namespace: 'dandanache',
     author: 'Dan Danache',
     description: 'Control lights using motion and contact sensors.',
@@ -20,7 +17,7 @@ definition (
 preferences {
    page (title:'Control lights using motion and contact sensors.', name:'mainPage', install:true, uninstall:true) {
       section {
-         app (name:'childApps', appName:"Lumos Automation ${APP_VERSION}", namespace:'dandanache', title:'+ Create new Lumos Automation ...', multiple:true, width:4)
+         app (name:'childApps', appName:"Lumos Automation 1.0.0", namespace:'dandanache', title:'+ Create new Lumos Automation ...', multiple:true, width:4)
       }
    }
 }
