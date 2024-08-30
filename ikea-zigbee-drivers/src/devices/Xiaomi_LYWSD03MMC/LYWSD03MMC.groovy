@@ -1,4 +1,10 @@
 {{!--------------------------------------------------------------------------}}
+{{# @fields }}
+
+// Fields for devices.Xiaomi_LYWSD03MMC
+import java.math.RoundingMode
+{{/ @fields }}
+{{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
 // Inputs for devices.Xiaomi_LYWSD03MMC
@@ -116,6 +122,7 @@ case { contains it, [clusterInt:0x0204, commandInt:0x01, attrInt:0x0010] }:
 
 // Write Attributes Response
 case { contains it, [endpointInt:0x01, commandInt:0x04, isClusterSpecific:false] }:
+    utils_processedZclMessage 'Write Attributes Response', "cluster=0x${msg.clusterId}"
     return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

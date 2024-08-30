@@ -18,6 +18,9 @@ import groovy.time.TimeCategory
     'thereshold': '43200' // When checking, mark the device as offline if no Zigbee message was received in the last 43200 seconds
 ]
 
+// Fields for devices.Xiaomi_LYWSD03MMC
+import java.math.RoundingMode
+
 metadata {
     definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Xiaomi_LYWSD03MMC.groovy') {
         capability 'Configuration'
@@ -469,6 +472,7 @@ void parse(String description) {
         
         // Write Attributes Response
         case { contains it, [endpointInt:0x01, commandInt:0x04, isClusterSpecific:false] }:
+            utils_processedZclMessage 'Write Attributes Response', "cluster=0x${msg.clusterId}"
             return
 
         // ---------------------------------------------------------------------------------------------------------------
