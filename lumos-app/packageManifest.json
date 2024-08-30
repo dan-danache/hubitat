@@ -18,8 +18,7 @@
         "name": "Lumos",
         "description": "Control lights using motion and contact sensors.",
         "required": true
-    }],
-    "drivers": [{
+    },{
         "id": "cfd64837-4770-41fd-9a64-cd6df6a32727",
         "namespace": "dandanache",
         "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lumos-app_1.0.0/lumos-app/lumos-automation.groovy",
