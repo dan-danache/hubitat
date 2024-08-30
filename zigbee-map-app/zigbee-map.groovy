@@ -17,7 +17,7 @@ import com.hubitat.app.ChildDeviceWrapper
 @Field static final def URL_PATTERN = ~/^https?:\/\/[^\/]+(.+)/
 
 definition(
-    name: APP_NAME,
+    name: "${APP_NAME} ${APP_VERSION}",
     namespace: 'dandanache',
     author: 'Dan Danache',
     description: 'Visualize the topology and connectivity of your Zigbee network.',
@@ -84,7 +84,6 @@ Map main() {
     def showInstall = app.getInstallationState() == 'INCOMPLETE'
     dynamicPage (
         name: 'main',
-        title: "<b>${APP_NAME} v${APP_VERSION}</b>",
         install: true,
         uninstall: !showInstall
     ) {
