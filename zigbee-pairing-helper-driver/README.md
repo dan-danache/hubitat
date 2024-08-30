@@ -2,6 +2,8 @@
 
 This driver allows you to pair a Zigbee device through a specific existing Zigbee router device from the mesh.
 
+> This functionality was included and improved in the [Zigbee Map](../zigbee-map-app/) application.
+
 ## Driver Install
 
 ### Install using HPM (offers automatic updates)
