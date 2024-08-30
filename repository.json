@@ -66,6 +66,14 @@
             "category": "Utility",
             "tags": [ "Tools & Utilities" , "Dashboards", "Monitoring"],
             "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/watchtower-app/packageManifest.json"
+        },
+        {
+            "id": "23b507e6-22ac-4a4e-bcda-f1969c174cd6",
+            "name": "Lumos",
+            "description": "Control lights using motion and contact sensors.",
+            "category": "Utility",
+            "tags": [ "Motion Control" , "Control", "Dorrs & Windows", "Lights & Switches"],
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/lumos-app/packageManifest.json"
         }
     ]
 }
