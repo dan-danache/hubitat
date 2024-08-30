@@ -5,6 +5,7 @@
  */
 import groovy.transform.CompileStatic
 import groovy.transform.Field
+import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = '{{ device.model }}'
 @Field static final String DRIVER_VERSION = '{{ driver.version }}'
@@ -186,7 +187,7 @@ void parse(String description) {
     // Extract msg
     Map msg = [:]
     if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
-    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
+    else if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)

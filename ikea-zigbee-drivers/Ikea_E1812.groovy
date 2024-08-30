@@ -5,9 +5,10 @@
  */
 import groovy.transform.CompileStatic
 import groovy.transform.Field
+import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Tradfri Shortcut Button (E1812)'
-@Field static final String DRIVER_VERSION = '5.0.1'
+@Field static final String DRIVER_VERSION = '5.1.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -52,7 +53,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1812.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Tradfri Shortcut Button (E1812) <small>v5.0.1</small><br>
+                IKEA Tradfri Shortcut Button (E1812) <small>v5.1.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-shortcut-button-e1812" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -333,7 +334,7 @@ void parse(String description) {
     // Extract msg
     Map msg = [:]
     if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
-    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
+    else if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -410,6 +411,9 @@ void parse(String description) {
         // Other events that we expect but are not usefull
         case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
             utils_processedZclMessage 'Configure Reporting Response', "attribute=BatteryPercentage, data=${msg.data}"
+            return
+        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0020] }:
+            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryVoltage, data=${msg.value}"
             return
         
         // Events for capability.HealthCheck

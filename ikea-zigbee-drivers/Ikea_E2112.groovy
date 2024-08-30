@@ -5,9 +5,10 @@
  */
 import groovy.transform.CompileStatic
 import groovy.transform.Field
+import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Vindstyrka Air Quality Sensor (E2112)'
-@Field static final String DRIVER_VERSION = '5.0.1'
+@Field static final String DRIVER_VERSION = '5.1.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -49,7 +50,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2112.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Vindstyrka Air Quality Sensor (E2112) <small>v5.0.1</small><br>
+                IKEA Vindstyrka Air Quality Sensor (E2112) <small>v5.1.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vindstyrka-air-quality-sensor-e2112" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -152,11 +153,11 @@ void configure(boolean auto = false) {
     
     // Configuration for capability.Temperature
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0000 0x0258 {3200} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 0.5°C)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0A00 0x0258 {0A00} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 0.1°C)
     
     // Configuration for capability.RelativeHumidity
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0000 0x0258 {6400} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 1%)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0A00 0x0258 {3200} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 0.5%)
     
     // Configuration for capability.HealthCheck
     sendEvent name:'healthStatus', value:'online', descriptionText:'Health status initialized to online'
@@ -271,7 +272,7 @@ void parse(String description) {
     // Extract msg
     Map msg = [:]
     if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
-    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
+    else if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -355,7 +356,8 @@ void parse(String description) {
                 return
             }
         
-            String temperature = convertTemperatureIfNeeded(Integer.parseInt(msg.value, 16) / 100, 'C', 0)
+            // https://www.urbandictionary.com/define.php?term=Retard%20Unit
+            String temperature = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
             utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
             return
@@ -378,7 +380,7 @@ void parse(String description) {
                 return
             }
         
-            Integer humidity = Math.round(Integer.parseInt(msg.value, 16) / 100)
+            String humidity = "${Integer.parseInt(msg.value, 16) / 100}"
             utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity}%", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RelativeHumidity=${msg.value}"
             return

@@ -1,5 +1,5 @@
 /**
- * IKEA Tradfri Open/Close Remote (E1766)
+ * Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
-@Field static final String DRIVER_NAME = 'IKEA Tradfri Open/Close Remote (E1766)'
+@Field static final String DRIVER_NAME = 'Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)'
 @Field static final String DRIVER_VERSION = '5.1.0'
 
 // Fields for capability.HealthCheck
@@ -18,24 +18,18 @@ import groovy.time.TimeCategory
     'thereshold': '43200' // When checking, mark the device as offline if no Zigbee message was received in the last 43200 seconds
 ]
 
-// Fields for capability.PushableButton
-@Field static final Map<String, List<String>> BUTTONS = [
-    'OPEN': ['1', 'Open'],
-    'CLOSE': ['2', 'Close'],
-]
-
 metadata {
-    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1766.groovy') {
+    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Xiaomi_LYWSD03MMC.groovy') {
         capability 'Configuration'
         capability 'Refresh'
+        capability 'Sensor'
+        capability 'TemperatureMeasurement'
+        capability 'RelativeHumidityMeasurement'
         capability 'Battery'
         capability 'HealthCheck'
-        capability 'HoldableButton'
         capability 'PowerSource'
-        capability 'PushableButton'
-        capability 'ReleasableButton'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0009,0020,1000,FC7C', outClusters:'0003,0004,0006,0008,0019,0102,1000', model:'TRADFRI open/close remote', manufacturer:'IKEA of Sweden' // Firmware: 24.4.6 (117C-11C6-24040006)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0405,0402,0204', outClusters:'0019', model:'LYWSD03MMC', manufacturer:'Xiaomi' // Firmware: Unknown
         
         // Attributes for capability.Battery
         attribute 'lastBattery', 'date'
@@ -43,18 +37,15 @@ metadata {
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
-    
-    // Commands for capability.FirmwareUpdate
-    command 'updateFirmware'
 
     preferences {
         input(
             name: 'helpInfo', type: 'hidden',
             title: '''
-            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1766.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Tradfri Open/Close Remote (E1766) <small>v5.1.0</small><br>
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Xiaomi_LYWSD03MMC.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC) <small>v5.1.0</small><br>
                 <small><div>
-                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-openclose-remote-e1766" target="_blank">device details</a><br>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#xiaomi-mi-temperature-and-humidity-monitor-2-lywsd03mmc" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
                 </div></small>
             </div>
@@ -69,14 +60,36 @@ metadata {
             required: true
         )
         
-        // Inputs for capability.ZigbeeBindings
+        // Inputs for devices.Xiaomi_LYWSD03MMC
         input(
-            name: 'controlDevice', type: 'enum',
-            title: 'Control Zigbee device',
-            description: '<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-            options: ['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
-            defaultValue: '----',
-            required: false
+            name: 'temperatureCalibration', type: 'number',
+            title: 'Temperature calibration',
+            description: '<small>Temperature calibration offset. Range -10.00°C .. 10.00°C.</small>',
+            defaultValue: 0.00,
+            range: '-10..10',
+            required: true
+        )
+        input(
+            name: 'humidityCalibration', type: 'number',
+            title: 'Humidity calibration',
+            description: '<small>Humidity calibration offset. Range -10.00% .. 10.00%.</small>',
+            defaultValue: 0.00,
+            range: '-10..10',
+            required: true
+        )
+        input(
+            name: 'enableDisplay', type: 'bool',
+            title: 'Enable device display',
+            description: '<small>Turn device display on.</small>',
+            defaultValue: true,
+            required: true
+        )
+        input(
+            name: 'showSmiley', type: 'bool',
+            title: 'Show smiley',
+            description: '<small>Show the smiley on the device screen.</small>',
+            defaultValue: true,
+            required: true
         )
     }
 }
@@ -108,19 +121,40 @@ List<String> updated(boolean auto = false) {
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, 'healthCheck'
     
-    // Preferences for capability.ZigbeeBindings
-    if (controlDevice != null && controlDevice != '----') {
-        if (controlDevice == '0000') {
-            log_info '🛠️ Clearing all device bindings'
-            state.stopControlling = 'devices'
-        } else {
-            log_info "🛠️ Adding binding to device #${controlDevice} for clusters [0x0102]"
+    // Sync device temperature unit with Hubitat configuration
+    log_info "🛠️ temperatureUnit = °${location.temperatureScale}"
+    cmds += zigbee.writeAttribute(0x0204, 0x0000, DataType.ENUM8, location.temperatureScale == 'C' ? 0x00 : 0x01)
     
-            cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0102'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0102
-        }
-        device.updateSetting 'controlDevice', [value:'----', type:'enum']
-        cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
+    // Preferences for devices.Xiaomi_LYWSD03MMC
+    if (temperatureCalibration == null) {
+        temperatureCalibration = '0.00'
+        device.updateSetting 'temperatureCalibration', [value:temperatureCalibration, type:'number']
     }
+    log_info "🛠️ temperatureCalibration = ${temperatureCalibration}"
+    Integer temperatureDelta = (new BigDecimal(temperatureCalibration) * 100).intValue()
+    cmds += zigbee.writeAttribute(0x0402, 0x0010, DataType.INT16, temperatureDelta)
+    
+    if (humidityCalibration == null) {
+        humidityCalibration = '0.00'
+        device.updateSetting 'humidityCalibration', [value:humidityCalibration, type:'number']
+    }
+    log_info "🛠️ humidityCalibration = ${humidityCalibration}"
+    Integer humidityDelta = (new BigDecimal(humidityCalibration) * 100).intValue()
+    cmds += zigbee.writeAttribute(0x0405, 0x0010, DataType.INT16, humidityDelta)
+    
+    if (enableDisplay == null) {
+        enableDisplay = true
+        device.updateSetting 'enableDisplay', [value:enableDisplay, type:'bool']
+    }
+    log_info "🛠️ enableDisplay = ${enableDisplay}"
+    cmds += zigbee.writeAttribute(0x0204, 0x0011, DataType.BOOLEAN, enableDisplay ? 0x01 : 0x00)
+    
+    if (showSmiley == null) {
+        showSmiley = true
+        device.updateSetting 'showSmiley', [value:showSmiley, type:'bool']
+    }
+    log_info "🛠️ showSmiley = ${showSmiley}"
+    cmds += zigbee.writeAttribute(0x0204, 0x0010, DataType.BOOLEAN, showSmiley ? 0x01 : 0x00)
 
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
@@ -169,8 +203,13 @@ void configure(boolean auto = false) {
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
     
-    // Configuration for devices.Ikea_E1743
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0102 {${device.zigbeeId}} {}" // Window Covering cluster
+    // Configuration for capability.Temperature
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0A00 0x0258 {0A00} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 0.1°C)
+    
+    // Configuration for capability.RelativeHumidity
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0A00 0x0258 {3200} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 0.5%)
     
     // Configuration for capability.Battery
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
@@ -183,10 +222,6 @@ void configure(boolean auto = false) {
     // Configuration for capability.PowerSource
     sendEvent name:'powerSource', value:'unknown', type:'digital', descriptionText:'Power source initialized to unknown'
     cmds += zigbee.readAttribute(0x0000, 0x0007) // PowerSource
-    
-    // Configuration for capability.PushableButton
-    Integer numberOfButtons = BUTTONS.count { true }
-    sendEvent name:'numberOfButtons', value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, SWBuildID
@@ -213,11 +248,20 @@ void refresh(boolean auto = false) {
 
     List<String> cmds = []
     
+    // Refresh for capability.Temperature
+    cmds += zigbee.readAttribute(0x0402, 0x0000) // Temperature
+    
+    // Refresh for capability.RelativeHumidity
+    cmds += zigbee.readAttribute(0x0405, 0x0000) // RelativeHumidity
+    
     // Refresh for capability.Battery
     cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
     
-    // Refresh for capability.ZigbeeBindings
-    cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}" // Start querying the Bindings Table
+    // Refresh for devices.Xiaomi_LYWSD03MMC
+    cmds += zigbee.readAttribute(0x0402, 0x0010) // TemperatureCalibration
+    cmds += zigbee.readAttribute(0x0405, 0x0010) // HumidityCalibration
+    cmds += zigbee.readAttribute(0x0204, 0x0011) // EnableDisplay
+    cmds += zigbee.readAttribute(0x0204, 0x0010) // ShowSmiley
     utils_sendZigbeeCommands cmds
 }
 
@@ -245,64 +289,6 @@ void pingExecute() {
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace('.000 seconds', ' seconds')
     log_info "Will be marked as offline if no message is received until ${thereshold.format('yyyy-MM-dd HH:mm:ss', location.timeZone)} (${offlineMarkAgo} from now)"
-}
-
-// Implementation for capability.HoldableButton
-void hold(String buttonNumber) { hold Integer.parseInt(buttonNumber) }
-void hold(BigDecimal buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) {
-        log_warn "Cannot hold button ${buttonNumber} because it is not defined"
-        return
-    }
-    utils_sendEvent name:'held', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was held"
-}
-
-// Implementation for capability.PushableButton
-void push(String buttonNumber) { push Integer.parseInt(buttonNumber) }
-void push(BigDecimal buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) {
-        log_warn "Cannot push button ${buttonNumber} because it is not defined"
-        return
-    }
-    utils_sendEvent name:'pushed', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was pressed"
-}
-
-// Implementation for capability.ReleasableButton
-void release(String buttonNumber) { release Integer.parseInt(buttonNumber) }
-void release(BigDecimal buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) {
-        log_warn "Cannot release button ${buttonNumber} because it is not defined"
-        return
-    }
-    utils_sendEvent name:'released', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was released"
-}
-
-// Implementation for capability.ZigbeeBindings
-private Map<String, String> retrieveSwitchDevices() {
-    try {
-        List<Integer> switchDeviceIds = httpGet([uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch']) { it.data*.id }
-        httpGet([uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json']) { response ->
-            response.data.devices
-                .findAll { switchDeviceIds.contains(it.id) }
-                .sort { it.name }
-                .collectEntries { [(it.zigbeeId): it.name] }
-        }
-    /* groovylint-disable-next-line CatchException */
-    } catch (Exception ex) {
-        return ['ZZZZ': "Exception: ${ex}"]
-    }
-}
-
-// Implementation for capability.FirmwareUpdate
-void updateFirmware() {
-    log_info 'Looking for firmware updates ...'
-    if (device.currentValue('powerSource', true) == 'battery') {
-        log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
-    }
-    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -343,20 +329,51 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.Ikea_E1743
+        // Events for capability.Temperature
         // ===================================================================================================================
         
-        // I/O button was pressed
-        case { contains it, [clusterInt:0x0102, commandInt:0x00] }:
-        case { contains it, [clusterInt:0x0102, commandInt:0x01] }:
-            List<String> button = msg.commandInt == 0x00 ? BUTTONS.OPEN : BUTTONS.CLOSE
-            utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
+        // Report/Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0x0402, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0000] }:
+        
+            // A MeasuredValue of 0x8000 indicates that the temperature measurement is invalid
+            if (msg.value == '8000') {
+                log_warn "Ignored invalid temperature value: 0x${msg.value}"
+                return
+            }
+        
+            // https://www.urbandictionary.com/define.php?term=Retard%20Unit
+            String temperature = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
+            utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
             return
         
-        // I/O button was released
-        case { contains it, [clusterInt:0x0102, commandInt:0x02] }:
-            List<String> button = device.currentValue('pushed', true) == 1 ? BUTTONS.OPEN : BUTTONS.CLOSE
-            utils_sendEvent name:'released', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released"
+        // Other events that we expect but are not usefull
+        case { contains it, [clusterInt:0x0402, commandInt:0x07] }:
+            utils_processedZclMessage 'Configure Reporting Response', "attribute=Temperature, data=${msg.data}"
+            return
+        
+        // Events for capability.RelativeHumidity
+        // ===================================================================================================================
+        
+        // Report/Read Attributes Reponse: MeasuredValue
+        case { contains it, [clusterInt:0x0405, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0000] }:
+        
+            // A MeasuredValue of 0xFFFF indicates that the measurement is invalid
+            if (msg.value == 'FFFF') {
+                log_warn "Ignored invalid relative humidity value: 0x${msg.value}"
+                return
+            }
+        
+            String humidity = "${Integer.parseInt(msg.value, 16) / 100}"
+            utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity}%", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RelativeHumidity=${msg.value}"
+            return
+        
+        // Other events that we expect but are not usefull
+        case { contains it, [clusterInt:0x0405, commandInt:0x07] }:
+            utils_processedZclMessage 'Configure Reporting Response', "attribute=RelativeHumidity, data=${msg.data}"
             return
         
         // Events for capability.Battery
@@ -419,82 +436,39 @@ void parse(String description) {
             utils_processedZclMessage 'Read Attributes Response', "PowerSource=${msg.value}"
             return
         
-        // Events for capability.ZigbeeBindings
+        // Events for devices.Xiaomi_LYWSD03MMC
         // ===================================================================================================================
         
-        // Mgmt_Bind_rsp := { 08:Status, 08:BindingTableEntriesTotal, 08:StartIndex, 08:BindingTableEntriesIncluded, 112/168*n:BindingTableList }
-        // BindingTableList: { 64:SrcAddr, 08:SrcEndpoint, 16:ClusterId, 08:DstAddrMode, 16/64:DstAddr, 0/08:DstEndpoint }
-        // Example: [71, 00, 01, 00, 01,  C6, 9C, FE, FE, FF, F9, E3, B4,  01,  06, 00,  03,  E9, A6, C9, 17, 00, 6F, 0D, 00,  01]
-        case { contains it, [endpointInt:0x00, clusterInt:0x8033] }:
-            if (msg.data[1] != '00') {
-                utils_processedZdpMessage 'Mgmt_Bind_rsp', "Status=FAILED, data=${msg.data}"
-                return
-            }
-            Integer totalEntries = Integer.parseInt msg.data[2], 16
-            Integer startIndex = Integer.parseInt msg.data[3], 16
-            Integer includedEntries = Integer.parseInt msg.data[4], 16
-            if (startIndex == 0) {
-                state.remove 'ctrlDev'
-                state.remove 'ctrlGrp'
-            }
-            if (includedEntries == 0) {
-                utils_processedZdpMessage 'Mgmt_Bind_rsp', "totalEntries=${totalEntries}, startIndex=${startIndex}, includedEntries=${includedEntries}"
-                return
-            }
+        // Read Attributes: TemperatureCalibration
+        case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0010] }:
+            temperatureCalibration = new BigDecimal(Integer.parseInt(msg.value, 16) / 100.0d).setScale(2, RoundingMode.HALF_UP).toPlainString()
+            device.updateSetting 'temperatureCalibration', [value:temperatureCalibration, type:'number']
+            utils_processedZclMessage 'Read Attributes Response', "TemperatureCalibration=${msg.value} (${temperatureCalibration}°C)"
+            return
         
-            Integer pos = 5
-            Integer deleted = 0
-            Map<String, String> allDevices = retrieveSwitchDevices()
-            Set<String> devices = []
-            Set<String> groups = []
-            List<String> cmds = []
-            for (int idx = 0; idx < includedEntries; idx++) {
-                String srcDeviceId = msg.data[(pos)..(pos + 7)].reverse().join()
-                String srcEndpoint = msg.data[pos + 8]
-                String cluster = msg.data[(pos + 9)..(pos + 10)].reverse().join()
-                String dstAddrMode = msg.data[pos + 11]
-                if (dstAddrMode != '01' && dstAddrMode != '03') continue
+        // Read Attributes: HumidityCalibration
+        case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0010] }:
+            humidityCalibration = new BigDecimal(Integer.parseInt(msg.value, 16) / 100.0d).setScale(2, RoundingMode.HALF_UP).toPlainString()
+            device.updateSetting 'humidityCalibration', [value:humidityCalibration, type:'number']
+            utils_processedZclMessage 'Read Attributes Response', "HumidityCalibration=${msg.value} (${humidityCalibration}%)"
+            return
         
-                // Found device binding
-                if (dstAddrMode == '03') {
-                    String dstDeviceId = msg.data[(pos + 12)..(pos + 19)].reverse().join()
-                    String dstEndpoint = msg.data[pos + 20]
-                    String dstDeviceName = allDevices.getOrDefault(dstDeviceId, "Unknown (${dstDeviceId})")
-                    pos += 21
+        // Read Attributes: EnableDisplay
+        case { contains it, [clusterInt:0x0204, commandInt:0x01, attrInt:0x0011] }:
+            enableDisplay = msg.value == '01' ? true : false
+            device.updateSetting 'enableDisplay', [value:enableDisplay, type:'bool']
+            utils_processedZclMessage 'Read Attributes Response', "EnableDisplay=${msg.value} (${enableDisplay})"
+            return
         
-                    // Remove all binds that are not targeting the hub
-                    if (state.stopControlling == 'devices') {
-                        if (dstDeviceId != "${location.hub.zigbeeEui}") {
-                            log_debug "Removing binding for device ${dstDeviceName} on cluster 0x${cluster}"
-                            cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${utils_payload srcDeviceId} ${srcEndpoint} ${utils_payload cluster} 03 ${utils_payload dstDeviceId} ${dstEndpoint}} {0x0000}"
-                            deleted++
-                        }
-                        continue
-                    }
+        // Read Attributes: ShowSmiley
+        case { contains it, [clusterInt:0x0204, commandInt:0x01, attrInt:0x0010] }:
+            showSmiley = msg.value == '01' ? true : false
+            device.updateSetting 'showSmiley', [value:showSmiley, type:'bool']
+            utils_processedZclMessage 'Read Attributes Response', "ShowSmiley=${msg.value} (${showSmiley})"
+            return
         
-                    log_debug "Found binding for device ${dstDeviceName} on cluster 0x${cluster}"
-                    devices.add dstDeviceName
-                    continue
-                }
-        
-                // Found group binding
-                pos += 14
-            }
-        
-            Set<String> ctrlDev = (state.ctrlDev ?: []).toSet()
-            ctrlDev.addAll(devices.findAll { !it.startsWith('Unknown') })
-            if (ctrlDev.size() > 0) state.ctrlDev = ctrlDev.unique()
-        
-            // Get next batch
-            if (startIndex + includedEntries < totalEntries) {
-                cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 ${Integer.toHexString(startIndex + includedEntries - deleted).padLeft(2, '0')}} {0x0000}"
-            } else {
-                log_info "Current device bindings: ${state.ctrlDev ?: 'None'}"
-                log_info "Current group bindings: ${state.ctrlGrp ?: 'None'}"
-                state.remove 'stopControlling'
-            }
-            utils_sendZigbeeCommands cmds
-            utils_processedZdpMessage 'Mgmt_Bind_rsp', "totalEntries=${totalEntries}, startIndex=${startIndex}, devices=${devices}, groups=${groups}"
+        // Write Attributes Response
+        case { contains it, [endpointInt:0x01, commandInt:0x04, isClusterSpecific:false] }:
             return
 
         // ---------------------------------------------------------------------------------------------------------------

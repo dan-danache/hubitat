@@ -324,7 +324,7 @@ case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0002] }:
 // Read Attributes: IndicatorStatus
 case { contains it, [clusterInt:0xFC7D, commandInt:0x01, attrInt:0x0003] }:
     String indicatorStatus = msg.value == '01' ? 'off' : 'on'
-    utils_sendEvent name:'indicatorStatus', value:status, descriptionText:"Indicator status turned ${indicatorStatus}", type:'digital'
+    utils_sendEvent name:'indicatorStatus', value:indicatorStatus, descriptionText:"Indicator status turned ${indicatorStatus}", type:'digital'
     utils_processedZclMessage 'Read Attributes Response', "IndicatorStatus=${indicatorStatus}"
     return
 

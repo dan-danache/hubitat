@@ -44,6 +44,7 @@ Devices from other vendors (not in HPM):
 * [Schneider Wiser UFH (CCTFR6600)](#schneider-wiser-ufh-cctfr6600)
 * [Swann One Key Fob (SWO-KEF1PA)](#swann-one-key-fob-swo-kef1pa)
 * [Tuya Temperature and Humidity Sensor (TS0201)](#tuya-temperature-and-humidity-sensor-ts0201)
+* [Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)](#xiaomi-mi-temperature-and-humidity-monitor-2-lywsd03mmc)
 
 Advanced features:
 * [Zigbee Bindings](Zigbee_Bindings.md)
@@ -296,7 +297,7 @@ Below you can find the details of each remote device, including the features and
 | Product Image | <img src="img/Ikea_E2201.webp" style="width: 200px"> |
 | Product Code | `205.281.28`｜`805.597.96` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2201.groovy` |
-| Tested firmwares | `1.0.47` |
+| Tested firmwares | `1.0.47`｜`1.0.57` |
 | Since version | `2.0.0` |
 
 #### Features
@@ -323,7 +324,7 @@ Below you can find the details of each remote device, including the features and
 | Product Image | <img src="img/Ikea_E2213.webp" style="width: 200px"> |
 | Product Code | `305.603.54` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2213.groovy` |
-| Tested firmwares | `1.0.20` |
+| Tested firmwares | `1.0.20`｜`1.0.21` |
 | Since version | `3.6.0` |
 
 #### Features
@@ -350,7 +351,7 @@ Below you can find the details of each remote device, including the features and
 | Product Image | <img src="img/Ikea_E2002.webp" style="width: 200px"> |
 | Product Code | `304.883.63` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2002.groovy` |
-| Tested firmwares | `1.0.024`｜`2.4.5` |
+| Tested firmwares | `1.0.024`｜`2.4.5`｜`2.4.11` |
 | Since version | `2.0.0` |
 
 #### Features
@@ -604,7 +605,7 @@ This device offers a range of features:
 | Product Image | <img src="img/Ikea_E2134.webp" style="width: 200px"> |
 | Product Code | `405.043.48` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2134.groovy` |
-| Tested firmwares | `1.0.57` |
+| Tested firmwares | `1.0.57`｜`1.0.64` |
 | Since version | `3.6.0` |
 
 #### Features
@@ -717,7 +718,7 @@ Below you can find the details of each outlet device, including the features and
 | Product Image | <img src="img/Ikea_E2204.webp" style="width: 200px"> |
 | Product Code | `805.403.49` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2204.groovy` |
-| Tested firmwares | `2.4.4` |
+| Tested firmwares | `2.4.4`｜`2.4.25` |
 | Since version | `4.0.0` |
 
 #### Features
@@ -961,6 +962,21 @@ Unknown
 | Product Image | <img src="img/Tuya_TS0201.webp" style="width: 200px"> |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Tuya_TS0201.groovy` |
 | Since version | `5.0.0` |
+
+#### Features
+* **Temperature and Humidity Measurements**: Provide standard measurements of the current temperature and the amount of moisture in the air.
+* **Battery Report**: Provides a percentage-based report on the current battery level.
+* **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
+
+### Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
+
+Converted from Bluetooth to Zigbee using this [Zigbee 3.0 Firmware](https://github.com/devbis/z03mmc) directly from the web browser (no wire soldering required).
+
+| Parameter | Details |
+|-----------|-------------|
+| Product Image | <img src="img/Xiaomi_LYWSD03MMC.webp" style="width: 200px"> |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Xiaomi_LYWSD03MMC.groovy` |
+| Since version | `5.1.0` |
 
 #### Features
 * **Temperature and Humidity Measurements**: Provide standard measurements of the current temperature and the amount of moisture in the air.
