@@ -87,6 +87,7 @@ export class ChartHelper {
     }
 
     static updateChartType(chart) {
+        return this.updatePointStyle(chart)
         //console.log('1. updateChartType')
         if (chart.scales.x === undefined || chart.data.datasets[0] === undefined) return
         const min = chart.scales.x.min
@@ -102,6 +103,20 @@ export class ChartHelper {
             chart.config.type = chartType
             //console.log('4. updating')
             chart.update('none')
+        }
+    }
+
+    static updatePointStyle(chart) {
+        if (chart.scales.x === undefined || chart.data.datasets[0] === undefined) return
+        const min = chart.scales.x.min
+        const max = chart.scales.x.max
+        const data = chart.data.datasets[0].data
+        const visibleDatapoints = data.filter(point => point.x >= min && point.x <= max).length
+
+        const pointStyle = chart.width / visibleDatapoints > 30 ? 'circle' : false
+        if (chart.data.datasets[0].pointStyle !== pointStyle) {
+            chart.data.datasets.forEach(dataset => dataset.pointStyle = pointStyle)
+            chart.update()
         }
     }
 

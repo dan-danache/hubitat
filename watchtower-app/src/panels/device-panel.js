@@ -86,30 +86,61 @@ export class DevicePanel extends LitElement {
 
     async initChart() {
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
-        const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.precision)
+        const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.mm1, this.config.mm2, this.config.precision)
         const colors = ColorHelper.colors()
         this.nodata = data.attr1.length == 0
 
+        const attr1Label = ChartHelper.prettyName(this.config.attr1)
+        const attr1Unit = supportedAttributes[this.config.attr1].unit
         const datasets = [{
-            label: ChartHelper.prettyName(this.config.attr1),
+            label: attr1Label,
             data: data.attr1,
             pointStyle: false,
-            backgroundColor: colors.Green + '44',
-            borderColor: colors.Green,
+            backgroundColor: colors.Blue + '44',
+            borderColor: colors.Blue,
             borderWidth: 1.2,
             tension: 0.5,
-            fill: 'start',
+            fill: this.config.mm1 !== true && this.config.mm2 !== true,
             yAxisID: 'attr1',
-            unit: supportedAttributes[this.config.attr1].unit
+            unit: attr1Unit,
         }]
+
+        if (this.config.mm1) {
+            datasets.push({
+                label: `${attr1Label} min`,
+                data: data.min1,
+                pointStyle: false,
+                backgroundColor: colors.Blue + '22',
+                borderColor: colors.Blue,
+                borderWidth: 1.2,
+                borderDash: [2, 2],
+                tension: 0.5,
+                fill: '+1',
+                yAxisID: 'attr1',
+                unit: attr1Unit,
+            })
+            datasets.push({
+                label: `${attr1Label} max`,
+                data: data.max1,
+                pointStyle: false,
+                borderColor: colors.Blue,
+                backgroundColor: colors.Blue + '22',
+                borderWidth: 1.2,
+                borderDash: [2, 2],
+                tension: 0.5,
+                fill: false,
+                yAxisID: 'attr1',
+                unit: attr1Unit,
+            })
+        }
 
         this.chart.options.scales.attr1 = {
             position: 'left',
             display: true,
             title: {
                 display: true,
-                text: `${datasets[0].label} ${supportedAttributes[this.config.attr1].unit}`,
-                color: colors.Green
+                text: `${attr1Label} ${attr1Unit}`,
+                color: colors.Blue
             },
             ticks: { color: colors.TextColorDarker, precision: 0 },
             grid: { color: colors.TextColorDarker + '33' },
@@ -122,26 +153,56 @@ export class DevicePanel extends LitElement {
         }
 
         if (this.config.attr2 !== undefined) {
+            const attr2Label = ChartHelper.prettyName(this.config.attr2)
+            const attr2Unit = supportedAttributes[this.config.attr2].unit
             datasets.push({
-                label: ChartHelper.prettyName(this.config.attr2),
+                label: attr2Label,
                 data: data.attr2,
                 pointStyle: false,
-                backgroundColor: colors.Blue + '44',
-                borderColor: colors.Blue,
+                backgroundColor: colors.Green + '44',
+                borderColor: colors.Green,
                 borderWidth: 1.2,
                 tension: 0.5,
-                fill: 'start',
+                fill: this.config.mm1 !== true && this.config.mm2 !== true,
                 yAxisID: 'attr2',
-                unit: supportedAttributes[this.config.attr2].unit
+                unit: attr2Unit,
             })
+            if (this.config.mm2) {
+                datasets.push({
+                    label: `${attr2Label} min`,
+                    data: data.min2,
+                    pointStyle: false,
+                    backgroundColor: colors.Green + '22',
+                    borderColor: colors.Green,
+                    borderWidth: 1.2,
+                    borderDash: [2, 2],
+                    tension: 0.5,
+                    fill: '+1',
+                    yAxisID: 'attr2',
+                    unit: attr2Unit,
+                })
+                datasets.push({
+                    label: `${attr2Label} max`,
+                    data: data.max2,
+                    pointStyle: false,
+                    borderColor: colors.Green,
+                    backgroundColor: colors.Green + '22',
+                    borderWidth: 1.2,
+                    borderDash: [2, 2],
+                    tension: 0.5,
+                    fill: false,
+                    yAxisID: 'attr2',
+                    unit: attr2Unit,
+                })
+            }
 
             this.chart.options.scales.attr2 = {
                 position: 'right',
                 display: true,
                 title: {
                     display: true,
-                    text: `${datasets[1].label} ${supportedAttributes[this.config.attr2].unit}`,
-                    color: colors.Blue
+                    text:  `${attr2Label} ${attr2Unit}`,
+                    color: colors.Green
                 },
                 ticks: { color: colors.TextColorDarker, precision: 0 },
                 grid: { drawOnChartArea: false },
@@ -167,16 +228,17 @@ export class DevicePanel extends LitElement {
     }
 
     async refresh() {
-        this.classList.add('spinner')
-        const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.precision)
-        console.log('refresh data', data)
-        this.nodata = data.attr1.length == 0
-        this.chart.data.datasets[0].data = data.attr1
-        if (this.config.attr2 !== undefined) this.chart.data.datasets[1].data = data.attr2
-        this.chart.config.type = data.attr1.length < 10 ? 'bar' : 'line'
-        this.chart.update('none')
-        ChartHelper.updateChartType(this.chart)
-        setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
+        this.initChart()
+        // this.classList.add('spinner')
+        // const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.precision, this.config.mm)
+        // console.log('refresh data', data)
+        // this.nodata = data.attr1.length == 0
+        // this.chart.data.datasets[0].data = data.attr1
+        // if (this.config.attr2 !== undefined) this.chart.data.datasets[1].data = data.attr2
+        // //this.chart.config.type = data.attr1.length < 10 ? 'bar' : 'line'
+        // this.chart.update('none')
+        // ChartHelper.updateChartType(this.chart)
+        // setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
 
     decorateConfig(config) {
@@ -206,36 +268,39 @@ export class DevicePanel extends LitElement {
 export class DevicePanelConfig extends LitElement {
     static properties = {
         devices: { type: Object, state: true },
+        supportedAttributes: { type: Object, state: true },
         attributes: { type: Object, state: true },
 
         device: { type: String, state: true },
         attr1: { type: String, state: true },
+        mm1: { type: Boolean, state: true },
         attr2: { type: String, state: true },
+        mm2: { type: Boolean, state: true },
     }
 
     constructor() {
         super()
         this.devices = undefined
+        this.supportedAttributes = undefined
         this.attributes = undefined
 
         this.dev = undefined
-        this.attr1 = undefined
-        this.attr2 = undefined
+        this.attr1 = this.attr2 = undefined
+        this.mm1 = this.mm2 = false
     }
 
     render() {
         return html`
             <label for="device">Select device:</label>
-            ${this.devices ? this.renderDevicesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
+            ${this.devices && this.supportedAttributes ? this.renderDevicesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
             ${this.attributes ? this.renderAttributesSelect() : '' }
         `
     }
 
     connectedCallback() {
         super.connectedCallback()
-        DatastoreHelper.fetchMonitoredDevices().then(devices => {
-            this.devices = devices
-        })
+        DatastoreHelper.fetchMonitoredDevices().then(devices => { this.devices = devices })
+        DatastoreHelper.fetchSupportedAttributes().then(attributes => { this.supportedAttributes = attributes })
     }
 
     createRenderRoot() {
@@ -243,7 +308,6 @@ export class DevicePanelConfig extends LitElement {
     }
 
     renderDevicesSelect() {
-        setTimeout(() => this.renderRoot.querySelector('#device').focus(), 0)
         return html`
             <section>
                 <select id="device" .value=${this.dev} @change=${this.onDeviceSelect} required="true">
@@ -258,39 +322,56 @@ export class DevicePanelConfig extends LitElement {
     }
 
     renderAttributesSelect() {
-        setTimeout(() => this.renderRoot.querySelector('#attr1').focus(), 0)
         return html`
             <section>
                 <label for="attr1">Select attribute to chart:</label>
-                <select id="attr1" .value=${this.attr1} @change=${event => this.attr1 = event.target.value} required="true">
+                <select id="attr1" .value=${this.attr1} @change=${event => { this.attr1 = event.target.value; this.mm1 = false }} required="true">
                     <option value=""></option>
                     ${this.attributes.filter(attribute => attribute != this.attr2).map(attribute => html`
                         <option value="${attribute}" .selected=${this.attr1 === attribute}>${attribute}</option>
                     `
                     )}
                 </select>
+                ${ this.attr1 && this.supportedAttributes[this.attr1].minMax == true ? html`
+                    <div>
+                        <label><input type="checkbox"
+                            .checked="${this.mm1}"
+                            @change=${ event => this.mm1 = event.target.checked }
+                        > Chart ${this.attr1} min/max</label>
+                    </div>
+                ` : ''}
             </section>
             ${ this.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
         `
     }
 
     renderOptionalAttributesSelect() {
-        setTimeout(() => this.renderRoot.querySelector('#attr2').focus(), 0)
         return html`
             <section>
                 <label for="attr2">Select additional attribute:</label>
-                <select id="attr2" .value=${this.attr2} @change=${event => this.attr2 = event.target.value}>
+                <select id="attr2" .value=${this.attr2} @change=${event => { this.attr2 = event.target.value; this.mm2 = false }}>
                     <option value="">[optional]</option>
                     ${this.attributes.filter(attribute => attribute != this.attr1).map(attribute => html`
                         <option value="${attribute}" .selected=${this.attr2 === attribute}>${attribute}</option>
                     `
                     )}
                 </select>
+                ${ this.attr2 && this.supportedAttributes[this.attr2].minMax == true ? html`
+                    <div>
+                        <label><input type="checkbox"
+                            .checked="${this.mm2}"
+                            @change=${ event => this.mm2 = event.target.checked }
+                        > Chart ${this.attr2} min/max</label>
+                    </div>
+                ` : ''}
             </section>
         `
     }
 
     onDeviceSelect(event) {
+        this.attr1 = this.attr2 = undefined
+        this.mm1 = this.mm2 = false
+
         this.dev = event.target.value !== '' ? event.target.value : undefined
         if (this.dev === undefined) {
             this.attributes = undefined
@@ -303,6 +384,11 @@ export class DevicePanelConfig extends LitElement {
     }
 
     decorateConfig(config) {
-        return { ...config, dev: this.dev, attr1: this.attr1, attr2: this.attr2, precision: '5m' }
+        return { ...config, dev: this.dev, precision: '5m',
+            attr1: this.attr1,
+            attr2: this.attr2,
+            mm1: this.mm1 === true ? true : undefined,
+            mm2: this.mm2 === true ? true : undefined,
+        }
     }
 }

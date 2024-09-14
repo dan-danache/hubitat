@@ -109,6 +109,25 @@ Certain mains-powered devices, such as light bulbs or air purifiers, can be turn
 - windGust (km/h or mph)
 - windSpeed (km/h or mph)
 
+### Handling of Min/Max Values
+
+For certain attributes, such as temperature and humidity, storing only the 1-hour, 1-day, or 1-week averages may not provide a complete picture. Therefore, the application also automatically records the minimum and maximum values for these intervals in the CSV files.
+
+These min/max values can be visualized in a chart using the Device tile. When configuring the tile, if a supported device attribute is selected, the "Chart attribute min/max" option becomes available:
+
+![Min/max tile configuration](img/device-tile-min-max-config.png)
+
+Once the chart is rendered, the min/max values are displayed:
+
+![Min/max tile configuration](img/device-tile-min-max.png)
+
+**Note**: Min/max values are charted only when the 1-hour, 1-day, or 1-week time resolutions are selected.
+
+In the example above (1-hour time resolution):
+1. The top tile displays the min/max values for both temperature and humidity.
+1. The middle tile displays the min/max values only for temperature.
+1. The bottom tile displays temperature and humidity without the min/max values.
+
 ## Usage
 
 To use the Watchtower app, follow these steps:
@@ -231,9 +250,6 @@ The zoom functionality allows you to interact with charts displaying multiple da
 On mobile devices, start by tapping the chart briefly, then immediately drag the desired chart area to zoom in.
 
 ![Chart Zoom](img/zoom.png)
-
-### Line vs Bar Charts
-Charts will automatically switch between line and bar types based on the number of data points visible. When fewer data points are displayed (e.g., when zoomed in or when time resolution is changed), the chart switches to a bar type for better visibility. When more data points are available, a line chart is more suitable for data analysis.
 
 ### Auto-refresh
 

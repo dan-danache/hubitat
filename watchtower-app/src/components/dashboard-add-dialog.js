@@ -66,6 +66,9 @@ export class DashboardAddDialog extends LitElement {
         section.modal-body section {
             margin-bottom: 1em;
         }
+        section.modal-body section > div {
+            margin-top: .3em;
+        }
         footer {
             padding: 1em;
             text-align: right;
@@ -84,7 +87,7 @@ export class DashboardAddDialog extends LitElement {
             background-color: var(--Blue);
             color: var(--Base3);
         }
-        label { display: block; margin-bottom: .3em }
+        label { display: block; margin-bottom: .3em; user-select: none }
         select {
             display: block;
         }

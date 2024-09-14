@@ -70,6 +70,7 @@
             * { margin: 0 }
             html { height: 100%; -webkit-text-size-adjust: 100%; scrollbar-width:thin }
             body {
+                display: block;
                 min-height: 100%;
                 box-sizing: border-box;
                 margin: 0;
@@ -78,8 +79,8 @@
                 background-color: var(--bg-color);
                 color: var(--text-color);
                 cursor: default;
-                width: 100vw;
                 display: block;
+                overflow-x: hidden;
             }
             body.embedded {
                 background-color: transparent;
