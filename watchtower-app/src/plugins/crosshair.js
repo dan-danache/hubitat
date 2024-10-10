@@ -118,9 +118,9 @@ export default {
             return
         }
 
-        // Remove drag if out of bounds
-        if (chart.crosshair.dragStarted && e.type === 'mouseout') {
-            console.log('mouseout -> dragStarted = false')
+        // Remove drag box and trace line if out of bounds
+        if (e.type === 'mouseout') {
+            chart.crosshair.enabled = false
             chart.crosshair.canStartDrag = false
             chart.crosshair.dragStarted = false
             return
@@ -145,10 +145,8 @@ export default {
 
     afterDraw: function(chart) {
         if (!chart.crosshair.enabled) return
-        console.log('afterDraw', chart.crosshair.dragStarted)
         if (chart.crosshair.dragStarted) this.drawZoombox(chart)
         else this.drawTraceLine(chart)
-
         return true
     },
 
@@ -192,7 +190,6 @@ export default {
     },
 
     doZoom: function(chart, start, end) {
-        console.log('doZoom', start, end, chart.options.scales.x.min, chart.options.scales.x.max)
 
         // Swap start/end if user dragged from right to left
         if (start > end) {
@@ -290,12 +287,6 @@ export default {
         var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor')
 
         chart.ctx.beginPath()
-        console.log('drawZoombox',
-            chart.crosshair.dragStartX,
-            yScale.getPixelForValue(yScale.max),
-            chart.crosshair.x - chart.crosshair.dragStartX,
-            yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max)
-        )
         chart.ctx.rect(
             chart.crosshair.dragStartX,
             yScale.getPixelForValue(yScale.max),
