@@ -1,10 +1,10 @@
 import '../vendor/vendor.min.js'
 import { ColorHelper } from './color-helper.js'
-import ToggleScaleVisibilityPlugin from '../plugins/toggle-scale-visibility.js'
+//import ToggleScaleVisibilityPlugin from '../plugins/toggle-scale-visibility.js'
 import CrosshairPlugin from '../plugins/crosshair.js'
 
 // Register custom plugins
-Chart.register(ToggleScaleVisibilityPlugin)
+//Chart.register(ToggleScaleVisibilityPlugin)
 Chart.register(CrosshairPlugin)
 
 const positioners = Chart.Tooltip.positioners

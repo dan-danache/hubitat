@@ -12,11 +12,10 @@ var defaultOptions = {
         zoomButtonClass: 'reset-zoom',
     },
     snap: {
-        enabled: false,
+        enabled: true,
     },
     callbacks: {
-        afterZoom: function(start, end) {
-        }
+        afterZoom: function(start, end) {}
     }
 }
 
@@ -31,7 +30,6 @@ export default {
         if (chart.options.plugins.crosshair === undefined) chart.options.plugins.crosshair = defaultOptions
 
         chart.crosshair = {
-            enabled: false,
             x: null,
             originalData: [],
             originalXRange: {},
@@ -98,8 +96,8 @@ export default {
         let e = event.event
         //console.log('event', chart.crosshair.dragStarted, chart.crosshair.canStartDrag, e)
 
-        // suppress tooltips for linked charts
-        chart.crosshair.enabled = (e.type !== 'mouseout' && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)))
+        // Suppress tooltips for linked charts
+        chart.crosshair.enabled = true //(e.type !== 'mouseout' && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)))
 
         // Enable drag on mobile phones on second quick touch
         if (e.type === 'click') {
@@ -122,6 +120,7 @@ export default {
 
         // Remove drag if out of bounds
         if (chart.crosshair.dragStarted && e.type === 'mouseout') {
+            console.log('mouseout -> dragStarted = false')
             chart.crosshair.canStartDrag = false
             chart.crosshair.dragStarted = false
             return
@@ -140,13 +139,13 @@ export default {
             chart.update('none')
         }
 
-        chart.crosshair.x = e.x
+        chart.crosshair.x = Math.min(Math.max(e.x, xScale.getPixelForValue(xScale.min)), xScale.getPixelForValue(xScale.max))
         chart.draw()
     },
 
     afterDraw: function(chart) {
         if (!chart.crosshair.enabled) return
-
+        console.log('afterDraw', chart.crosshair.dragStarted)
         if (chart.crosshair.dragStarted) this.drawZoombox(chart)
         else this.drawTraceLine(chart)
 
@@ -154,20 +153,22 @@ export default {
     },
 
     beforeTooltipDraw: function(chart) {
-        // suppress tooltips on dragging
+
+        // Suppress tooltips on dragging
         return !chart.crosshair.dragStarted && !chart.crosshair.suppressTooltips
     },
 
     resetZoom: function(chart) {
         if (chart.crosshair.originalData.length > 0) {
-            // reset original data
+
+            // Reset original data
             for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
                 var dataset = chart.data.datasets[datasetIndex]
                 dataset.data = chart.crosshair.originalData.shift(0)
             }
         }
 
-        // reset original xRange
+        // Reset original xRange
         if (chart.crosshair.originalXRange.min) {
             chart.options.scales.x.min = chart.crosshair.originalXRange.min
             chart.crosshair.originalXRange.min = null
@@ -191,8 +192,9 @@ export default {
     },
 
     doZoom: function(chart, start, end) {
+        console.log('doZoom', start, end, chart.options.scales.x.min, chart.options.scales.x.max)
 
-        // swap start/end if user dragged from right to left
+        // Swap start/end if user dragged from right to left
         if (start > end) {
             var tmp = start
             start = end
@@ -208,7 +210,7 @@ export default {
             chart.crosshair.originalXRange.max = chart.options.scales.x.max
         }
 
-        // add restore zoom button
+        // Add restore zoom button
         if (!chart.crosshair.button) {
             var button = document.createElement('button')
 
@@ -224,11 +226,11 @@ export default {
             chart.crosshair.button = button
         }
 
-        // set axis scale
+        // Set axis scale
         chart.options.scales.x.min = start
         chart.options.scales.x.max = end
 
-        // make a copy of the original data for later restoration
+        // Make a copy of the original data for later restoration
         var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false
         var filterDataset = (chart.config.options.scales.x.type !== 'category')
 
@@ -238,7 +240,7 @@ export default {
                 var index = 0
                 var started = false
                 var stop = false
-                if (storeOriginals)  chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data
+                if (storeOriginals) chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data
                 var sourceDataset = chart.crosshair.originalData[datasetIndex]
 
                 for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
@@ -247,7 +249,7 @@ export default {
                     // var oldDataX = this.getXScale(chart).getRightValue(oldData)
                     var oldDataX = oldData.x !== undefined ? oldData.x : NaN
 
-                    // append one value outside of bounds
+                    // Append one value outside of bounds
                     if (oldDataX >= start && !started && index > 0) {
                         newData.push(sourceDataset[index - 1])
                         started = true
@@ -288,6 +290,12 @@ export default {
         var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor')
 
         chart.ctx.beginPath()
+        console.log('drawZoombox',
+            chart.crosshair.dragStartX,
+            yScale.getPixelForValue(yScale.max),
+            chart.crosshair.x - chart.crosshair.dragStartX,
+            yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max)
+        )
         chart.ctx.rect(
             chart.crosshair.dragStartX,
             yScale.getPixelForValue(yScale.max),

@@ -12,7 +12,7 @@ export class DashboardGrid extends LitElement {
             color: var(--text-color);
             border: 1px transparent solid;
             border-radius: 5px;
-            box-shadow: 0 0 5px var(--shadow-color);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
         }
         .grid-stack-item-content:hover {
             border-color: var(--border-color);
@@ -48,7 +48,7 @@ export class DashboardGrid extends LitElement {
             cursor: move;
             background-color: var(--bg-color);
             color: var(--text-color);
-            box-shadow: 0 0 0.3em var(--shadow-color);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
             border: 1px var(--border-color) solid;
             border-radius: 0 0 5px 5px;
             border-top: 0;

@@ -186,7 +186,7 @@ export class DashboardMenu extends LitElement {
                     <hr>
                     <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
                 `}
-                <aside>v2.0.1</aside>
+                <aside>v2.0.2</aside>
             </nav>
         `;
     }
@@ -262,10 +262,10 @@ export class DashboardMenu extends LitElement {
         if (this.startX == undefined) return
         const endX = event.changedTouches[0].clientX
         const diff = endX - this.startX
-        if (!this.open && this.startX < 30 && diff > 50) {
+        if (!this.open && this.startX < 60 && diff > 50) {
             this.open = true
             return
         }
-        if (this.open && endX < 30 && diff < -50) this.open = false
+        if (this.open && endX < 150 && diff < -50) this.open = false
     }
 }

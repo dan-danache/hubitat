@@ -10,7 +10,7 @@ export class PrecisionSelector extends LitElement {
             color: var(--text-color);
             border: 1px var(--border-color) solid;
             border-bottom: 0;
-            box-shadow: 0 0 0.3em var(--shadow-color);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
             border-radius: 5px 5px 0 0;
             display: flex;
             user-select: none;
@@ -25,8 +25,8 @@ export class PrecisionSelector extends LitElement {
             width: 2.85em;
             text-align: center;
         }
-        ul li:first-child { border-radius: 5px 0 0 0 }
-        ul li:last-child { border: 0; border-radius: 0 5px 0 0 }
+        ul li:first-child { border-radius: 4px 0 0 0 }
+        ul li:last-child { border: 0; border-radius: 0 4px 0 0 }
         ul li:hover {
             background-color: var(--bg-color-darker);
         }
