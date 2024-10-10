@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>${dashboard_name}</title>
+        <meta charset="utf-8" />
+        <meta name="keywords" content="hubitat, dashboard, metrics, watchtower" />
+        <meta name="author" content="Dan Danache" />
+        <meta name="description" content="Data-Driven Insights for a Smarter Home" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Watchtower" />
+        <meta name="application-name" content="Watchtower" />
+        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="msapplication-config" content="/ui2/images/browserconfig.xml" />
+        <meta name="theme-color" />
+        <meta name="x5-orientation" content="portrait" />
+        <meta name="x5-page-mode" content="app" />
+        <meta name="screen-orientation" content="portrait" />
+        <meta name="browsermode" content="application" />
+        <!--meta name="color-scheme" content="dark light" /-->
+        <link rel="apple-touch-icon" sizes="512x512" href="./icon.png?access_token=${access_token}" />
+        <link rel="icon" type="image/png" sizes="512x512" href="./icon.png?access_token=${access_token}" />
+        <link rel="mask-icon" type="image/png" sizes="512x512" href="./icon.png?access_token=${access_token}" />
+        <link rel="manifest" />
+        <link rel="shortcut icon" href="./icon.png?access_token=${access_token}" />
+        <style>
+            :root {
+                --Base03: #1b1b1b; /* background tones (dark) */
+                --Base02: #242424; /* -- */
+                --Base01: #666666; /* content tones */
+                --Base00: #747474; /* -- */
+                --Base0: #8c8c8c;  /* -- */
+                --Base1: #9a9a9a;  /* -- */
+                --Base2: #eee8d5;  /* background tones (white) */
+                --Base3: #fdf6e3;  /* -- */
+                --Yellow: #b58900; /* accent tones */
+                --Orange: #cb4b16;
+                --Red: #dc322f;
+                --Magenta: #d33682;
+                --Violet: #6c71c4;
+                --Blue: #268bd2;
+                --Cyan: #2aa198;
+                --Green: #859900;
+                --Black: #000;
+                --bg-color: var(--Base2);
+                --bg-color-darker: var(--Base3);
+                --text-color: var(--Base03);
+                --text-color-darker: var(--Base00);
+                --border-color: var(--Base1);
+                --shadow-color: var(--Base1);
+                --separator-color: var(--Base1);
+                --Gray: var(--Base1);
+                --tooltip-bg-color: var(--Base02);
+                --tooltip-text-color: var(--Base2);
+            }
+            [data-theme='dark'] {
+                --bg-color: var(--Base03);
+                --bg-color-darker: var(--Base02);
+                --text-color: var(--Base3);
+                --text-color-darker: var(--Base1);
+                --border-color: var(--Base01);
+                --shadow-color: #0f0f0f;
+                --separator-color: var(--Base01);
+                --Gray: var(--Base01);
+                --tooltip-bg-color: var(--Base2);
+                --tooltip-text-color: var(--Base02);
+            }
+            *, *::before, *::after { box-sizing: border-box }
+            * { margin: 0 }
+            html { height: 100%; -webkit-text-size-adjust: 100%; scrollbar-width:thin }
+            body {
+                display: block;
+                min-height: 100%;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 5px;
+                font: 0.85rem sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                cursor: default;
+                display: block;
+                overflow-x: hidden;
+            }
+            body.embedded {
+                background-color: transparent;
+                padding: 0;
+                position: relative;
+                inset: -5px;
+                width: calc(100vw + 9px);
+                overflow: hidden;
+            }
+            a { text-decoration: none; color: var(--Blue) }
+
+            /* CSS spinner */
+            .spinner:after {
+                position: absolute;
+                top: calc(50% - 32px);
+                left: calc(50% - 32px);
+                content: ' ';
+                display: block;
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                border: 1px solid var(--text-color-darker);
+                border-color: var(--text-color-darker) transparent var(--text-color-darker) transparent;
+                animation: spinner 1.2s linear infinite;
+            }
+            @keyframes spinner {
+                0% { transform: rotate(0deg) }
+                100% { transform: rotate(360deg) }
+            }
+        </style>
+        <script>window.litDisableBundleWarning = true</script>
+        <script type="module" src="watchtower.js?access_token=${access_token}"></script>
+    </head>
+    <body class="spinner">
+        <watchtower-app></watchtower-app>
+    </body>
+</html>

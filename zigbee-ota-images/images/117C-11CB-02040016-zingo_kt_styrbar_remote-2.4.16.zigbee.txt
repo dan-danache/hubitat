@@ -1,0 +1,12 @@
+Source: http://fw.ota.homesmart.ikea.net/global/GW1.0/01.21.031/bin/0000000-zingo_kt_styrbar_remote-0x11CB-2.4.16-prod.ota.ota.signed
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 4555,
+    "fileVersion": 33816598,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL zingo_kt_styrbar_remote\u0000\u0000\u0000\u0000\u0000",
+    "totalImageSize": 218698
+}

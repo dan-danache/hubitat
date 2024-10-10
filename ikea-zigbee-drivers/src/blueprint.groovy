@@ -5,6 +5,7 @@
  */
 import groovy.transform.CompileStatic
 import groovy.transform.Field
+import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = '{{ device.model }}'
 @Field static final String DRIVER_VERSION = '{{ driver.version }}'
@@ -76,7 +77,7 @@ void installed() {
 
 // Called when the "Save Preferences" button is clicked
 List<String> updated(boolean auto = false) {
-    log_info "Saving preferences${auto ? ' (auto)' : ''} ..."
+    log_info "🎬 Saving preferences${auto ? ' (auto)' : ''} ..."
     List<String> cmds = []
 
     unschedule()
@@ -116,7 +117,7 @@ void logsOff() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -155,7 +156,7 @@ private void autoConfigure() {
 
 // capability.Refresh
 void refresh(boolean auto = false) {
-    log_warn "Refreshing device state${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -186,7 +187,7 @@ void parse(String description) {
     // Extract msg
     Map msg = [:]
     if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
-    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
+    else if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)

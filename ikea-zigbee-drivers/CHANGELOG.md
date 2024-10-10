@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2024-??-??
+
+### Added
+- Add support for Xiaomi Mi Temperature & Humidity Monitor 2 (LYWSD03MMC)
+
+### Changed
+- E2204: Move "Dark Mode" preference to "setIndicatorStatus()" command and "indicatorStatus" attribute
+- Add decimal points support for Temperature and Humidity values
+
+## [5.0.1] - 2024-05-22
+
+### Fixed
+- Fix lights usage in Room Lighting - `@tray_e`
+
 ## [5.0.0] - 2024-05-21
 
 ### Added
@@ -15,10 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add "lastBattery" attribute representing the time the last battery report was received
 - Add Scenes support using Zigbee Bindings for E1810 and E2002
 - Put all devices in "identifying mode" while "configure()" is running - `@UncleAlias`
-- E2006: Move "Dark Mode" preference to "setIndicatorStatus()" command and "indicatorStatus" attribute - `@userLP24`
 
 ### Changed
 - Remove ICPSHC24 driver; LED drivers must use the new Dimmable Lights driver
+- E2006: Move "Dark Mode" preference to "setIndicatorStatus()" command and "indicatorStatus" attribute - `@userLP24`
 
 ### Fixed
 - Legrand Connected Outlet: Fix blue light is ON when the device is OFF and OFF when its ON - `@BorrisTheCat`

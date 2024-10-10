@@ -10,7 +10,7 @@
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
     "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
     "category": "Control",
-    "tags": [ "Zigbee" ],
+    "tags": [ "Zigbee", "Tools & Utilities" ],
     "drivers" : [
         {
             "id" : "4eae9aee-83ca-4745-b946-b924ecc96090",

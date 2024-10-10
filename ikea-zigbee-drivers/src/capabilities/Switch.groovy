@@ -33,23 +33,23 @@ command 'onWithTimedOff', [[name:'On duration*', type:'NUMBER', description:'Aft
 
 // Implementation for capability.Switch
 void on() {
-    log_debug 'Sending On command'
+    log_debug '🎬 Sending On command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114301}"])
 }
 void off() {
-    log_debug 'Sending Off command'
+    log_debug '🎬 Sending Off command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114300}"])
 }
 
 void toggle() {
-    log_debug 'Sending Toggle command'
+    log_debug '🎬 Sending Toggle command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114302}"])
 }
 {{# params.onWithTimedOff }}
 
 void onWithTimedOff(BigDecimal onTime = 1) {
     Integer delay = onTime < 1 ? 1 : (onTime > 6500 ? 6500 : onTime)
-    log_debug 'Sending OnWithTimedOff command'
+    log_debug '🎬 Sending OnWithTimedOff command'
     Integer dur = delay * 10
     String payload = "00 ${utils_payload dur, 4} 0000"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])

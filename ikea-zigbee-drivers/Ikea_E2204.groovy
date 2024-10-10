@@ -5,9 +5,10 @@
  */
 import groovy.transform.CompileStatic
 import groovy.transform.Field
+import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Tretakt Smart Plug (E2204)'
-@Field static final String DRIVER_VERSION = '5.0.0'
+@Field static final String DRIVER_VERSION = '5.1.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -34,6 +35,9 @@ metadata {
 
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57,FC7C,FC85', outClusters:'0019', model:'TRETAKT Smart plug', manufacturer:'IKEA of Sweden' // Firmware: 2.4.4 (117C-1100-02040004)
         
+        // Attributes for devices.Ikea_E2204
+        attribute 'indicatorStatus', 'enum', ['on', 'off']
+        
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
@@ -41,6 +45,9 @@ metadata {
     // Commands for capability.Switch
     command 'toggle'
     command 'onWithTimedOff', [[name:'On duration*', type:'NUMBER', description:'After how many seconds power will be turned Off [1..6500]']]
+    
+    // Commands for devices.Ikea_E2204
+    command 'setIndicatorStatus', [[name:'Status*', type:'ENUM', description:'Select LED indicator status on the device', constraints:['on', 'off']]]
     
     // Commands for capability.FirmwareUpdate
     command 'updateFirmware'
@@ -50,7 +57,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2204.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Tretakt Smart Plug (E2204) <small>v5.0.0</small><br>
+                IKEA Tretakt Smart Plug (E2204) <small>v5.1.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tretakt-smart-plug-e2204" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -85,12 +92,6 @@ metadata {
             description: '<small>Lock physical button, safeguarding against accidental operation.</small>',
             defaultValue: false
         )
-        input(
-            name: 'darkMode', type: 'bool',
-            title: 'Dark mode',
-            description: '<small>Turn off LED indicators on the device, ensuring total darkness.</small>',
-            defaultValue: false
-        )
         
         // Inputs for capability.ZigbeeBindings
         input(
@@ -116,7 +117,7 @@ void installed() {
 
 // Called when the "Save Preferences" button is clicked
 List<String> updated(boolean auto = false) {
-    log_info "Saving preferences${auto ? ' (auto)' : ''} ..."
+    log_info "🎬 Saving preferences${auto ? ' (auto)' : ''} ..."
     List<String> cmds = []
 
     unschedule()
@@ -143,13 +144,6 @@ List<String> updated(boolean auto = false) {
     }
     log_info "🛠️ childLock = ${childLock}"
     cmds += zigbee.writeAttribute(0xFC85, 0x0000, 0x10, childLock ? 0x01 : 0x00, [mfgCode:'0x117C'])
-    
-    if (darkMode == null) {
-        darkMode = false
-        device.updateSetting 'darkMode', [value:darkMode, type:'bool']
-    }
-    log_info "🛠️ darkMode = ${darkMode}"
-    cmds += zigbee.writeAttribute(0xFC85, 0x0001, 0x10, darkMode ? 0x01 : 0x00, [mfgCode:'0x117C'])
     
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, 'healthCheck'
@@ -197,7 +191,7 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -245,7 +239,7 @@ private void autoConfigure() {
 
 // capability.Refresh
 void refresh(boolean auto = false) {
-    log_warn "Refreshing device state${auto ? ' (auto)' : ''} ..."
+    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -258,7 +252,7 @@ void refresh(boolean auto = false) {
     
     // Refresh for devices.Ikea_E2204
     cmds += zigbee.readAttribute(0xFC85, 0x0000, [mfgCode:'0x117C'] ) // ChildLock
-    cmds += zigbee.readAttribute(0xFC85, 0x0001, [mfgCode:'0x117C'] ) // DarkMode
+    cmds += zigbee.readAttribute(0xFC85, 0x0001, [mfgCode:'0x117C'] ) // IndicatorStatus
     
     // Refresh for capability.ZigbeeGroups
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}" // Get groups membership
@@ -267,32 +261,39 @@ void refresh(boolean auto = false) {
 
 // Implementation for capability.Switch
 void on() {
-    log_debug 'Sending On command'
+    log_debug '🎬 Sending On command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114301}"])
 }
 void off() {
-    log_debug 'Sending Off command'
+    log_debug '🎬 Sending Off command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114300}"])
 }
 
 void toggle() {
-    log_debug 'Sending Toggle command'
+    log_debug '🎬 Sending Toggle command'
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114302}"])
 }
 
 void onWithTimedOff(BigDecimal onTime = 1) {
     Integer delay = onTime < 1 ? 1 : (onTime > 6500 ? 6500 : onTime)
-    log_debug 'Sending OnWithTimedOff command'
+    log_debug '🎬 Sending OnWithTimedOff command'
     Integer dur = delay * 10
     String payload = "00 ${utils_payload dur, 4} 0000"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])
+}
+
+// Implementation for devices.Ikea_E2204
+void setIndicatorStatus(String status) {
+    log_debug "🎬 Setting status indicator to: ${status}"
+    utils_sendZigbeeCommands(zigbee.writeAttribute(0xFC85, 0x0001, 0x10, status == 'off' ? 0x00 : 0x01, [mfgCode:'0x117C']))
+    utils_sendEvent name:'indicatorStatus', value:status, descriptionText:"Indicator status turned ${status}", type:'digital'
 }
 
 // Implementation for capability.HealthCheck
 void ping() {
     log_warn 'ping ...'
     utils_sendZigbeeCommands(zigbee.readAttribute(0x0000, 0x0000))
-    log_debug 'Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
+    log_debug '🎬 Ping command sent to the device; we\'ll wait 5 seconds for a reply ...'
     runIn 5, 'pingExecute'
 }
 void pingExecute() {
@@ -339,7 +340,7 @@ void parse(String description) {
     // Extract msg
     Map msg = [:]
     if (description.startsWith('zone status')) msg += [clusterInt:0x500, commandInt:0x00, isClusterSpecific:true]
-    if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
+    else if (description.startsWith('enroll request')) msg += [clusterInt:0x500, commandInt:0x01, isClusterSpecific:true]
 
     msg += zigbee.parseDescriptionAsMap description
     if (msg.containsKey('endpoint')) msg.endpointInt = Integer.parseInt(msg.endpoint, 16)
@@ -405,11 +406,11 @@ void parse(String description) {
             utils_processedZclMessage 'Read Attributes Response', "ChildLock=${msg.value}"
             return
         
-        // Read Attributes: DarkMode
+        // Read Attributes: IndicatorStatus
         case { contains it, [clusterInt:0xFC85, commandInt:0x01, attrInt:0x0001] }:
-            darkMode = msg.value == '01'
-            device.updateSetting 'darkMode', [darkMode:childLock, type:'bool']
-            utils_processedZclMessage 'Read Attributes Response', "DarkMode=${msg.value}"
+            String indicatorStatus = msg.value == '00' ? 'off' : 'on'
+            utils_sendEvent name:'indicatorStatus', value:indicatorStatus, descriptionText:"Indicator status turned ${indicatorStatus}", type:'digital'
+            utils_processedZclMessage 'Read Attributes Response', "IndicatorStatus=${indicatorStatus}"
             return
         
         // Write Attributes Response

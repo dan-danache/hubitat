@@ -7,7 +7,7 @@ capability 'RelativeHumidityMeasurement'
 
 // Configuration for capability.RelativeHumidity
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0000 0x0258 {6400} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 1%)
+cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0A00 0x0258 {3200} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 0.5%)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}
@@ -31,8 +31,8 @@ case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0000] }:
         return
     }
 
-    Integer humidity = Math.round(Integer.parseInt(msg.value, 16) / 100)
-    utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity} %", type:type
+    String humidity = "${Integer.parseInt(msg.value, 16) / 100}"
+    utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity}%", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RelativeHumidity=${msg.value}"
     return
 

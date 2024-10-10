@@ -7,7 +7,7 @@ capability 'TemperatureMeasurement'
 
 // Configuration for capability.Temperature
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0000 0x0258 {6400} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 1°C)
+cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0A00 0x0258 {0A00} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 0.1°C)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}
@@ -31,8 +31,9 @@ case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0000] }:
         return
     }
 
-    String temperature = convertTemperatureIfNeeded(Integer.parseInt(msg.value, 16) / 100, 'C', 0)
-    utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature} °${location.temperatureScale}", type:type
+    // https://www.urbandictionary.com/define.php?term=Retard%20Unit
+    String temperature = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
+    utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
     return
 

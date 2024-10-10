@@ -13,9 +13,9 @@ cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0702 0x0000 
 {{# @refresh }}
 
 // Refresh for capability.EnergyMeter
-cmds += zigbee.readAttribute(0x0702, 0x0000) // EnergySumation
 cmds += zigbee.readAttribute(0x0702, 0x0301) // EnergyMultiplier
 cmds += zigbee.readAttribute(0x0702, 0x0302) // EnergyDivisor
+cmds += zigbee.readAttribute(0x0702, 0x0000) // EnergySumation
 {{/ @refresh }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
