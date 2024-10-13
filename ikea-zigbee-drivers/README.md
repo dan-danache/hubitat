@@ -875,10 +875,11 @@ Below you can find the details of each device, including the features and pairin
 | Since version | `5.1.0` |
 
 #### Features
+* **Switch Style Configuration**: This feature allows users to configure the physical switch style, with options including rocker / toggle, and push button.
 * **Button Events**: Supports "Push" events for both buttons.
 * **Battery Report**: Provides a percentage-based report on the current battery level.
 * **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
-* **Contact Sensor**: If enabled in Preferences panel, create and use 2 Contact Sensor child device.
+* **Contact Sensor**: If enabled in Preferences panel, track open/closed state using two Contact Sensor child devices.
 
 #### Pairing Instructions
 1. Remove the battery. Replace with a fresh battery if the case.
