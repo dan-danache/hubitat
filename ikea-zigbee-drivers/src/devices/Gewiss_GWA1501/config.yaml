@@ -1,0 +1,28 @@
+device:
+  model: Gewiss 2-channel Contact Interface (GWA1501)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Gewiss_GWA1501.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Gewiss_GWA1501.webp
+  links:
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#gewiss-2-channel-contact-interface-gwa1501
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
+
+  fingerprints:
+  - firmwares: 1994-0002-00000400
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,000F,0020,0406,FD75', outClusters:'0003,0004,0005,0006,0008,0019,0102,FD70,FD71,FD72,FD73', model:'GWA1501_BinaryInput_FC', manufacturer:'Gewiss', controllerType:'ZGB'
+
+  capabilities:
+    - file: src/devices/Gewiss_GWA1501/GWA1501.groovy
+    - file: src/capabilities/Battery.groovy
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 43200    # report device as offline if no message was received in the last 12 hours (device should report battery percentage every 5 hours)
+    - file: src/capabilities/PushableButton.groovy
+      params:
+        buttons:
+        - { id: 'ONE', name: 'Button 1', number: 1 }
+        - { id: 'TWO', name: 'Button 2', number: 2 }
+    - file: src/capabilities/FirmwareUpdate.groovy

@@ -31,6 +31,7 @@ Outlets:
 * [Askvader On/Off Switch (E1836)](#askvader-onoff-switch-e1836)
 * [Tradfri Control Outlet (E1603, E1706)](#tradfri-control-outlet-e1603-e1706)
 * [Tretakt Smart Plug (E2204)](#tretakt-smart-plug-e2204)
+* [Inspelning Smart Plug (E2206)](#inspelning-smart-plug-e2206)
 
 Appliances:
 * [Knycklan Water Valve Receiver (E1842)](#knycklan-water-valve-receiver-e1842)
@@ -38,6 +39,7 @@ Appliances:
 
 Devices from other vendors (not in HPM):
 * [Aqara Dual Relay Module T2 (DCM-K01)](#aqara-dual-relay-module-t2-dcm-k01)
+* [Gewiss 2-channel Contact Interface (GWA1501)](#gewiss-2-channel-contact-interface-gwa1501)
 * [Legrand Connected Outlet (741811)](#legrand-connected-outlet-741811)
 * [Philips Hue Wall Switch Module (RDM001)](#philips-hue-wall-switch-module-rdm001)
 * [Philips Hue Dimmer Switch (RWL022)](#philips-hue-dimmer-switch-rwl022)
@@ -85,7 +87,7 @@ These products come equipped with the following features:
 Also includes the 10W and 30W LED drivers.
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Icon | <img src="img/Ikea_DIM-Light.webp" style="width: 200px"> |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_DIM-Light.groovy` |
 | Since version | `5.0.0` |
@@ -181,7 +183,7 @@ These products come equipped with the following features:
 * **Adjustable Color**: Grants comprehensive control over the light color by manipulating the hue, saturation, and level (HSL), enabling you to personalize your lighting experience.
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Icon | <img src="img/Ikea_CWS-Light.webp" style="width: 200px"> |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_CWS-Light.groovy` |
 | Since version | `5.0.0` |
@@ -230,7 +232,7 @@ These products come equipped with the following features:
 Bulbs of this type lack native support for color temperature control. Their hardware is exclusively equipped with red, green, and blue LEDs, and does not include white light LEDs. As a result, they are unable to natively produce variations in light temperature.
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Icon | <img src="img/Ikea_RGBO-Light.webp" style="width: 200px"> |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_RGBO-Light.groovy` |
 | Since version | `5.0.0` |
@@ -267,7 +269,7 @@ Below you can find the details of each remote device, including the features and
 ### Knycklan Water Valve Remote (E1841)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1841.webp" style="width: 200px"> |
 | Product Code | `204.257.24` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1841.groovy` |
@@ -293,7 +295,7 @@ Below you can find the details of each remote device, including the features and
 ### Rodret Dimmer (E2201)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2201.webp" style="width: 200px"> |
 | Product Code | `205.281.28`｜`805.597.96` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2201.groovy` |
@@ -320,7 +322,7 @@ Below you can find the details of each remote device, including the features and
 ### Somrig Shortcut Button (E2213)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2213.webp" style="width: 200px"> |
 | Product Code | `305.603.54` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2213.groovy` |
@@ -347,7 +349,7 @@ Below you can find the details of each remote device, including the features and
 ### Styrbar Remote Control N2 (E2002)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2002.webp" style="width: 200px"> |
 | Product Code | `304.883.63` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2002.groovy` |
@@ -377,7 +379,7 @@ Below you can find the details of each remote device, including the features and
 ### Symfonisk Sound Remote Gen2 (E2123)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2123.webp" style="width: 200px"> |
 | Product Code | `305.273.12` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2123.groovy` |
@@ -407,7 +409,7 @@ Below you can find the details of each remote device, including the features and
 ### Tradfri On/Off Switch (E1743)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1743.webp" style="width: 200px"> |
 | Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1743.groovy` |
@@ -433,7 +435,7 @@ Below you can find the details of each remote device, including the features and
 ### Tradfri Open/Close Remote (E1766)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1766.webp" style="width: 200px"> |
 | Product Code | |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1766.groovy` |
@@ -459,7 +461,7 @@ Below you can find the details of each remote device, including the features and
 ### Tradfri Remote Control (E1810)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1810.webp" style="width: 200px"> |
 | Product Code | `304.431.24`｜`004.431.30` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1810.groovy` |
@@ -488,7 +490,7 @@ Below you can find the details of each remote device, including the features and
 ### Tradfri Shortcut Button (E1812)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1812.webp" style="width: 200px"> |
 | Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1812.groovy` |
@@ -517,7 +519,7 @@ Below you can find the details of each sensor device, including the features and
 ### Badring Water Leakage Sensor (E2202)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2202.webp" style="width: 200px"> |
 | Product Code | `605.043.52` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2202.groovy` |
@@ -541,7 +543,7 @@ Below you can find the details of each sensor device, including the features and
 ### Parasoll Door/Window Sensor (E2013)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2013.webp" style="width: 200px"> |
 | Product Code | `805.043.08` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2013.groovy` |
@@ -568,7 +570,7 @@ Below you can find the details of each sensor device, including the features and
 ### Tradfri Motion Sensor (E1745)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1745.webp" style="width: 200px"> |
 | Product Code | `704.299.13` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1745.groovy` |
@@ -601,7 +603,7 @@ This device offers a range of features:
 ### Vallhorn Motion Sensor (E2134)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2134.webp" style="width: 200px"> |
 | Product Code | `405.043.48` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2134.groovy` |
@@ -630,7 +632,7 @@ This device offers a range of features:
 ### Vindstyrka Air Quality Sensor (E2112)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2112.webp" style="width: 200px"> |
 | Product Code | `404.982.34` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2112.groovy` |
@@ -658,7 +660,7 @@ Below you can find the details of each outlet device, including the features and
 ### Askvader On/Off Switch (E1836)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1836.webp" style="width: 200px"> |
 | Product Code | `504.638.80` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1836.groovy` |
@@ -685,7 +687,7 @@ Below you can find the details of each outlet device, including the features and
 ### Tradfri Control Outlet (E1603, E1706)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1603.webp" style="width: 200px"> |
 | Product Code | `304.883.63`｜`303.561.69` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1603.groovy` |
@@ -714,9 +716,10 @@ Below you can find the details of each outlet device, including the features and
 ### Tretakt Smart Plug (E2204)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2204.webp" style="width: 200px"> |
-| Product Code | `805.403.49` |
+| Product Code | `805.403.49`｜`405.565.11` |
+| Variants | E2205 🇺🇸｜E2240 🇬🇧｜E2209 🇫🇷 |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2204.groovy` |
 | Tested firmwares | `2.4.4`｜`2.4.25` |
 | Since version | `4.0.0` |
@@ -740,13 +743,45 @@ Below you can find the details of each outlet device, including the features and
 1. You're all set! Enjoy using your Tretakt Smart Plug.
 
 
+### Inspelning Smart Plug (E2206)
+
+| Parameter | Details |
+|-----------|---------|
+| Product Image | <img src="img/Ikea_E2206.webp" style="width: 200px"> |
+| Product Code | `005.698.36`｜`905.698.46` |
+| Variants | E2220 🇺🇸｜E2222 🇫🇷 |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2206.groovy` |
+| Tested firmwares | `2.?.?` |
+| Since version | `5.1.0` |
+
+#### Features
+* **Command Controls**: Includes "On", "Off", "Toggle", and "On with Timed Off" commands.
+* **Power Outage Configuration**: Configures the state after a power outage (options include "Power On", "Power Off", and "Restore previous state").
+* **Power Reporting**: Reports the power (in Watts).
+* **Energy Consumption Reporting**: Reports the energy consumption (in kWh).
+* **Child Lock**: Allows the enabling or disabling of the physical button on the device, providing an additional layer of safety.
+* **Dark Mode**: Allows the LED indicator on the device to be turned off, ensuring total darkness when needed.
+* **Health Status**: Indicates whether the device is online or offline.
+* **Device State Refresh**: Refreshes the device state on demand for real-time status updates.
+* **Zigbee Group Membership**: The device can be a member of Zigbee groups. This allows for efficient management of multiple devices.
+
+#### Pairing Instructions
+1. Find the small reset button near on/off button and make sure you have a pointy object at hand.
+1. If the device is already plugged in, unplug it for 20 seconds (power-cycle) before each pairing attempt.
+1. Plug the device back into an outlet.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Push the small reset button on top of the smart plug with a pointy object for at least 5 seconds until the LED starts pulsating.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Tretakt Smart Plug.
+
+
 ## Appliances
 Below you can find the details of each appliance device, including the features and pairing instructions.
 
 ### Knycklan Water Valve Receiver (E1842)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E1842.webp" style="width: 200px"> |
 | Product Code | `204.257.24` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1842.groovy` |
@@ -770,7 +805,7 @@ Below you can find the details of each appliance device, including the features 
 ### Starkvind Air Purifier (E2006)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Ikea_E2006.webp" style="width: 200px"> |
 | Product Code | `194.442.19` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2006.groovy` |
@@ -803,7 +838,7 @@ Below you can find the details of each device, including the features and pairin
 ### Aqara Dual Relay Module T2 (DCM-K01)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Aqara_DCM-K01.webp" style="width: 200px"> |
 | Product Link | [Dual Relay Module T2](https://www.aqara.com/eu/dual-relay-module-t2/) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Aqara_DCM-K01.groovy` |
@@ -830,11 +865,43 @@ Below you can find the details of each device, including the features and pairin
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your Aqara Dual Relay Module T2.
 
+### Gewiss 2-channel Contact Interface (GWA1501)
+
+| Parameter | Details |
+|-----------|---------|
+| Product Image | <img src="img/Gewiss_GWA1501.webp" style="width: 200px"> |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Gewiss_GWA1501.groovy` |
+| Tested firmwares | `1994-0002-00000400` |
+| Since version | `5.1.0` |
+
+#### Features
+* **Button Events**: Supports "Push" events for both buttons.
+* **Battery Report**: Provides a percentage-based report on the current battery level.
+* **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
+* **Contact Sensor**: If enabled in Preferences panel, create and use 2 Contact Sensor child device.
+
+#### Pairing Instructions
+1. Remove the battery. Replace with a fresh battery if the case.
+1. Flip the switches in the off position (contacts I1/C1 and I2/C2 are open).
+1. Set jumpers in position `0000` (▄ ▄ ▄ ▄) = Factory default.
+1. Re-insert the battery.
+1. Push and hold the small pairing button (A2 in manual) for at least 10 seconds. The status LED will flash red and green alternately for 3 seconds, then become red fixed. Device is now factory reset.
+1. Remove the battery.
+1. Set jumpers in position `1011` (▀ ▄ ▀ ▀) = Pairing configuration.
+1. Re-insert the battery.
+1. Device is now in pairing mode for 5 minutes. LED light should stay red.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. LED should start to slowly blink green for a few seconds, then bink orange while driver is configuring the device.
+1. After pairing is complete, the LED will continue to slowly blink green for a few minutes.
+1. Provide a name for your device, and assign it to a room.
+1. Set jumpers in position `0011` (▄ ▄ ▀ ▀) = One-way switch (on/off) configuration.
+1. Flip switches on and off.
+1. You're all set! Enjoy using your Gewiss 2-channel Contact Interface.
 
 ### Legrand Connected Outlet (741811)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Legrand_741811.webp" style="width: 200px"> |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Legrand_741811.groovy` |
 | Tested firmwares | `003e` |
@@ -862,7 +929,7 @@ Below you can find the details of each device, including the features and pairin
 ### Philips Hue Wall Switch Module (RDM001)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Philips_RDM001.webp" style="width: 200px"> |
 | Product Link | [Single](https://www.philips-hue.com/en-us/p/hue-philips-hue-wall-switch-module/046677571160)｜[2-Pack](https://www.philips-hue.com/en-us/p/hue-philips-hue-wall-switch-module-2-pack/046677571245) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RDM001.groovy` |
@@ -888,7 +955,7 @@ Below you can find the details of each device, including the features and pairin
 ### Philips Hue Dimmer Switch (RWL022)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Philips_RWL022.webp" style="width: 200px"> |
 | Product Link | [Philips Hue Dimmer Switch](https://www.philips-hue.com/en-gb/p/hue-dimmer-switch--latest-model-/8719514274617) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Philips_RWL022.groovy` |
@@ -917,7 +984,7 @@ This device is extremely chatty as it polls the Hubitat hub for the status of ea
 **Warning**: The driver code for this device is still a work-in-progess.
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Schneider_CCTFR6600.webp" style="width: 200px"> |
 | Product Link | [Wiser Underfloor Heating Connection Strip](https://www.productinfo.schneider-electric.com/wiser_home/viewer?docidentity=WiserUnderfloorHeatingConnectionStr-EE42C909&lang=en) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Schneider_CCTFR6600.groovy` |
@@ -936,7 +1003,7 @@ This device is extremely chatty as it polls the Hubitat hub for the status of ea
 ### Swann One Key Fob (SWO-KEF1PA)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Swann_SWO-KEF1PA.webp" style="width: 200px"> |
 | Product Link | [Swann One Key Fob](https://cdn.swann.com/media/wysiwyg/docs/en/Key_Fob_QSG.pdf) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Swann_SWO-KEF1PA.groovy` |
@@ -958,7 +1025,7 @@ Unknown
 ### Tuya Temperature and Humidity Sensor (TS0201)
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Tuya_TS0201.webp" style="width: 200px"> |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Tuya_TS0201.groovy` |
 | Since version | `5.0.0` |
@@ -973,7 +1040,7 @@ Unknown
 Converted from Bluetooth to Zigbee using this [Zigbee 3.0 Firmware](https://github.com/devbis/z03mmc) directly from the web browser (no wire soldering required).
 
 | Parameter | Details |
-|-----------|-------------|
+|-----------|---------|
 | Product Image | <img src="img/Xiaomi_LYWSD03MMC.webp" style="width: 200px"> |
 | Product Link | [Mi Temperature And Humidity Monitor 2](https://www.mi.com/my/product/mi-temperature-and-humidity-monitor-2/) |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Xiaomi_LYWSD03MMC.groovy` |
