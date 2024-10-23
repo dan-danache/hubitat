@@ -1,0 +1,12 @@
+Source: https://fw.ota.homesmart.ikea.com/files/zingo-sigma-driver-silverglans-ww_release_prod_v65569_73466dc4-1320-4242-add6-717432538a77.ota
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 16644,
+    "fileVersion": 65569,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL Signed OTA\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "totalImageSize": 230566
+}

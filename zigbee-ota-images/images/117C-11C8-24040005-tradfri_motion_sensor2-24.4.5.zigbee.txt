@@ -1,12 +1,12 @@
-Source: https://github.com/zigpy/zigpy/discussions/660
-Image Details: {                                                                                                                                                                                        
-  otaHeaderVersion: 256,                                                                                                                                                                 
-  otaHeaderLength: 56,                                                                                                                                                                   
-  otaHeaderFieldControl: 0,                                                                                                                                                              
-  manufacturerCode: 4476,                                                                                                                                                                
-  imageType: 4552,                                                                                                                                                                       
-  fileVersion: 604241925,                                                                                                                                                                
-  zigbeeStackVersion: 2,                                                                                                                                                                 
-  otaHeaderString: 'GBL GBL_tradfri_motion_sensor2\x00\x00',                                                                                                                             
-  totalImageSize: 217548                                                                                                                                                                 
+Source: https://fw.ota.homesmart.ikea.com/files/tradfri-motion-sensor2_release_prod_v604241925_8afa2f7c-19c3-4ddf-a96c-233714179022.ota
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 4552,
+    "fileVersion": 604241925,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL GBL_tradfri_motion_sensor2\u0000\u0000",
+    "totalImageSize": 217548
 }

@@ -1,0 +1,12 @@
+Source: https://fw.ota.homesmart.ikea.com/files/zingo-cws_release_prod_v16777272_89b37a10-683a-4183-9ed7-4973bc34994b.ota
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 10245,
+    "fileVersion": 16777272,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL zingo_cws\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "totalImageSize": 334450
+}

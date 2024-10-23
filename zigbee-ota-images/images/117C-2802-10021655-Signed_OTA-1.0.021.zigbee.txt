@@ -1,0 +1,12 @@
+Source: https://fw.ota.homesmart.ikea.com/files/mgm210l-light-cws-cv-rgbw_release_prod_v268572245_3ae78af7-14fd-44df-bca2-6d366f2e9d02.ota
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 10242,
+    "fileVersion": 268572245,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL Signed OTA\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "totalImageSize": 228582
+}

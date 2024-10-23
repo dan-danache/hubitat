@@ -1,4 +1,4 @@
-input = https://github.com/zigpy/zigpy/discussions/660                                                                                
+Source: https://fw.ota.homesmart.ikea.com/files/zingo-ikea-vindstyrka_release_prod_v16777233_c0532d00-594a-4e10-bb82-1b80d5b6ed87.ota
 Image Details: {
     "otaHeaderVersion": 256,
     "otaHeaderLength": 56,
@@ -7,6 +7,6 @@ Image Details: {
     "imageType": 4367,
     "fileVersion": 16777233,
     "zigbeeStackVersion": 2,
-    "otaHeaderString": 'GBL zingo_ikea_vindstyrka\x00\x00\x00\x00\x00\x00\x00',
+    "otaHeaderString": "GBL zingo_ikea_vindstyrka\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "totalImageSize": 283326
 }

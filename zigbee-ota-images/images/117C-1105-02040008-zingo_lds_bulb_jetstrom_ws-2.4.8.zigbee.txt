@@ -1,0 +1,12 @@
+Source: https://fw.ota.homesmart.ikea.com/files/zingo-jetstrom-ws_release_prod_v33816584_33813e5d-0cc9-4b4a-9e93-9000ee44cbe4.ota
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 4357,
+    "fileVersion": 33816584,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL zingo_lds_bulb_jetstrom_ws\u0000\u0000",
+    "totalImageSize": 249938
+}

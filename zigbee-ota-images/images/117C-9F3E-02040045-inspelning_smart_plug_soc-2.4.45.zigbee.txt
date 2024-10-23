@@ -1,0 +1,12 @@
+Source: https://fw.ota.homesmart.ikea.com/files/inspelning-smart-plug-soc_release_prod_v33816645_02579ff4-6fec-42f6-8957-4048def87def.ota
+Image Details: {
+    "otaHeaderVersion": 256,
+    "otaHeaderLength": 56,
+    "otaHeaderFieldControl": 0,
+    "manufacturerCode": 4476,
+    "imageType": 40766,
+    "fileVersion": 33816645,
+    "zigbeeStackVersion": 2,
+    "otaHeaderString": "GBL inspelning_smart_plug_soc\u0000\u0000\u0000",
+    "totalImageSize": 294530
+}
