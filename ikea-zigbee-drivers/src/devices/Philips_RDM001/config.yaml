@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 1.0.5 (100B-011C-0000041A)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,FC00', outClusters:'0003,0004,0006,0008,0019', model:'RDM001', manufacturer:'Signify Netherlands B.V.'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,FC00', outClusters:'0003,0004,0006,0008,0019', model:'RDM001', manufacturer:'Signify Netherlands B.V.', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Philips_RDM001/RDM001.groovy

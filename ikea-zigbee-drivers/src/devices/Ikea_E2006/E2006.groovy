@@ -36,37 +36,32 @@ command 'setIndicatorStatus', [[name:'Status*', type:'ENUM', description:'Select
 
 // Inputs for devices.Ikea_E2006
 input(
-    name: 'pm25ReportDelta', type: 'enum',
-    title: 'Sensor report frequency',
-    description: '<small>Adjust how often the device sends its PM 2.5 sensor data.</small>',
-    options: [
+    name:'pm25ReportDelta', type:'enum', title:'Sensor report frequency', required:true,
+    description:'<small>Adjust how often the device sends its PM 2.5 sensor data.</small>',
+    options:[
         '01': 'Very High - report changes of +/- 1μg/m3',
         '02': 'High - report changes of +/- 2μg/m3',
         '03': 'Medium - report changes of +/- 3μg/m3',
         '05': 'Low - report changes of +/- 5μg/m3',
         '10': 'Very Low - report changes of +/- 10μg/m3'
     ],
-    defaultValue: '03',
-    required: true
+    defaultValue:'03'
 )
 input(
-    name: 'filterLifeTime', type: 'enum',
-    title: 'Filter life time',
-    description: '<small>Configure time between filter changes (default 6 months).</small>',
-    options: [
+    name:'filterLifeTime', type:'enum', title:'Filter life time', required:true,
+    description:'<small>Configure time between filter changes (default 6 months).</small>',
+    options:[
          '90': '3 months',
         '180': '6 months',
         '270': '9 months',
         '360': '1 year'
     ],
-    defaultValue: '180',
-    required: true
+    defaultValue:'180'
 )
 input(
-    name: 'childLock', type: 'bool',
-    title: 'Child lock',
-    description: '<small>Lock physical controls, safeguarding against accidental operation.</small>',
-    defaultValue: false
+    name:'childLock', type:'bool', title:'Child lock',
+    description:'<small>Lock physical controls, safeguarding against accidental operation.</small>',
+    defaultValue:false
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}

@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 1.0.57 (117C-1938-01000057)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,0B05,1000,FC7C,FC81', outClusters:'0003,0004,0006,0019,1000', model:'VALLHORN Wireless Motion Sensor', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,0B05,1000,FC7C,FC81', outClusters:'0003,0004,0006,0019,1000', model:'VALLHORN Wireless Motion Sensor', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - name: Sensor

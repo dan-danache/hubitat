@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: Unknown
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0B04,0702,0005,0004,0003,0012,0000,0006,FCC0', outClusters:'0019,000A', model:'lumi.switch.acn047', manufacturer:'Aqara'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0B04,0702,0005,0004,0003,0012,0000,0006,FCC0', outClusters:'0019,000A', model:'lumi.switch.acn047', manufacturer:'Aqara', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Aqara_DCM-K01/DCM-K01.groovy

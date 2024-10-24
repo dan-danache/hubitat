@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 1.0.002 (117C-110D-00010002)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57', outClusters:'0019', model:'ASKVADER on/off switch', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,1000,FC57', outClusters:'0019', model:'ASKVADER on/off switch', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - name: RelaySwitch

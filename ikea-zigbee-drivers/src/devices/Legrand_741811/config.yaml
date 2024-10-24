@@ -10,11 +10,11 @@ device:
 
   fingerprints:
   - firmwares: 002f
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006,000F', outClusters:'0006,0000,FC01,0005,0019', model:' Mobile outlet', manufacturer:' Legrand'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006,000F', outClusters:'0006,0000,FC01,0005,0019', model:' Mobile outlet', manufacturer:' Legrand', controllerType:'ZGB'
   - firmwares: 003e (1021-0011-003E4203)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006', outClusters:'0006,0000,FC01,0005,0019', model:' Connected outlet', manufacturer:' Legrand'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006', outClusters:'0006,0000,FC01,0005,0019', model:' Connected outlet', manufacturer:' Legrand', controllerType:'ZGB'
   - firmwares: 0053 (1021-0011-005343FF)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006', outClusters:'0006,0000,FC01,0005,0019', model:' Connected outlet', manufacturer:' Legrand'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,FC01,0B04,0006', outClusters:'0006,0000,FC01,0005,0019', model:' Connected outlet', manufacturer:' Legrand', controllerType:'ZGB'
 
   capabilities:
     - file: src/capabilities/Switch.groovy

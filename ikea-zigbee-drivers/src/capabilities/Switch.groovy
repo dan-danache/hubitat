@@ -9,13 +9,10 @@ capability 'Switch'
 
 // Inputs for capability.Switch
 input(
-    name: 'powerOnBehavior',
-    type: 'enum',
-    title: 'Power On behaviour',
-    description: '<small>Select what happens after a power outage.</small>',
-    options: ['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
-    defaultValue: 'RESTORE_PREVIOUS_STATE',
-    required: true
+    name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
+    description:'<small>Select what happens after a power outage.</small>',
+    options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
+    defaultValue:'RESTORE_PREVIOUS_STATE'
 )
 {{/ params.powerOnBehavior }}
 {{/ @inputs }}

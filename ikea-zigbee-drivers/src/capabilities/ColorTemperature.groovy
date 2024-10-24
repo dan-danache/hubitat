@@ -8,26 +8,22 @@ capability 'ColorMode'
 
 // Inputs for capability.ColorTemperature
 input(
-    name: 'colorTemperatureStep', type: 'enum',
-    title: 'Color Temperature up/down shift',
-    description: '<small>Color Temperature +/- adjust for the shiftColorTemperature() command.</small>',
-    options: ['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
-    defaultValue: '25',
-    required: true
+    name:'colorTemperatureStep', type:'enum', title:'Color Temperature up/down shift', required:true,
+    description:'<small>Color Temperature +/- adjust for the shiftColorTemperature() command.</small>',
+    options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
+    defaultValue:'25'
 )
 input(
-    name: 'colorTemperatureChangeRate', type: 'enum',
-    title: 'Color Temperature change rate',
-    description: '<small>Color Temperature +/- adjust for the startColorTemperatureChange() command.</small>',
-    options: [
+    name:'colorTemperatureChangeRate', type:'enum', title:'Color Temperature change rate', required:true,
+    description:'<small>Color Temperature +/- adjust for the startColorTemperatureChange() command.</small>',
+    options:[
          '10': '10% / sec - from hot to cold in 10 seconds',
          '20': '20% / sec - from hot to cold in 5 seconds',
          '33': '33% / sec - from hot to cold in 3 seconds',
          '50': '50% / secs - from hot to cold in 2 seconds',
         '100': '100% / sec - from hot to cold in 1 seconds',
     ],
-    defaultValue: '20',
-    required: true
+    defaultValue:'20'
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}

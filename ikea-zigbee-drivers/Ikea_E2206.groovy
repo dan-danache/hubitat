@@ -59,8 +59,8 @@ metadata {
 
     preferences {
         input(
-            name: 'helpInfo', type: 'hidden',
-            title: '''
+            name:'helpInfo', type:'hidden',
+            title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2206.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
                 IKEA Inspelning Smart Plug (E2206) <small>v5.1.0</small><br>
                 <small><div>
@@ -71,31 +71,25 @@ metadata {
             '''
         )
         input(
-            name: 'logLevel', type: 'enum',
-            title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
-            options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
-            defaultValue: '1',
-            required: true
+            name:'logLevel', type:'enum', title:'Log verbosity', required:true,
+            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
+            defaultValue:'1'
         )
         
         // Inputs for capability.Switch
         input(
-            name: 'powerOnBehavior',
-            type: 'enum',
-            title: 'Power On behaviour',
-            description: '<small>Select what happens after a power outage.</small>',
-            options: ['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
-            defaultValue: 'RESTORE_PREVIOUS_STATE',
-            required: true
+            name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
+            description:'<small>Select what happens after a power outage.</small>',
+            options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
+            defaultValue:'RESTORE_PREVIOUS_STATE'
         )
         
         // Inputs for capability.PowerMeter
         input(
-            name: 'powerReportDelta', type: 'enum',
-            title: 'Power report frequency',
-            description: '<small>Configure when device reports current power demand.</small>',
-            options: [
+            name:'powerReportDelta', type:'enum', title:'Power report frequency', required:true,
+            description:'<small>Configure when device reports current power demand.</small>',
+            options:[
                   '1':'Report changes of +/- 1 watt',
                   '2':'Report changes of +/- 2 watts',
                   '5':'Report changes of +/- 5 watts',
@@ -106,16 +100,14 @@ metadata {
                 '200':'Report changes of +/- 200 watts',
                 '500':'Report changes of +/- 500 watts',
             ],
-            defaultValue: '50',
-            required: true
+            defaultValue:'50'
         )
         
         // Inputs for capability.CurrentMeter
         input(
-            name: 'amperageReportDelta', type: 'enum',
-            title: 'Amperage report frequency',
-            description: '<small>Configure when device reports current amperage.</small>',
-            options: [
+            name:'amperageReportDelta', type:'enum', title:'Amperage report frequency', required:true,
+            description:'<small>Configure when device reports current amperage.</small>',
+            options:[
                  '10':'Report changes of +/- 10 milliamperes',
                  '20':'Report changes of +/- 20 milliamperes',
                  '50':'Report changes of +/- 50 milliamperes',
@@ -126,16 +118,14 @@ metadata {
                '2000':'Report changes of +/- 2 amperes',
                '5000':'Report changes of +/- 5 amperes',
             ],
-            defaultValue: '200',
-            required: true
+            defaultValue:'200'
         )
         
         // Inputs for capability.VoltageMeasurement
         input(
-            name: 'voltageReportDelta', type: 'enum',
-            title: 'Voltage report frequency',
-            description: '<small>Configure when device reports current voltage.</small>',
-            options: [
+            name:'voltageReportDelta', type:'enum', title:'Voltage report frequency', required:true,
+            description:'<small>Configure when device reports current voltage.</small>',
+            options:[
                   '1':'Report changes of +/- 1 volt',
                   '2':'Report changes of +/- 2 volts',
                   '5':'Report changes of +/- 5 volts',
@@ -143,16 +133,14 @@ metadata {
                  '20':'Report changes of +/- 20 volts',
                  '50':'Report changes of +/- 50 volts',
             ],
-            defaultValue: '5',
-            required: true
+            defaultValue:'5'
         )
         
         // Inputs for capability.EnergyMeter
         input(
-            name: 'energyReportDelta', type: 'enum',
-            title: 'Energy report frequency',
-            description: '<small>Configure when device reports total consumed energy.</small>',
-            options: [
+            name:'energyReportDelta', type:'enum', title:'Energy report frequency', required:true,
+            description:'<small>Configure when device reports total consumed energy.</small>',
+            options:[
                   '10':'Report changes of 10 Wh',
                   '20':'Report changes of 20 Wh',
                   '50':'Report changes of 50 Wh',
@@ -161,26 +149,22 @@ metadata {
                  '500':'Report changes of 500 Wh',
                 '1000':'Report changes of 1 kWh',
             ],
-            defaultValue: '100',
-            required: true
+            defaultValue:'100'
         )
         
         // Inputs for devices.Ikea_E2206
         input(
-            name: 'childLock', type: 'bool',
-            title: 'Child lock',
-            description: '<small>Lock physical button, safeguarding against accidental operation.</small>',
-            defaultValue: false
+            name:'childLock', type:'bool', title:'Child lock',
+            description:'<small>Lock physical button, safeguarding against accidental operation.</small>',
+            defaultValue:false
         )
         
         // Inputs for capability.ZigbeeBindings
         input(
-            name: 'joinGroup', type: 'enum',
-            title: 'Join a Zigbee group',
-            description: '<small>Select a Zigbee group you want to join.</small>',
-            options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
-            defaultValue: '----',
-            required: false
+            name:'joinGroup', type:'enum', title:'Join a Zigbee group', required:false,
+            description:'<small>Select a Zigbee group you want to join.</small>',
+            options:['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
+            defaultValue:'----'
         )
     }
 }

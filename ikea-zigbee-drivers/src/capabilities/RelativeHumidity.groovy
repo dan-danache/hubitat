@@ -7,7 +7,7 @@ capability 'RelativeHumidityMeasurement'
 
 // Configuration for capability.RelativeHumidity
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0A00 0x0258 {3200} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 0.5%)
+cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x000F 0x0E10 {3200} {}" // Report MeasuredValue (uint16) at most every 15 seconds, at least every 1 hour (Δ = 0.5%)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}
