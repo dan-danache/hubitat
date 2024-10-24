@@ -67,7 +67,7 @@ Once you have HPM installed, follow these steps to install the IKEA Zigbee drive
 1. Select the driver(s) you need from the dropdown list and follow the install instructions.
 
 ### Manual Installation
-If you don"t want to use HPM, you can also install the drivers manually by importing the driver code from GitHub. Follow these steps to do so:
+If you don't want to use HPM, you can also install the drivers manually by importing the driver code from GitHub. Follow these steps to do so:
 
 1. In the Hubitat interface, go to **Drivers Code**.
 1. Click **New Driver** in the top right, then click **Import** in the top right.
@@ -121,7 +121,7 @@ Also includes the 10W and 30W LED drivers.
 #### Pairing Instructions
 1. If the device is already powered on, power it off for 20 seconds (power-cycle) before each pairing attempt.
 1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
-1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=npxOrPxVfe0)).
+1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=mJm9YpPrGzk)).
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your Dimmable Light.
 
@@ -169,7 +169,7 @@ These products come equipped with the following features:
 #### Pairing Instructions
 1. If the device is already powered on, power it off for 20 seconds (power-cycle) before each pairing attempt.
 1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
-1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=npxOrPxVfe0)).
+1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=mJm9YpPrGzk)).
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your White Spectrum Light.
 
@@ -218,7 +218,7 @@ These products come equipped with the following features:
 #### Pairing Instructions
 1. If the device is already powered on, power it off for 20 seconds (power-cycle) before each pairing attempt.
 1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
-1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=npxOrPxVfe0)).
+1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=mJm9YpPrGzk)).
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your Color White Spectrum Light.
 
@@ -258,7 +258,7 @@ Bulbs of this type lack native support for color temperature control. Their hard
 #### Pairing Instructions
 1. If the device is already powered on, power it off for 20 seconds (power-cycle) before each pairing attempt.
 1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
-1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=npxOrPxVfe0)).
+1. Put the light in pairing mode ([see video](https://www.youtube.com/watch?v=mJm9YpPrGzk)).
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your RGB-Only Light.
 
