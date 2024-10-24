@@ -56,5 +56,8 @@ case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
 case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0020] }:
     utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryVoltage, data=${msg.value}"
     return
+case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x003E] }:
+    utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryAlarmState, data=${msg.value}"
+    return
 {{/ @events }}
 {{!--------------------------------------------------------------------------}}

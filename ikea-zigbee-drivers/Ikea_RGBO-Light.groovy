@@ -3,6 +3,7 @@
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
@@ -36,8 +37,8 @@ metadata {
         capability 'HealthCheck'
         capability 'PowerSource'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0019,1000', model:'TRADFRI bulb E27 CWS opal 600lm', manufacturer:'IKEA of Sweden' // LED1624G9E27EU: 2.3.093 (117C-2801-23086631)
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0019,1000', model:'TRADFRI bulb E14 CWS opal 600lm', manufacturer:'IKEA of Sweden' // LED1624G9E14EU: 2.3.093 (117C-2803-23093631)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0019,1000', model:'TRADFRI bulb E27 CWS opal 600lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // LED1624G9E27EU: 2.3.093 (117C-2801-23086631)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0019,1000', model:'TRADFRI bulb E14 CWS opal 600lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // LED1624G9E14EU: 2.3.093 (117C-2803-23093631)
         
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
@@ -55,8 +56,8 @@ metadata {
 
     preferences {
         input(
-            name: 'helpInfo', type: 'hidden',
-            title: '''
+            name:'helpInfo', type:'hidden',
+            title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_RGBO-Light.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
                 IKEA RGB-Only Light <small>v5.1.0</small><br>
                 <small><div>
@@ -67,53 +68,43 @@ metadata {
             '''
         )
         input(
-            name: 'logLevel', type: 'enum',
-            title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
-            options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
-            defaultValue: '1',
-            required: true
+            name:'logLevel', type:'enum', title:'Log verbosity', required:true,
+            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
+            defaultValue:'1'
         )
         
         // Inputs for capability.Switch
         input(
-            name: 'powerOnBehavior',
-            type: 'enum',
-            title: 'Power On behaviour',
-            description: '<small>Select what happens after a power outage.</small>',
-            options: ['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
-            defaultValue: 'RESTORE_PREVIOUS_STATE',
-            required: true
+            name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
+            description:'<small>Select what happens after a power outage.</small>',
+            options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
+            defaultValue:'RESTORE_PREVIOUS_STATE'
         )
         
         // Inputs for capability.Brightness
         input(
-            name: 'levelStep', type: 'enum',
-            title: 'Brightness up/down shift',
-            description: '<small>Brightness +/- adjust for the shiftLevel() command.</small>',
-            options: ['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
-            defaultValue: '25',
-            required: true
+            name:'levelStep', type:'enum', title:'Brightness up/down shift', required:true,
+            description:'<small>Brightness +/- adjust for the shiftLevel() command.</small>',
+            options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
+            defaultValue:'25'
         )
         input(
-            name: 'levelChangeRate', type: 'enum',
-            title: 'Brightness change rate',
-            description: '<small>Brightness +/- adjust for the startLevelChange() command.</small>',
-            options: [
+            name:'levelChangeRate', type:'enum', title:'Brightness change rate', required:true,
+            description:'<small>Brightness +/- adjust for the startLevelChange() command.</small>',
+            options:[
                  '10': '10% / sec - from 0% to 100% in 10 seconds',
                  '20': '20% / sec - from 0% to 100% in 5 seconds',
                  '33': '33% / sec - from 0% to 100% in 3 seconds',
                  '50': '50% / secs - from 0% to 100% in 2 seconds',
                 '100': '100% / sec - from 0% to 100% in 1 seconds',
             ],
-            defaultValue: '20',
-            required: true
+            defaultValue:'20'
         )
         input(
-            name: 'levelTransitionTime', type: 'enum',
-            title: 'Brightness transition time',
-            description: '<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
-            options: [
+            name:'levelTransitionTime', type:'enum', title:'Brightness transition time', required:true,
+            description:'<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
+            options:[
                  '0': 'Instant',
                  '5': '0.5 seconds',
                 '10': '1 second',
@@ -124,47 +115,37 @@ metadata {
                 '50': '5 seconds',
                '100': '10 seconds'
             ],
-            defaultValue: '5',
-            required: true
+            defaultValue:'5'
         )
         input(
-            name: 'turnOnBehavior', type: 'enum',
-            title: 'Turn On behavior',
-            description: '<small>Select what happens when the device is turned On.</small>',
-            options: [
+            name:'turnOnBehavior', type:'enum', title:'Turn On behavior', required:true,
+            description:'<small>Select what happens when the device is turned On.</small>',
+            options:[
                 'RESTORE_PREVIOUS_LEVEL': 'Restore previous brightness',
                 'FIXED_VALUE': 'Always start with the same fixed brightness'
             ],
-            defaultValue: 'RESTORE_PREVIOUS_LEVEL',
-            required: true
+            defaultValue:'RESTORE_PREVIOUS_LEVEL'
         )
         if (turnOnBehavior == 'FIXED_VALUE') {
             input(
-                name: 'onLevelValue',
-                type: 'number',
-                title: 'Fixed brightness value',
-                description: '<small>Range 1..100</small>',
-                defaultValue: 50,
-                range: '1..100',
-                required: true
+                name:'onLevelValue', type:'number', title:'Fixed brightness value', required:true,
+                description:'<small>Range 1..100</small>',
+                range:'1..100',
+                defaultValue:50
             )
         }
         input(
-            name: 'prestaging', type: 'bool',
-            title: 'Pre-staging',
-            description: '<small>Set brightness level without turning On the device (for later use).</small>',
-            defaultValue: false,
-            required: true
+            name:'prestaging', type:'bool', title:'Pre-staging', required:true,
+            description:'<small>Set brightness level without turning On the device (for later use).</small>',
+            defaultValue:false
         )
         
         // Inputs for capability.ZigbeeBindings
         input(
-            name: 'joinGroup', type: 'enum',
-            title: 'Join a Zigbee group',
-            description: '<small>Select a Zigbee group you want to join.</small>',
-            options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
-            defaultValue: '----',
-            required: false
+            name:'joinGroup', type:'enum', title:'Join a Zigbee group', required:false,
+            description:'<small>Select a Zigbee group you want to join.</small>',
+            options:['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
+            defaultValue:'----'
         )
     }
 }
@@ -177,6 +158,7 @@ metadata {
 void installed() {
     log_warn 'Installing device ...'
     log_warn '[IMPORTANT] For battery-powered devices, make sure that you keep your device as close as you can (less than 2inch / 5cm) to your Hubitat hub for at least 30 seconds. Otherwise the device will successfully pair but it won\'t work properly!'
+    state.lastCx = DRIVER_VERSION
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -295,14 +277,10 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "⚙️ Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
-
-    // Apply preferences first
-    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {100002 0000213C00}"]
-    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -312,6 +290,23 @@ void configure(boolean auto = false) {
     state.lastTx = 0
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
+
+    // Put device in identifying state (blinking LED)
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-refresh device state
+    cmds += refresh true
+    utils_sendZigbeeCommands cmds
+
+    // Apply configuration after the auto-refresh finishes
+    runIn(cmds.findAll { !it.startsWith('delay') }.size() + 1, 'configureApply')
+}
+void configureApply() {
+    log_info "⚙️ Finishing device configuration ..."
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-apply preferences
+    cmds += updated true
     
     // Configuration for capability.Switch
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
@@ -338,21 +333,20 @@ void configure(boolean auto = false) {
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, SWBuildID
     cmds += zigbee.readAttribute(0x0000, [0x0005]) // ModelIdentifier
     cmds += zigbee.readAttribute(0x0000, [0x000A]) // ProductCode
-    cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {100002 0000210000}"
-    utils_sendZigbeeCommands cmds
 
-    log_info 'Configuration done; refreshing device current state in 7 seconds ...'
-    runIn 7, 'refresh', [data:true]
+    // Stop blinking LED
+    cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 0000}"
+    utils_sendZigbeeCommands cmds
 }
 /* groovylint-disable-next-line UnusedPrivateMethod */
 private void autoConfigure() {
-    log_warn "Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
+    log_warn "👁️ Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
     configure true
 }
 
 // capability.Refresh
-void refresh(boolean auto = false) {
-    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
+List<String> refresh(boolean auto = false) {
+    log_info "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -371,7 +365,10 @@ void refresh(boolean auto = false) {
     
     // Refresh for capability.ZigbeeGroups
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0004 {0143 02 00}" // Get groups membership
+
+    if (auto) return cmds
     utils_sendZigbeeCommands cmds
+    return []
 }
 
 // Implementation for capability.Switch
@@ -720,8 +717,8 @@ void parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            log_warn 'Rejoined the Zigbee mesh; refreshing device state in 3 seconds ...'
-            runIn 3, 'refresh'
+            log_warn '🙋‍♂️ Rejoined the Zigbee mesh. Syncing device state ...'
+            utils_sendZigbeeCommands(refresh(true))
             return
 
         // Report/Read Attributes Response (Basic cluster)
@@ -734,7 +731,7 @@ void parse(String description) {
 
         // Mgmt_Leave_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8034, commandInt:0x00] }:
-            log_warn 'Device is leaving the Zigbee mesh. See you later, Aligator!'
+            log_warn '💀 Device is leaving the Zigbee mesh. See you later, Aligator!'
             return
 
         // Ignore the following Zigbee messages
@@ -762,7 +759,7 @@ void parse(String description) {
         // Unexpected Zigbee message
         // ---------------------------------------------------------------------------------------------------------------
         default:
-            log_error "Sent unexpected Zigbee message: description=${description}, msg=${msg}"
+            log_error "🚩 Sent unexpected Zigbee message: description=${description}, msg=${msg}"
     }
 }
 

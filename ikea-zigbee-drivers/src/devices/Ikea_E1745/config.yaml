@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 24.4.5 (117C-11C8-24040005)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57,FC7C', outClusters:'0003,0004,0006,0008,0019,1000', model:'TRADFRI motion sensor', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57,FC7C', outClusters:'0003,0004,0006,0008,0019,1000', model:'TRADFRI motion sensor', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - name: Sensor

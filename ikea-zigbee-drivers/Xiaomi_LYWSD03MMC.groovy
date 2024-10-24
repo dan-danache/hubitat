@@ -3,6 +3,7 @@
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
@@ -32,7 +33,7 @@ metadata {
         capability 'HealthCheck'
         capability 'PowerSource'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0405,0402,0204', outClusters:'0019', model:'LYWSD03MMC', manufacturer:'Xiaomi' // Firmware: Unknown
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0405,0402,0204', outClusters:'0019', model:'LYWSD03MMC', manufacturer:'Xiaomi', controllerType:'ZGB' // Firmware: Unknown
         
         // Attributes for capability.Battery
         attribute 'lastBattery', 'date'
@@ -43,8 +44,8 @@ metadata {
 
     preferences {
         input(
-            name: 'helpInfo', type: 'hidden',
-            title: '''
+            name:'helpInfo', type:'hidden',
+            title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Xiaomi_LYWSD03MMC.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
                 Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC) <small>v5.1.0</small><br>
                 <small><div>
@@ -55,44 +56,34 @@ metadata {
             '''
         )
         input(
-            name: 'logLevel', type: 'enum',
-            title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
-            options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
-            defaultValue: '1',
-            required: true
+            name:'logLevel', type:'enum', title:'Log verbosity', required:true,
+            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
+            defaultValue:'1'
         )
         
         // Inputs for devices.Xiaomi_LYWSD03MMC
         input(
-            name: 'temperatureCalibration', type: 'number',
-            title: 'Temperature calibration',
-            description: '<small>Temperature calibration offset. Range -10.00°C .. 10.00°C.</small>',
-            defaultValue: 0.00,
-            range: '-10..10',
-            required: true
+            name:'temperatureCalibration', type:'number', title:'Temperature calibration', required:true,
+            description:'<small>Temperature calibration offset. Range -10.00°C .. 10.00°C.</small>',
+            range:'-10..10',
+            defaultValue:0.00
         )
         input(
-            name: 'humidityCalibration', type: 'number',
-            title: 'Humidity calibration',
-            description: '<small>Humidity calibration offset. Range -10.00% .. 10.00%.</small>',
-            defaultValue: 0.00,
-            range: '-10..10',
-            required: true
+            name:'humidityCalibration', type:'number', title:'Humidity calibration', required:true,
+            description:'<small>Humidity calibration offset. Range -10.00% .. 10.00%.</small>',
+            range:'-10..10',
+            defaultValue:0.00
         )
         input(
-            name: 'enableDisplay', type: 'bool',
-            title: 'Enable device display',
-            description: '<small>Turn device display on.</small>',
-            defaultValue: true,
-            required: true
+            name:'enableDisplay', type:'bool', title:'Enable device display', required:true,
+            description:'<small>Turn device display on.</small>',
+            defaultValue:true
         )
         input(
-            name: 'showSmiley', type: 'bool',
-            title: 'Show smiley',
-            description: '<small>Show the smiley on the device screen.</small>',
-            defaultValue: true,
-            required: true
+            name:'showSmiley', type:'bool', title:'Show smiley', required:true,
+            description:'<small>Show the smiley on the device screen.</small>',
+            defaultValue:true
         )
     }
 }
@@ -105,6 +96,7 @@ metadata {
 void installed() {
     log_warn 'Installing device ...'
     log_warn '[IMPORTANT] For battery-powered devices, make sure that you keep your device as close as you can (less than 2inch / 5cm) to your Hubitat hub for at least 30 seconds. Otherwise the device will successfully pair but it won\'t work properly!'
+    state.lastCx = DRIVER_VERSION
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -188,14 +180,10 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "⚙️ Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
-
-    // Apply preferences first
-    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {100002 0000213C00}"]
-    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -205,14 +193,31 @@ void configure(boolean auto = false) {
     state.lastTx = 0
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
+
+    // Put device in identifying state (blinking LED)
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-refresh device state
+    cmds += refresh true
+    utils_sendZigbeeCommands cmds
+
+    // Apply configuration after the auto-refresh finishes
+    runIn(cmds.findAll { !it.startsWith('delay') }.size() + 1, 'configureApply')
+}
+void configureApply() {
+    log_info "⚙️ Finishing device configuration ..."
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-apply preferences
+    cmds += updated true
     
     // Configuration for capability.Temperature
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x0A00 0x0258 {0A00} {}" // Report MeasuredValue (int16) at least every 10 minutes (Δ = 0.1°C)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x000F 0x0E10 {1400} {}" // Report MeasuredValue (int16) at most every 15 seconds, at least every 1 hour (Δ = 0.2°C)
     
     // Configuration for capability.RelativeHumidity
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x0A00 0x0258 {3200} {}" // Report MeasuredValue (uint16) at least every 10 minutes (Δ = 0.5%)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x000F 0x0E10 {3200} {}" // Report MeasuredValue (uint16) at most every 15 seconds, at least every 1 hour (Δ = 0.5%)
     
     // Configuration for capability.Battery
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
@@ -230,21 +235,20 @@ void configure(boolean auto = false) {
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, SWBuildID
     cmds += zigbee.readAttribute(0x0000, [0x0005]) // ModelIdentifier
     cmds += zigbee.readAttribute(0x0000, [0x000A]) // ProductCode
-    cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {100002 0000210000}"
-    utils_sendZigbeeCommands cmds
 
-    log_info 'Configuration done; refreshing device current state in 7 seconds ...'
-    runIn 7, 'refresh', [data:true]
+    // Stop blinking LED
+    cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 0000}"
+    utils_sendZigbeeCommands cmds
 }
 /* groovylint-disable-next-line UnusedPrivateMethod */
 private void autoConfigure() {
-    log_warn "Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
+    log_warn "👁️ Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
     configure true
 }
 
 // capability.Refresh
-void refresh(boolean auto = false) {
-    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
+List<String> refresh(boolean auto = false) {
+    log_info "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -265,7 +269,10 @@ void refresh(boolean auto = false) {
     cmds += zigbee.readAttribute(0x0405, 0x0010) // HumidityCalibration
     cmds += zigbee.readAttribute(0x0204, 0x0011) // EnableDisplay
     cmds += zigbee.readAttribute(0x0204, 0x0010) // ShowSmiley
+
+    if (auto) return cmds
     utils_sendZigbeeCommands cmds
+    return []
 }
 
 // Implementation for capability.HealthCheck
@@ -411,6 +418,9 @@ void parse(String description) {
         case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0020] }:
             utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryVoltage, data=${msg.value}"
             return
+        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x003E] }:
+            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryAlarmState, data=${msg.value}"
+            return
         
         // Events for capability.HealthCheck
         // ===================================================================================================================
@@ -481,8 +491,8 @@ void parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            log_warn 'Rejoined the Zigbee mesh; refreshing device state in 3 seconds ...'
-            runIn 3, 'refresh'
+            log_warn '🙋‍♂️ Rejoined the Zigbee mesh. Syncing device state ...'
+            utils_sendZigbeeCommands(refresh(true))
             return
 
         // Report/Read Attributes Response (Basic cluster)
@@ -495,7 +505,7 @@ void parse(String description) {
 
         // Mgmt_Leave_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8034, commandInt:0x00] }:
-            log_warn 'Device is leaving the Zigbee mesh. See you later, Aligator!'
+            log_warn '💀 Device is leaving the Zigbee mesh. See you later, Aligator!'
             return
 
         // Ignore the following Zigbee messages
@@ -523,7 +533,7 @@ void parse(String description) {
         // Unexpected Zigbee message
         // ---------------------------------------------------------------------------------------------------------------
         default:
-            log_error "Sent unexpected Zigbee message: description=${description}, msg=${msg}"
+            log_error "🚩 Sent unexpected Zigbee message: description=${description}, msg=${msg}"
     }
 }
 

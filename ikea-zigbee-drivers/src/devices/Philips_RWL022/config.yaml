@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 2.45.2_hF4400CA (100B-0119-02002D02)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,FC00,1000', outClusters:'0019,0000,0003,0004,0006,0008,0005,1000', model:'RWL022', manufacturer:'Signify Netherlands B.V.' 
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,FC00,1000', outClusters:'0019,0000,0003,0004,0006,0008,0005,1000', model:'RWL022', manufacturer:'Signify Netherlands B.V.', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Philips_RWL022/RWL022.groovy

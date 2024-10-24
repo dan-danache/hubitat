@@ -57,8 +57,8 @@ metadata {
 
     preferences {
         input(
-            name: 'helpInfo', type: 'hidden',
-            title: '''
+            name:'helpInfo', type:'hidden',
+            title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Gewiss_GWA1501.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
                 Gewiss 2-channel Contact Interface (GWA1501) <small>v5.1.0</small><br>
                 <small><div>
@@ -69,30 +69,24 @@ metadata {
             '''
         )
         input(
-            name: 'logLevel', type: 'enum',
-            title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
-            options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
-            defaultValue: '1',
-            required: true
+            name:'logLevel', type:'enum', title:'Log verbosity', required:true,
+            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
+            defaultValue:'1'
         )
         
         // Inputs for devices.Gewiss_GWA1501
         input(
-            name: 'switchStyle', type: 'enum',
-            title: 'Switch Style',
-            description: '<small>Select physical switch button configuration.</small>',
+            name:'switchStyle', type:'enum', title:'Switch Style', required:true,
+            description:'<small>Select physical switch button configuration.</small>',
             options: GWA1501_SWITCH_STYLE,
-            defaultValue: '00',
-            required: true
+            defaultValue:'00'
         )
         
         input(
-            name: 'enableContacts', type: 'bool',
-            title: 'Use as Contact Sensor',
-            description: '<small>Track open/closed state using two Contact Sensor child devices.</small>',
-            defaultValue: false,
-            required: true
+            name:'enableContacts', type:'bool', title:'Use as Contact Sensor', required:true,
+            description:'<small>Track open/closed state using two Contact Sensor child devices.</small>',
+            defaultValue:false
         )
     }
 }
@@ -179,14 +173,10 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "⚙️ Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
-
-    // Apply preferences first
-    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
-    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -196,14 +186,28 @@ void configure(boolean auto = false) {
     state.lastTx = 0
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
+
+    // Put device in identifying state (blinking LED)
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-refresh device state
+    cmds += refresh true
+    utils_sendZigbeeCommands cmds
+
+    // Apply configuration after the auto-refresh finishes
+    runIn(cmds.findAll { !it.startsWith('delay') }.size() + 1, 'configureApply')
+}
+void configureApply() {
+    log_info "⚙️ Finishing device configuration ..."
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-apply preferences
+    cmds += updated true
     
     // Configuration for devices.Gewiss_GWA1501
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster (ep 0x01)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster (ep 0x02)
     cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload '0x01'} ${utils_payload '0x0020'} 03 ${utils_payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // Unbind Poll Control cluster
-    
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x01)
-    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x02)
     cmds += zigbee.writeAttribute(0x0020, 0x0000, 0x23, 0x00) // Disable periodic polling by the device (to conserve battery)
     
     // Configuration for capability.Battery
@@ -222,11 +226,10 @@ void configure(boolean auto = false) {
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, SWBuildID
     cmds += zigbee.readAttribute(0x0000, [0x0005]) // ModelIdentifier
     cmds += zigbee.readAttribute(0x0000, [0x000A]) // ProductCode
+
+    // Stop blinking LED
     cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 0000}"
     utils_sendZigbeeCommands cmds
-
-    log_info 'Configuration done; refreshing device current state in 7 seconds ...'
-    runIn 7, 'refresh', [data:true]
 }
 /* groovylint-disable-next-line UnusedPrivateMethod */
 private void autoConfigure() {
@@ -235,8 +238,8 @@ private void autoConfigure() {
 }
 
 // capability.Refresh
-void refresh(boolean auto = false) {
-    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
+List<String> refresh(boolean auto = false) {
+    log_info "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -246,10 +249,15 @@ void refresh(boolean auto = false) {
     // Refresh for devices.Gewiss_GWA1501
     cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x01]) // Occupancy (ep 01)
     cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x02]) // Occupancy (ep 02)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x01)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x02)
     
     // Refresh for capability.Battery
     cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
+
+    if (auto) return cmds
     utils_sendZigbeeCommands cmds
+    return []
 }
 
 // Implementation for devices.Gewiss_GWA1501
@@ -353,7 +361,7 @@ void parse(String description) {
         // Report/Read Attributes Reponse: Occupancy
         case { contains it, [clusterInt:0x0406, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
-            String newState = msg.value == '01' ? 'open' : 'closed'
+            String newState = msg.value == '01' ? 'closed' : 'open'
         
             // Send button events only when the device reports any change, not on refresh
             // Ignore open state for push buttons
@@ -429,8 +437,8 @@ void parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            log_warn '🙋‍♂️ Rejoined the Zigbee mesh; refreshing device state in 3 seconds ...'
-            runIn 3, 'refresh'
+            log_warn '🙋‍♂️ Rejoined the Zigbee mesh. Syncing device state ...'
+            utils_sendZigbeeCommands(refresh(true))
             return
 
         // Report/Read Attributes Response (Basic cluster)

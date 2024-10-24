@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - E2204: Move "Dark Mode" preference to "setIndicatorStatus()" command and "indicatorStatus" attribute
 - Add decimal points support for Temperature and Humidity values
 - Refresh device state before configuring the device
+- Add missing fingerprints for Styrbar 2.4.11 and Rodret 1.0.57
 
 ## [5.0.1] - 2024-05-22
 

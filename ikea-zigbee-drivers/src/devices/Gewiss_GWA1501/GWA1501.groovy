@@ -19,20 +19,16 @@ import com.hubitat.app.DeviceWrapper
 
 // Inputs for devices.Gewiss_GWA1501
 input(
-    name: 'switchStyle', type: 'enum',
-    title: 'Switch Style',
-    description: '<small>Select physical switch button configuration.</small>',
+    name:'switchStyle', type:'enum', title:'Switch Style', required:true,
+    description:'<small>Select physical switch button configuration.</small>',
     options: GWA1501_SWITCH_STYLE,
-    defaultValue: '00',
-    required: true
+    defaultValue:'00'
 )
 
 input(
-    name: 'enableContacts', type: 'bool',
-    title: 'Use as Contact Sensor',
-    description: '<small>Track open/closed state using two Contact Sensor child devices.</small>',
-    defaultValue: false,
-    required: true
+    name:'enableContacts', type:'bool', title:'Use as Contact Sensor', required:true,
+    description:'<small>Track open/closed state using two Contact Sensor child devices.</small>',
+    defaultValue:false
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
@@ -84,9 +80,6 @@ if (enableContacts != true) {
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster (ep 0x01)
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster (ep 0x02)
 cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload '0x01'} ${utils_payload '0x0020'} 03 ${utils_payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // Unbind Poll Control cluster
-
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x01)
-cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x02)
 cmds += zigbee.writeAttribute(0x0020, 0x0000, 0x23, 0x00) // Disable periodic polling by the device (to conserve battery)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
@@ -95,6 +88,8 @@ cmds += zigbee.writeAttribute(0x0020, 0x0000, 0x23, 0x00) // Disable periodic po
 // Refresh for devices.Gewiss_GWA1501
 cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x01]) // Occupancy (ep 01)
 cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x02]) // Occupancy (ep 02)
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x01)
+cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x02)
 {{/ @refresh }}
 {{# @events }}
 
@@ -104,7 +99,7 @@ cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x02]) // Occupancy (
 // Report/Read Attributes Reponse: Occupancy
 case { contains it, [clusterInt:0x0406, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
-    String newState = msg.value == '01' ? 'open' : 'closed'
+    String newState = msg.value == '01' ? 'closed' : 'open'
 
     // Send button events only when the device reports any change, not on refresh
     // Ignore open state for push buttons

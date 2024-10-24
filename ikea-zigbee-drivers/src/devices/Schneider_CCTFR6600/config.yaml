@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 9ae667b (105E-0A00-00007D00)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0006,0201,0B05,FE03,FF16', outClusters:'0003,0019', model:'UFH', manufacturer:'Schneider Electric'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0006,0201,0B05,FE03,FF16', outClusters:'0003,0019', model:'UFH', manufacturer:'Schneider Electric', controllerType:'ZGB'
 
   capabilities:
     - file: src/capabilities/HealthCheck.groovy

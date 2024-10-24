@@ -10,9 +10,11 @@ device:
 
   fingerprints:
   - firmwares: 1.0.024
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57', outClusters:'0003,0006,0008,0019,1000', model:'Remote Control N2', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57', outClusters:'0003,0006,0008,0019,1000', model:'Remote Control N2', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - firmwares: 2.4.5 (117C-11CB-02040005)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57,FC7C', outClusters:'0003,0005,0006,0008,0019,1000', model:'Remote Control N2', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57,FC7C', outClusters:'0003,0005,0006,0008,0019,1000', model:'Remote Control N2', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
+  - firmwares: 2.4.11 (117C-11CB-02040011)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,0020,1000,FC7C', outClusters:'0003,0004,0005,0006,0008,0019,1000', model:'Remote Control N2', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Ikea_E2002/E2002.groovy

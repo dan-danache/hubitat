@@ -14,83 +14,69 @@ attribute 'powerOutageCount', 'number'
 
 // Inputs for devices.Aqara_DCM-K01
 input(
-    name: 'switchType', type: 'enum',
-    title: 'Switch type',
-    description: '<small>What type of switches are connected to S1 and S2.</small>',
-    options: [
+    name:'switchType', type:'enum', title:'Switch type', required:true,
+    description:'<small>What type of switches are connected to S1 and S2.</small>',
+    options:[
         '1':'Latching switch - toggle/rocker',
         '2':'Momentary switch - push button',
         '3':'Disabled - connected switches are ignored',
     ],
-    defaultValue: '1',
-    required: true
+    defaultValue:'1'
 )
 input(
-    name: 'operationModeS1', type: 'enum',
-    title: 'Operation mode for Switch S1',
-    description: '<small>What happens when Switch S1 is used.</small>',
-    options: [
+    name:'operationModeS1', type:'enum', title:'Operation mode for Switch S1', required:true,
+    description:'<small>What happens when Switch S1 is used.</small>',
+    options:[
         '1':'Standard - Switch S1 controls Relay L1',
         '0':'Decoupled - Switch S1 only sends button events',
     ],
-    defaultValue: '1',
-    required: true
+    defaultValue:'1'
 )
 input(
-    name: 'operationModeS2', type: 'enum',
-    title: 'Operation mode for Switch S2',
-    description: '<small>What happens when Switch S2 is used.</small>',
-    options: [
+    name:'operationModeS2', type:'enum', title:'Operation mode for Switch S2', required:true,
+    description:'<small>What happens when Switch S2 is used.</small>',
+    options:[
         '1':'Standard - Switch S2 controls Relay L2',
         '0':'Decoupled - Switch S2 only sends button events',
     ],
-    defaultValue: '1',
-    required: true
+    defaultValue:'1'
 )
 input(
-    name: 'relayMode', type: 'enum',
-    title: 'Relay mode',
-    description: '<small>How Relay L1 and Relay L2 operate.</small>',
-    options: [
+    name:'relayMode', type:'enum', title:'Relay mode', required:true,
+    description:'<small>How Relay L1 and Relay L2 operate.</small>',
+    options:[
         '0':'Wet contact - connect L to L1, L2 (jumper wire installed)',
         '3':'Dry contact - connect LOUT to L1, L2 (no jumper wire)',
         '1':'Pulse - temporary connect LOUT to L1, L2 (no jumper wire)',
     ],
-    defaultValue: '0',
-    required: true
+    defaultValue:'0'
 )
 if ("${relayMode}" == '1') {
     input(
-        name: 'pulseDuration', type: 'number',
-        title: 'Pulse duration',
-        description: '<small>Only when Relay mode is Pulse. Range 200ms .. 2000ms.</small>',
-        defaultValue: 1000,
+        name:'pulseDuration', type:'number', title:'Pulse duration', required:true,
+        description:'<small>Only when Relay mode is Pulse. Range 200ms .. 2000ms.</small>',
         range: '200..2000',
-        required: true
+        defaultValue: 1000
     )
 }
 input(
-    name: 'interlock', type: 'enum',
-    title: 'Interlock',
-    description: '<small>Prevent both Relay L1 and Relay L2 being On at the same time.</small>',
-    options: [
+    name:'interlock', type:'enum', title:'Interlock', required:true,
+    description:'<small>Prevent both Relay L1 and Relay L2 being On at the same time.</small>',
+    options:[
         '0':'Disabled - control lights and other devices',
         '1':'Enabled - control bi-directional motors',
     ],
-    defaultValue: '0',
-    required: true
+    defaultValue:'0'
 )
 input(
-    name: 'powerOnBehavior', type: 'enum',
-    title: 'Power On behaviour',
-    description: '<small>What happens after a power outage.</small>',
-    options: [
+    name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
+    description:'<small>What happens after a power outage.</small>',
+    options:[
         '0': 'Turn power On',
         '2': 'Turn power Off',
         '1': 'Restore previous state'
     ],
-    defaultValue: '1',
-    required: true
+    defaultValue:'1'
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}

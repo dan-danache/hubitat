@@ -1,5 +1,5 @@
 /**
- * IKEA Vindstyrka Air Quality Sensor (E2112)
+ * Vimar IoT Dial Thermostat (02973)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
@@ -8,8 +8,10 @@ import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
-@Field static final String DRIVER_NAME = 'IKEA Vindstyrka Air Quality Sensor (E2112)'
+@Field static final String DRIVER_NAME = 'Vimar IoT Dial Thermostat (02973)'
 @Field static final String DRIVER_VERSION = '5.1.0'
+@Field static final Map<String, String> TH_MODES = ['00':'off', '03':'cool', '04':'heat']
+@Field static final Map<String, String> TH_STATES = ['00':'idle', '01':'heating', '02':'cooling']
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -20,40 +22,38 @@ import groovy.time.TimeCategory
 ]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2112.groovy') {
+    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Vimar_02973.groovy') {
         capability 'Configuration'
         capability 'Refresh'
         capability 'Sensor'
-        capability 'AirQuality'
         capability 'TemperatureMeasurement'
-        capability 'RelativeHumidityMeasurement'
+        capability 'ThermostatCoolingSetpoint'
+        capability 'ThermostatHeatingSetpoint'
+        capability 'ThermostatOperatingState'
+        capability 'ThermostatMode'
         capability 'HealthCheck'
         capability 'PowerSource'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0402,0405,FC57,FC7C,042A,FC7E', outClusters:'0003,0019,0020,0202', model:'VINDSTYRKA', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // Firmware: 1.0.010 (117C-110F-00010010)
+        fingerprint profileId:'0104', endpointId:'0A', inClusters:'0000,0003,0201', model:'WheelThermostat_v1.0', manufacturer:'Vimar', controllerType:'ZGB' // Firmware: 1.0.0_z
         
-        // Attributes for E2112.FineParticulateMatter
-        attribute 'airQuality', 'enum', ['good', 'moderate', 'unhealthy for sensitive groups', 'unhealthy', 'hazardous']
-        attribute 'pm25', 'number'
-        
-        // Attributes for E2112.VocIndex
-        attribute 'vocIndex', 'number'
+        // Attributes for capability.Thermostat
+        attribute 'supportedThermostatModes', 'JSON_OBJECT'
         
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
     
-    // Commands for capability.FirmwareUpdate
-    command 'updateFirmware'
+    // Commands for capability.Thermostat
+    command 'setThermostatMode', [[name:'Thermostat mode*', type:'ENUM', description:'Thermostat mode to set', constraints:TH_MODES.values()]]
 
     preferences {
         input(
             name:'helpInfo', type:'hidden',
             title:'''
-            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2112.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Vindstyrka Air Quality Sensor (E2112) <small>v5.1.0</small><br>
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Vimar_02973.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                Vimar IoT Dial Thermostat (02973) <small>v5.1.0</small><br>
                 <small><div>
-                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vindstyrka-air-quality-sensor-e2112" target="_blank">device details</a><br>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vimar-iot-dial-thermostat-02973" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
                 </div></small>
             </div>
@@ -156,21 +156,10 @@ void configureApply() {
     // Auto-apply preferences
     cmds += updated true
     
-    // Configuration for E2112.FineParticulateMatter
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x042A {${device.zigbeeId}} {}" // Particulate Matter 2.5 cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x042A 0x0000 0x39 0x000F 0x0E10 {40000000} {}" // Report MeasuredValue (single) at most every 15 seconds, at least every 1 hour (Δ = ??)
-    
-    // Configuration for E2112.VocIndex
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC7E {${device.zigbeeId}} {}" // VocIndex Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0xFC7E 0x0000 0x39 0x000F 0x0E10 {40000000} {117C}" // Report MeasuredValue (single) at most every 15 seconds, at least every 1 hour (Δ = ??)
-    
-    // Configuration for capability.Temperature
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0402 {${device.zigbeeId}} {}" // Temperature Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0402 0x0000 0x29 0x000F 0x0E10 {1400} {}" // Report MeasuredValue (int16) at most every 15 seconds, at least every 1 hour (Δ = 0.2°C)
-    
-    // Configuration for capability.RelativeHumidity
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0405 {${device.zigbeeId}} {}" // Relative Humidity Measurement cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0405 0x0000 0x21 0x000F 0x0E10 {3200} {}" // Report MeasuredValue (uint16) at most every 15 seconds, at least every 1 hour (Δ = 0.5%)
+    // Configuration for capability.Thermostat
+    sendEvent name:'supportedThermostatModes', value:TH_MODES.values(), type:'digital', descriptionText:"Supported thermostat modes initialized to ${TH_MODES.values()}"
+    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0201 {${device.zigbeeId}} {}" // Thermostat cluster
+    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0201 0x0000 0x29 0x000F 0x0E10 {1400} {}" // Report LocalTemperature (int16) at most every 15 seconds, at least every 1 hour (Δ = 0.2°C)
     
     // Configuration for capability.HealthCheck
     sendEvent name:'healthStatus', value:'online', descriptionText:'Health status initialized to online'
@@ -204,36 +193,79 @@ List<String> refresh(boolean auto = false) {
 
     List<String> cmds = []
     
-    // Refresh for E2112.FineParticulateMatter
-    cmds += zigbee.readAttribute(0x042A, 0x0000) // Fine Particulate Matter (PM25)
-    
-    // Refresh for E2112.VocIndex
-    cmds += zigbee.readAttribute(0xFC7E, 0x0000, [mfgCode: '0x117C']) // VOC Index
-    
-    // Refresh for capability.Temperature
-    cmds += zigbee.readAttribute(0x0402, 0x0000) // Temperature
-    
-    // Refresh for capability.RelativeHumidity
-    cmds += zigbee.readAttribute(0x0405, 0x0000) // RelativeHumidity
+    // Refresh for capability.Thermostat
+    cmds += zigbee.readAttribute(0x0201, 0x0000) // LocalTemperature
+    cmds += zigbee.readAttribute(0x0201, 0x0011) // OccupiedCoolingSetpoint
+    cmds += zigbee.readAttribute(0x0201, 0x0012) // OccupiedHeatingSetpoint
+    cmds += zigbee.readAttribute(0x0201, 0x001C) // SystemMode
+    cmds += zigbee.readAttribute(0x0201, 0x0029) // ThermostatRunningState
 
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
     return []
 }
 
-// Implementation for E2112.FineParticulateMatter
-private Integer lerp(Integer ylo, Integer yhi, BigDecimal xlo, BigDecimal xhi, Integer cur) {
-    return Math.round(((cur - xlo) / (xhi - xlo)) * (yhi - ylo) + ylo)
+// Implementation for capability.Thermostat
+void auto() {
+    setThermostatMode 'auto'
 }
-private List pm25Aqi(Integer pm25) { // See: https://en.wikipedia.org/wiki/Air_quality_index#United_States
-    if (pm25 <=  12.1) return [lerp(  0,  50,   0.0,  12.0, pm25), 'good', 'green']
-    if (pm25 <=  35.5) return [lerp( 51, 100,  12.1,  35.4, pm25), 'moderate', 'gold']
-    if (pm25 <=  55.5) return [lerp(101, 150,  35.5,  55.4, pm25), 'unhealthy for sensitive groups', 'darkorange']
-    if (pm25 <= 150.5) return [lerp(151, 200,  55.5, 150.4, pm25), 'unhealthy', 'red']
-    if (pm25 <= 250.5) return [lerp(201, 300, 150.5, 250.4, pm25), 'very unhealthy', 'purple']
-    if (pm25 <= 350.5) return [lerp(301, 400, 250.5, 350.4, pm25), 'hazardous', 'maroon']
-    if (pm25 <= 500.5) return [lerp(401, 500, 350.5, 500.4, pm25), 'hazardous', 'maroon']
-    return [500, 'hazardous', 'maroon']
+void cool() {
+    setThermostatMode 'cool'
+}
+void emergencyHeat() {
+    setThermostatMode 'emergency heat'
+}
+void heat() {
+    setThermostatMode 'heat'
+}
+void off() {
+    setThermostatMode 'off'
+}
+void setThermostatMode(String mode) {
+    log_debug "🎬 Setting thermostat mode to ${mode}"
+    List<String> cmds = []
+    switch (mode) {
+        case 'off':
+            cmds += zigbee.writeAttribute(0x0201, 0x001C, DataType.ENUM8, 0x00)
+            break
+        case 'cool':
+            if (device.currentValue('thermostatMode', true) == 'off') {
+                cmds += zigbee.writeAttribute(0x0201, 0x001B, DataType.ENUM8, 0x00)
+                cmds += zigbee.writeAttribute(0x0201, 0x001C, DataType.ENUM8, 0x03)
+            } else {
+                cmds += zigbee.writeAttribute(0x0201, 0x001C, DataType.ENUM8, 0x00)
+                cmds += zigbee.writeAttribute(0x0201, 0x001B, DataType.ENUM8, 0x00)
+                runIn 5, 'systemMode', [data:0x03]
+            }
+            break
+        case 'heat':
+            if (device.currentValue('thermostatMode', true) == 'off') {
+                cmds += zigbee.writeAttribute(0x0201, 0x001B, DataType.ENUM8, 0x02)
+                cmds += zigbee.writeAttribute(0x0201, 0x001C, DataType.ENUM8, 0x04)
+            } else {
+                cmds += zigbee.writeAttribute(0x0201, 0x001C, DataType.ENUM8, 0x00)
+                cmds += zigbee.writeAttribute(0x0201, 0x001B, DataType.ENUM8, 0x02)
+                runIn 5, 'systemMode', [data:0x04]
+            }
+            break
+        default:
+            log_warn "Mode \"${mode}\" is not supported"
+            return
+    }
+    utils_sendZigbeeCommands cmds
+}
+private void systemMode(Integer mode) {
+    utils_sendZigbeeCommands(zigbee.writeAttribute(0x0201, 0x001C, DataType.ENUM8, mode))
+}
+void setCoolingSetpoint(BigDecimal temperature) {
+    log_debug "🎬 Setting cooling setpoint to ${temperature}°${location.temperatureScale}"
+    BigDecimal setpoint = "${location.temperatureScale}" == 'C' ? temperature : (temperature - 32) * 5 / 9
+    utils_sendZigbeeCommands(zigbee.writeAttribute(0x0201, 0x0011, DataType.INT16, Integer.valueOf((setpoint * 100).intValue())))
+}
+void setHeatingSetpoint(BigDecimal temperature) {
+    log_debug "🎬 Setting heating setpoint to ${temperature}°${location.temperatureScale}"
+    BigDecimal setpoint = "${location.temperatureScale}" == 'C' ? temperature : (temperature - 32) * 5 / 9
+    utils_sendZigbeeCommands(zigbee.writeAttribute(0x0201, 0x0012, DataType.INT16, Integer.valueOf((setpoint * 100).intValue())))
 }
 
 // Implementation for capability.HealthCheck
@@ -260,15 +292,6 @@ void pingExecute() {
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace('.000 seconds', ' seconds')
     log_info "Will be marked as offline if no message is received until ${thereshold.format('yyyy-MM-dd HH:mm:ss', location.timeZone)} (${offlineMarkAgo} from now)"
-}
-
-// Implementation for capability.FirmwareUpdate
-void updateFirmware() {
-    log_info 'Looking for firmware updates ...'
-    if (device.currentValue('powerSource', true) == 'battery') {
-        log_warn '[IMPORTANT] Click the "Update Firmware" button immediately after pushing any button on the device in order to first wake it up!'
-    }
-    utils_sendZigbeeCommands zigbee.updateFirmware()
 }
 
 // ===================================================================================================================
@@ -309,100 +332,67 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for E2112.FineParticulateMatter
+        // Events for capability.Thermostat
         // ===================================================================================================================
         
-        // Report/Read Attributes Reponse: MeasuredValue
-        case { contains it, [clusterInt:0x042A, commandInt:0x0A, attrInt:0x0000] }:
-        case { contains it, [clusterInt:0x042A, commandInt:0x01, attrInt:0x0000] }:
-        
-            // A MeasuredValue of 0xFFFFFFFF indicates that the measurement is invalid
-            if (msg.value == 'FFFFFFFF') {
-                log_warn "Ignored invalid PM25 value: 0x${msg.value}"
-                return
-            }
-        
-            Integer pm25 = Math.round Float.intBitsToFloat(Integer.parseInt(msg.value, 16))
-            utils_sendEvent name:'pm25', value:pm25, unit:'μg/m³', descriptionText:"Fine particulate matter (PM2.5) concentration is ${pm25} μg/m³", type:type
-            List aqi = pm25Aqi pm25
-            utils_sendEvent name:'airQualityIndex', value:aqi[0], descriptionText:"Calculated Air Quality Index = ${aqi[0]}", type:type
-            utils_sendEvent name:'airQuality', value:"<span style=\"color:${aqi[2]}\">${aqi[1]}</span>", descriptionText:"Calculated Air Quality = ${aqi[1]}", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "PM25Measurement=${pm25} μg/m³"
-            return
-        
-        // Other events that we expect but are not usefull
-        case { contains it, [clusterInt:0x042A, commandInt:0x07] }:
-            utils_processedZclMessage 'Configure Reporting Response', "attribute=PM25, data=${msg.data}"
-            return
-        
-        // Events for E2112.VocIndex
-        // ===================================================================================================================
-        
-        // Report/Read Attributes Reponse: MeasuredValue
-        case { contains it, [clusterInt:0xFC7E, commandInt:0x0A, attrInt:0x0000] }:
-        case { contains it, [clusterInt:0xFC7E, commandInt:0x01, attrInt:0x0000] }:
-        
-            // A MeasuredValue of 0xFFFFFFFF indicates that the measurement is invalid
-            if (msg.value == 'FFFFFFFF') {
-                log_warn "Ignored invalid VOC Index value: 0x${msg.value}"
-                return
-            }
-        
-            Integer vocIndex = Math.round Float.intBitsToFloat(Integer.parseInt(msg.value, 16))
-            utils_sendEvent name:'vocIndex', value:vocIndex, descriptionText:"Voc index is ${vocIndex} / 500", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "VocIndex=${msg.value}"
-            return
-        
-        // Other events that we expect but are not usefull
-        case { contains it, [clusterInt:0xFC7E, commandInt:0x07] }:
-            utils_processedZclMessage 'Configure Reporting Response', "attribute=VocIndex, data=${msg.data}"
-            return
-        
-        // Events for capability.Temperature
-        // ===================================================================================================================
-        
-        // Report/Read Attributes Reponse: MeasuredValue
-        case { contains it, [clusterInt:0x0402, commandInt:0x0A, attrInt:0x0000] }:
-        case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0000] }:
-        
-            // A MeasuredValue of 0x8000 indicates that the temperature measurement is invalid
-            if (msg.value == '8000') {
-                log_warn "Ignored invalid temperature value: 0x${msg.value}"
-                return
-            }
+        // Report/Read Attributes Reponse: LocalTemperature
+        case { contains it, [clusterInt:0x0201, commandInt:0x0A, attrInt:0x0000] }:
+        case { contains it, [clusterInt:0x0201, commandInt:0x01, attrInt:0x0000] }:
         
             // https://www.urbandictionary.com/define.php?term=Retard%20Unit
             String temperature = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
-            utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
+            utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Local temperature is ${temperature}°${location.temperatureScale}", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "LocalTemperature=${msg.value}"
+            return
+        
+        // Report/Read Attributes Reponse: OccupiedCoolingSetpoint
+        case { contains it, [clusterInt:0x0201, commandInt:0x0A, attrInt:0x0011] }:
+        case { contains it, [clusterInt:0x0201, commandInt:0x01, attrInt:0x0011] }:
+        
+            // https://www.urbandictionary.com/define.php?term=Retard%20Unit
+            String coolingSetpoint = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
+            utils_sendEvent name:'coolingSetpoint', value:coolingSetpoint, unit:"°${location.temperatureScale}", descriptionText:"Cooling setpoint is ${coolingSetpoint}°${location.temperatureScale}", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "OccupiedCoolingSetpoint=${msg.value}"
+        
+            utils_sendZigbeeCommands(zigbee.readAttribute(0x0201, 0x001C))
+            return
+        
+        // Report/Read Attributes Reponse: OccupiedHeatingSetpoint
+        case { contains it, [clusterInt:0x0201, commandInt:0x0A, attrInt:0x0012] }:
+        case { contains it, [clusterInt:0x0201, commandInt:0x01, attrInt:0x0012] }:
+        
+            // https://www.urbandictionary.com/define.php?term=Retard%20Unit
+            String heatingSetpoint = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
+            utils_sendEvent name:'heatingSetpoint', value:heatingSetpoint, unit:"°${location.temperatureScale}", descriptionText:"Heating setpoint is ${heatingSetpoint}°${location.temperatureScale}", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "OccupiedHeatingSetpoint=${msg.value}"
+        
+            utils_sendZigbeeCommands(zigbee.readAttribute(0x0201, 0x001C))
+            return
+        
+        // Report/Read Attributes Reponse: SystemMode
+        case { contains it, [clusterInt:0x0201, commandInt:0x0A, attrInt:0x001C] }:
+        case { contains it, [clusterInt:0x0201, commandInt:0x01, attrInt:0x001C] }:
+            String thermostatMode = TH_MODES[msg.value]
+            utils_sendEvent name:'thermostatMode', value:thermostatMode, descriptionText:"Thermostat mode is ${thermostatMode}", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "SystemMode=${msg.value}"
+            return
+        
+        // Report/Read Attributes Reponse: ThermostatRunningState
+        case { contains it, [clusterInt:0x0201, commandInt:0x0A, attrInt:0x0029] }:
+        case { contains it, [clusterInt:0x0201, commandInt:0x01, attrInt:0x0029] }:
+            String thermostatOperatingState = TH_STATES[msg.value[-2..-1]]
+            utils_sendEvent name:'thermostatOperatingState', value:thermostatOperatingState, descriptionText:"Thermostat operating state is ${thermostatOperatingState}", type:type
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ThermostatRunningState=${msg.value}"
+            return
+        
+        // Write Attributes Response
+        case { contains it, [clusterInt:0x0201, commandInt:0x04, isClusterSpecific:false] }:
+            utils_processedZclMessage "Write Attributes Response", "Status=${msg.data}"
             return
         
         // Other events that we expect but are not usefull
-        case { contains it, [clusterInt:0x0402, commandInt:0x07] }:
-            utils_processedZclMessage 'Configure Reporting Response', "attribute=Temperature, data=${msg.data}"
-            return
-        
-        // Events for capability.RelativeHumidity
-        // ===================================================================================================================
-        
-        // Report/Read Attributes Reponse: MeasuredValue
-        case { contains it, [clusterInt:0x0405, commandInt:0x0A, attrInt:0x0000] }:
-        case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0000] }:
-        
-            // A MeasuredValue of 0xFFFF indicates that the measurement is invalid
-            if (msg.value == 'FFFF') {
-                log_warn "Ignored invalid relative humidity value: 0x${msg.value}"
-                return
-            }
-        
-            String humidity = "${Integer.parseInt(msg.value, 16) / 100}"
-            utils_sendEvent name:'humidity', value:humidity, unit:'%rh', descriptionText:"Relative humidity is ${humidity}%", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RelativeHumidity=${msg.value}"
-            return
-        
-        // Other events that we expect but are not usefull
-        case { contains it, [clusterInt:0x0405, commandInt:0x07] }:
-            utils_processedZclMessage 'Configure Reporting Response', "attribute=RelativeHumidity, data=${msg.data}"
+        case { contains it, [clusterInt:0x0201, commandInt:0x07] }:
+            utils_processedZclMessage 'Configure Reporting Response', "attribute=LocalTemperature, data=${msg.data}"
             return
         
         // Events for capability.HealthCheck

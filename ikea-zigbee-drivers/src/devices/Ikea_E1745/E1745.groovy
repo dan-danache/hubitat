@@ -14,10 +14,9 @@ attribute 'illumination', 'enum', ['dim', 'bright']  // Works only in night mode
 
 // Inputs for devices.Ikea_E1745
 input(
-    name: 'clearMotionPeriod', type: 'enum',
-    title: 'Clear motion after',
-    description: '<small>Set status inactive if no motion is detected in this period.</small>',
-    options: [
+    name:'clearMotionPeriod', type:'enum', title:'Clear motion after', required:true,
+    description:'<small>Set status inactive if no motion is detected in this period.</small>',
+    options:[
          '60': '1 minute',
         '120': '2 minutes',
         '180': '3 minutes',
@@ -29,16 +28,13 @@ input(
         '540': '9 minutes',
         '600': '10 minutes'
     ],
-    defaultValue: '180',
-    required: true
+    defaultValue:'180'
 )
 // Inputs for devices.Ikea_E1745
 input(
-    name: 'onlyTriggerInDimLight', type: 'bool',
-    title: 'Only detect motion in the dark',
-    description: '<small>Select the night mode 🌙 option on device for this to work.</small>',
-    defaultValue: false,
-    required: true
+    name:'onlyTriggerInDimLight', type:'bool', title:'Only detect motion in the dark', required:true,
+    description:'<small>Select the night mode 🌙 option on device for this to work.</small>',
+    defaultValue:false
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
