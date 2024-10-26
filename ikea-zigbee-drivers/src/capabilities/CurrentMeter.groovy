@@ -6,7 +6,9 @@ capability 'CurrentMeter'
 {{# @configure }}
 
 // Configuration for capability.CurrentMeter
+{{^ params.skipClusterBind}}
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
+{{/ params.skipClusterBind}}
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0602 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentMultiplier (uint16) (Δ = 1)
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0603 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentDivisor (uint16) (Δ = 1)
 {{/ @configure }}
@@ -28,7 +30,7 @@ input(
        '2000':'Report changes of +/- 2 amperes',
        '5000':'Report changes of +/- 5 amperes',
     ],
-    defaultValue:'200'
+    defaultValue:'10'
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
@@ -36,7 +38,7 @@ input(
 
 // Preferences for capability.CurrentMeter
 if (amperageReportDelta == null) {
-    amperageReportDelta = '200'
+    amperageReportDelta = '10'
     device.updateSetting 'amperageReportDelta', [value:amperageReportDelta, type:'enum']
 }
 log_info "🛠️ amperageReportDelta = +/- ${amperageReportDelta} milliamperes"
@@ -60,6 +62,13 @@ cmds += zigbee.readAttribute(0x0B04, 0x0508) // RMSCurrent
 // Report/Read Attributes Reponse: RMSCurrent
 case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0508] }:
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0508] }:
+
+    // A RMSCurrent of 0xFFFF indicates that the amperage measurement is invalid
+    if (msg.value == 'FFFF') {
+        log_warn "Ignored invalid amperage value: 0x${msg.value}"
+        return
+    }
+
     String amperage = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.amperageMultiplier ?: 1) / (state.amperageDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
     utils_sendEvent name:'amperage', value:amperage, unit:'A', descriptionText:"Amperage is ${amperage} A", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RMSCurrent=${msg.value} (${amperage} A)"

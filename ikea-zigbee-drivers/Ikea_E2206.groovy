@@ -51,6 +51,9 @@ metadata {
     command 'toggle'
     command 'onWithTimedOff', [[name:'On duration*', type:'NUMBER', description:'After how many seconds power will be turned Off [1..6500]']]
     
+    // Commands for capability.EnergyMeter
+    command 'resetEnergy'
+    
     // Commands for devices.Ikea_E2206
     command 'setIndicatorStatus', [[name:'Status*', type:'ENUM', description:'Select LED indicator status on the device', constraints:['on', 'off']]]
     
@@ -100,7 +103,7 @@ metadata {
                 '200':'Report changes of +/- 200 watts',
                 '500':'Report changes of +/- 500 watts',
             ],
-            defaultValue:'50'
+            defaultValue:'1'
         )
         
         // Inputs for capability.CurrentMeter
@@ -118,7 +121,7 @@ metadata {
                '2000':'Report changes of +/- 2 amperes',
                '5000':'Report changes of +/- 5 amperes',
             ],
-            defaultValue:'200'
+            defaultValue:'10'
         )
         
         // Inputs for capability.VoltageMeasurement
@@ -133,7 +136,7 @@ metadata {
                  '20':'Report changes of +/- 20 volts',
                  '50':'Report changes of +/- 50 volts',
             ],
-            defaultValue:'5'
+            defaultValue:'1'
         )
         
         // Inputs for capability.EnergyMeter
@@ -149,7 +152,7 @@ metadata {
                  '500':'Report changes of 500 Wh',
                 '1000':'Report changes of 1 kWh',
             ],
-            defaultValue:'100'
+            defaultValue:'10'
         )
         
         // Inputs for devices.Ikea_E2206
@@ -204,7 +207,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.PowerMeter
     if (powerReportDelta == null) {
-        powerReportDelta = '50'
+        powerReportDelta = '1'
         device.updateSetting 'powerReportDelta', [value:powerReportDelta, type:'enum']
     }
     log_info "🛠️ powerReportDelta = +/- ${powerReportDelta} watts"
@@ -213,7 +216,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.CurrentMeter
     if (amperageReportDelta == null) {
-        amperageReportDelta = '200'
+        amperageReportDelta = '10'
         device.updateSetting 'amperageReportDelta', [value:amperageReportDelta, type:'enum']
     }
     log_info "🛠️ amperageReportDelta = +/- ${amperageReportDelta} milliamperes"
@@ -222,7 +225,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.VoltageMeasurement
     if (voltageReportDelta == null) {
-        voltageReportDelta = '5'
+        voltageReportDelta = '1'
         device.updateSetting 'voltageReportDelta', [value:voltageReportDelta, type:'enum']
     }
     log_info "🛠️ voltageReportDelta = +/- ${voltageReportDelta} volts"
@@ -231,7 +234,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.EnergyMeter
     if (energyReportDelta == null) {
-        energyReportDelta = '100'
+        energyReportDelta = '10'
         device.updateSetting 'energyReportDelta', [value:energyReportDelta, type:'enum']
     }
     log_info "🛠️ energyReportDelta = ${energyReportDelta} Wh"
@@ -333,12 +336,10 @@ void configureApply() {
     cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0605 0x21 0x0000 0x0000 {0100} {}" // Report ACPowerDivisor (uint16) (Δ = 1)
     
     // Configuration for capability.CurrentMeter
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
     cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0602 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentMultiplier (uint16) (Δ = 1)
     cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0603 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentDivisor (uint16) (Δ = 1)
     
     // Configuration for capability.VoltageMeasurement
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
     cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0600 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageMultiplier (uint16) (Δ = 1)
     cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0601 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageDivisor (uint16) (Δ = 1)
     
@@ -399,7 +400,7 @@ List<String> refresh(boolean auto = false) {
     // Refresh for capability.EnergyMeter
     cmds += zigbee.readAttribute(0x0702, 0x0301) // EnergyMultiplier
     cmds += zigbee.readAttribute(0x0702, 0x0302) // EnergyDivisor
-    cmds += zigbee.readAttribute(0x0702, 0x0000) // EnergySumation
+    cmds += zigbee.readAttribute(0x0702, 0x0000) // CurrentSummationDelivered
     
     // Refresh for devices.Ikea_E2206
     cmds += zigbee.readAttribute(0xFC85, 0x0000, [mfgCode:'0x117C'] ) // ChildLock
@@ -435,12 +436,24 @@ void onWithTimedOff(BigDecimal onTime = 1) {
     String payload = "00 ${utils_payload dur, 4} 0000"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0006 {114342 ${payload}}"])
 }
+void resetEnergy() {
+    log_debug "🎬 Resetting energy counter ..."
+    state.resetEnergy = true
+    utils_sendZigbeeCommands(zigbee.readAttribute(0x0702, 0x0000))
+}
 
 // Implementation for devices.Ikea_E2206
 void setIndicatorStatus(String status) {
     log_debug "🎬 Setting status indicator to: ${status}"
     utils_sendZigbeeCommands(zigbee.writeAttribute(0xFC85, 0x0001, 0x10, status == 'off' ? 0x00 : 0x01, [mfgCode:'0x117C']))
     utils_sendEvent name:'indicatorStatus', value:status, descriptionText:"Indicator status turned ${status}", type:'digital'
+}
+void refreshPowerAndAmperage(String newState, boolean delay = true) {
+    if (newState == 'on') return
+    List<String> cmds = []
+    cmds += zigbee.readAttribute(0x0B04, 0x050B) // ActivePower
+    cmds += zigbee.readAttribute(0x0B04, 0x0508) // RMSCurrent
+    utils_sendZigbeeCommands cmds
 }
 
 // Implementation for capability.HealthCheck
@@ -525,6 +538,8 @@ void parse(String description) {
             String newState = msg.value == '00' ? 'off' : 'on'
             utils_sendEvent name:'switch', value:newState, descriptionText:"Was turned ${newState}", type:type
         
+            // Execute the configured callback: map[delay:3 function:refreshPowerAndAmperage]
+            if (device.currentValue('switch', true) != newState) runIn(3, 'refreshPowerAndAmperage', [data:newState])
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "OnOff=${newState}"
             return
         
@@ -556,6 +571,13 @@ void parse(String description) {
         // Report/Read Attributes Reponse: ActivePower
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x050B] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x050B] }:
+        
+            // A ActivePower of 0xFFFF indicates that the power measurement is invalid
+            if (msg.value == '8000') {
+                log_warn "Ignored invalid power value: 0x${msg.value}"
+                return
+            }
+        
             String power = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.powerMultiplier ?: 1) / (state.powerDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
             utils_sendEvent name:'power', value:power, unit:'W', descriptionText:"Power is ${power} W", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ActivePower=${msg.value} (${power} W)"
@@ -588,6 +610,13 @@ void parse(String description) {
         // Report/Read Attributes Reponse: RMSCurrent
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0508] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0508] }:
+        
+            // A RMSCurrent of 0xFFFF indicates that the amperage measurement is invalid
+            if (msg.value == 'FFFF') {
+                log_warn "Ignored invalid amperage value: 0x${msg.value}"
+                return
+            }
+        
             String amperage = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.amperageMultiplier ?: 1) / (state.amperageDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
             utils_sendEvent name:'amperage', value:amperage, unit:'A', descriptionText:"Amperage is ${amperage} A", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RMSCurrent=${msg.value} (${amperage} A)"
@@ -620,8 +649,15 @@ void parse(String description) {
         // Report/Read Attributes Reponse: RMSVoltage
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0505] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0505] }:
+        
+            // A RMSVoltage of 0xFFFF indicates that the voltage measurement is invalid
+            if (msg.value == 'FFFF') {
+                log_warn "Ignored invalid voltage value: 0x${msg.value}"
+                return
+            }
+        
             String voltage = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.voltageMultiplier ?: 1) / (state.voltageDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
-            utils_sendEvent name:'voltage', value:voltage, unit:'V', descriptionText:"Volatage is ${voltage} V", type:type
+            utils_sendEvent name:'voltage', value:voltage, unit:'V', descriptionText:"Voltage is ${voltage} V", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RMSVoltage=${msg.value} (${voltage} V)"
             return
         
@@ -649,12 +685,18 @@ void parse(String description) {
         // Events for capability.EnergyMeter
         // ===================================================================================================================
         
-        // Report/Read Attributes Reponse: EnergySummation
+        // Report/Read Attributes Reponse: CurrentSummationDelivered
         case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
-            String energy = new BigDecimal(Long.parseLong(msg.value, 16) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
+            String energy = '0.00'
+            if (state.resetEnergy == true) {
+                state.remove 'resetEnergy'
+                state.energyOffset = Long.parseLong(msg.value, 16)
+            } else {
+                energy = new BigDecimal((Long.parseLong(msg.value, 16) - (state.energyOffset ?: 0)) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
+            }
             utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Energy is ${energy} kWh", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "EnergySummation=${msg.value} (${energy} kWh)"
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "CurrentSummationDelivered=${msg.value} (${energy} kWh)"
             return
         
         // Read Attributes Reponse: EnergyMultiplier

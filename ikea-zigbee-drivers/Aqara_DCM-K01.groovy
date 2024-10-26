@@ -50,6 +50,9 @@ metadata {
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
     
+    // Commands for capability.EnergyMeter
+    command 'resetEnergy'
+    
     // Commands for capability.FirmwareUpdate
     command 'updateFirmware'
 
@@ -155,7 +158,7 @@ metadata {
                 '200':'Report changes of +/- 200 watts',
                 '500':'Report changes of +/- 500 watts',
             ],
-            defaultValue:'50'
+            defaultValue:'1'
         )
         
         // Inputs for capability.EnergyMeter
@@ -171,7 +174,7 @@ metadata {
                  '500':'Report changes of 500 Wh',
                 '1000':'Report changes of 1 kWh',
             ],
-            defaultValue:'100'
+            defaultValue:'10'
         )
     }
 }
@@ -254,7 +257,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.PowerMeter
     if (powerReportDelta == null) {
-        powerReportDelta = '50'
+        powerReportDelta = '1'
         device.updateSetting 'powerReportDelta', [value:powerReportDelta, type:'enum']
     }
     log_info "🛠️ powerReportDelta = +/- ${powerReportDelta} watts"
@@ -263,7 +266,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.EnergyMeter
     if (energyReportDelta == null) {
-        energyReportDelta = '100'
+        energyReportDelta = '10'
         device.updateSetting 'energyReportDelta', [value:energyReportDelta, type:'enum']
     }
     log_info "🛠️ energyReportDelta = ${energyReportDelta} Wh"
@@ -395,7 +398,7 @@ List<String> refresh(boolean auto = false) {
     // Refresh for capability.EnergyMeter
     cmds += zigbee.readAttribute(0x0702, 0x0301) // EnergyMultiplier
     cmds += zigbee.readAttribute(0x0702, 0x0302) // EnergyDivisor
-    cmds += zigbee.readAttribute(0x0702, 0x0000) // EnergySumation
+    cmds += zigbee.readAttribute(0x0702, 0x0000) // CurrentSummationDelivered
     
     // Refresh for capability.MultiRelay
     cmds += zigbee.readAttribute(0x0006, 0x0000, [destEndpoint:0x01]) // OnOff (ep 0x01)
@@ -404,6 +407,11 @@ List<String> refresh(boolean auto = false) {
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
     return []
+}
+void resetEnergy() {
+    log_debug "🎬 Resetting energy counter ..."
+    state.resetEnergy = true
+    utils_sendZigbeeCommands(zigbee.readAttribute(0x0702, 0x0000))
 }
 
 // Implementation for capability.MultiRelay
@@ -633,6 +641,13 @@ void parse(String description) {
         // Report/Read Attributes Reponse: ActivePower
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x050B] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x050B] }:
+        
+            // A ActivePower of 0xFFFF indicates that the power measurement is invalid
+            if (msg.value == '8000') {
+                log_warn "Ignored invalid power value: 0x${msg.value}"
+                return
+            }
+        
             String power = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.powerMultiplier ?: 1) / (state.powerDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
             utils_sendEvent name:'power', value:power, unit:'W', descriptionText:"Power is ${power} W", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ActivePower=${msg.value} (${power} W)"
@@ -662,12 +677,18 @@ void parse(String description) {
         // Events for capability.EnergyMeter
         // ===================================================================================================================
         
-        // Report/Read Attributes Reponse: EnergySummation
+        // Report/Read Attributes Reponse: CurrentSummationDelivered
         case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
-            String energy = new BigDecimal(Long.parseLong(msg.value, 16) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
+            String energy = '0.00'
+            if (state.resetEnergy == true) {
+                state.remove 'resetEnergy'
+                state.energyOffset = Long.parseLong(msg.value, 16)
+            } else {
+                energy = new BigDecimal((Long.parseLong(msg.value, 16) - (state.energyOffset ?: 0)) * (state.energyMultiplier ?: 1) / (state.energyDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
+            }
             utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Energy is ${energy} kWh", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "EnergySummation=${msg.value} (${energy} kWh)"
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "CurrentSummationDelivered=${msg.value} (${energy} kWh)"
             return
         
         // Read Attributes Reponse: EnergyMultiplier

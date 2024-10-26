@@ -106,7 +106,7 @@ metadata {
                 '200':'Report changes of +/- 200 watts',
                 '500':'Report changes of +/- 500 watts',
             ],
-            defaultValue:'50'
+            defaultValue:'1'
         )
         
         // Inputs for capability.ZigbeeBindings
@@ -174,7 +174,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.PowerMeter
     if (powerReportDelta == null) {
-        powerReportDelta = '50'
+        powerReportDelta = '1'
         device.updateSetting 'powerReportDelta', [value:powerReportDelta, type:'enum']
     }
     log_info "🛠️ powerReportDelta = +/- ${powerReportDelta} watts"
@@ -459,6 +459,13 @@ void parse(String description) {
         // Report/Read Attributes Reponse: ActivePower
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x050B] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x050B] }:
+        
+            // A ActivePower of 0xFFFF indicates that the power measurement is invalid
+            if (msg.value == '8000') {
+                log_warn "Ignored invalid power value: 0x${msg.value}"
+                return
+            }
+        
             String power = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.powerMultiplier ?: 1) / (state.powerDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
             utils_sendEvent name:'power', value:power, unit:'W', descriptionText:"Power is ${power} W", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ActivePower=${msg.value} (${power} W)"

@@ -96,9 +96,7 @@ case { contains it, [clusterInt:0x0006, commandInt:0x01, attrInt:0x0000] }:
 
     {{# params.callback}}
     // Execute the configured callback: {{ params.callback }}
-    if (device.currentValue('switch', true) != newState) {
-        {{ params.callback }}(newState)
-    }
+    if (device.currentValue('switch', true) != newState) runIn({{ params.callback.delay }}, '{{ params.callback.function }}', [data:newState])
     {{/ params.callback}}
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "OnOff=${newState}"
     return

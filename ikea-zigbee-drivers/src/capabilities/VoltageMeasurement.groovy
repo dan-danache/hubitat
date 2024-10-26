@@ -6,7 +6,9 @@ capability 'VoltageMeasurement'
 {{# @configure }}
 
 // Configuration for capability.VoltageMeasurement
+{{^ params.skipClusterBind}}
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
+{{/ params.skipClusterBind}}
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0600 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageMultiplier (uint16) (Δ = 1)
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0601 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageDivisor (uint16) (Δ = 1)
 {{/ @configure }}
@@ -25,7 +27,7 @@ input(
          '20':'Report changes of +/- 20 volts',
          '50':'Report changes of +/- 50 volts',
     ],
-    defaultValue:'5'
+    defaultValue:'1'
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
@@ -33,7 +35,7 @@ input(
 
 // Preferences for capability.VoltageMeasurement
 if (voltageReportDelta == null) {
-    voltageReportDelta = '5'
+    voltageReportDelta = '1'
     device.updateSetting 'voltageReportDelta', [value:voltageReportDelta, type:'enum']
 }
 log_info "🛠️ voltageReportDelta = +/- ${voltageReportDelta} volts"
@@ -58,8 +60,15 @@ cmds += zigbee.readAttribute(0x0B04, 0x0505) // RMSVoltage
 // Report/Read Attributes Reponse: RMSVoltage
 case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0505] }:
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0505] }:
+
+    // A RMSVoltage of 0xFFFF indicates that the voltage measurement is invalid
+    if (msg.value == 'FFFF') {
+        log_warn "Ignored invalid voltage value: 0x${msg.value}"
+        return
+    }
+
     String voltage = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.voltageMultiplier ?: 1) / (state.voltageDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
-    utils_sendEvent name:'voltage', value:voltage, unit:'V', descriptionText:"Volatage is ${voltage} V", type:type
+    utils_sendEvent name:'voltage', value:voltage, unit:'V', descriptionText:"Voltage is ${voltage} V", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "RMSVoltage=${msg.value} (${voltage} V)"
     return
 

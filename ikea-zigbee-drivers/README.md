@@ -772,8 +772,9 @@ Below you can find the details of each outlet device, including the features and
 1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
 1. Push the small reset button on top of the smart plug with a pointy object for at least 5 seconds until the LED starts pulsating.
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
-1. You're all set! Enjoy using your Tretakt Smart Plug.
+1. You're all set! Enjoy using your Inspelning Smart Plug.
 
+**Note**: By default, the Inspelning Smart Plug generates frequent updates when the connected device doesn’t maintain a constant power draw. These settings are suitable for phone chargers and small appliances. If you notice an excessive number of "info" entries in the Live logs, you can reduce the smart plug’s "sensitivity" using the dropdown menus in the "Preferences" section.
 
 ## Appliances
 Below you can find the details of each appliance device, including the features and pairing instructions.

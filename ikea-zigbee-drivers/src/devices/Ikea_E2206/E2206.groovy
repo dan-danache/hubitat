@@ -29,6 +29,13 @@ void setIndicatorStatus(String status) {
     utils_sendZigbeeCommands(zigbee.writeAttribute(0xFC85, 0x0001, 0x10, status == 'off' ? 0x00 : 0x01, [mfgCode:'0x117C']))
     utils_sendEvent name:'indicatorStatus', value:status, descriptionText:"Indicator status turned ${status}", type:'digital'
 }
+void refreshPowerAndAmperage(String newState, boolean delay = true) {
+    if (newState == 'on') return
+    List<String> cmds = []
+    cmds += zigbee.readAttribute(0x0B04, 0x050B) // ActivePower
+    cmds += zigbee.readAttribute(0x0B04, 0x0508) // RMSCurrent
+    utils_sendZigbeeCommands cmds
+}
 {{/ @implementation }}
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}

@@ -1,10 +1,10 @@
 {
     "packageName": "IKEA Zigbee drivers",
-    "version": "5.0.1",
-    "releaseNotes": "v5.0.1\n - Fix lights usage in Room Lighting - @tray_e",
+    "version": "5.1.0",
+    "releaseNotes": "v5.1.0\n - Add driver for IKEA Inspelning Smart Plug (E2206)\n - Add driver for Xiaomi Mi Temperature & Humidity Monitor 2 (LYWSD03MMC)\n - Add driver for Gewiss 2-channel Contact Interface (GWA1501)\n - E2204: Move \"Dark Mode\" preference to \"setIndicatorStatus()\" command and \"indicatorStatus\" attribute\n - Add decimal points support for Temperature and Humidity values\n - Refresh device state before configuring the device\n - Add missing fingerprints for Styrbar 2.4.11 and Rodret 1.0.57",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2024-05-21",
+    "dateReleased": "2024-10-25",
     "documentationLink": "https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
@@ -58,6 +58,14 @@
             "description": "Zigbee driver for IKEA RGB-Only Lights",
             "namespace": "dandanache",
             "location": "https://raw.githubusercontent.com/dan-danache/hubitat/ikea-zigbee-drivers_5.0.1/ikea-zigbee-drivers/Ikea_RGBO-Light.groovy",
+            "required": false
+        },
+        {
+            "id" : "5ff298c1-bb99-4128-84d4-9cb1aa30da7a",
+            "name": "IKEA Inspelning Smart Plug (E2206)",
+            "description": "Zigbee driver for IKEA Inspelning Smart Plug (E2206)",
+            "namespace": "dandanache",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/ikea-zigbee-drivers_5.0.1/ikea-zigbee-drivers/Ikea_E2206.groovy",
             "required": false
         },
         {

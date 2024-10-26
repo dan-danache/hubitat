@@ -18,9 +18,16 @@ device:
       params:
         powerOnBehavior: true
         onWithTimedOff: true
+        callback:
+          function: refreshPowerAndAmperage
+          delay: 3
     - file: src/capabilities/PowerMeter.groovy
     - file: src/capabilities/CurrentMeter.groovy
+      params:
+        skipClusterBind: true
     - file: src/capabilities/VoltageMeasurement.groovy
+      params:
+        skipClusterBind: true
     - file: src/capabilities/EnergyMeter.groovy
     - file: src/devices/Ikea_E2206/E2206.groovy
     - file: src/capabilities/HealthCheck.groovy

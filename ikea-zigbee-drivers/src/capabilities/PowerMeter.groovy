@@ -6,7 +6,9 @@ capability 'PowerMeter'
 {{# @configure }}
 
 // Configuration for capability.PowerMeter
+{{^ params.skipClusterBind}}
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
+{{/ params.skipClusterBind}}
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0604 0x21 0x0000 0x0000 {0100} {}" // Report ACPowerMultiplier (uint16) (Δ = 1)
 cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0605 0x21 0x0000 0x0000 {0100} {}" // Report ACPowerDivisor (uint16) (Δ = 1)
 {{/ @configure }}
@@ -28,7 +30,7 @@ input(
         '200':'Report changes of +/- 200 watts',
         '500':'Report changes of +/- 500 watts',
     ],
-    defaultValue:'50'
+    defaultValue:'1'
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
@@ -36,7 +38,7 @@ input(
 
 // Preferences for capability.PowerMeter
 if (powerReportDelta == null) {
-    powerReportDelta = '50'
+    powerReportDelta = '1'
     device.updateSetting 'powerReportDelta', [value:powerReportDelta, type:'enum']
 }
 log_info "🛠️ powerReportDelta = +/- ${powerReportDelta} watts"
@@ -60,6 +62,13 @@ cmds += zigbee.readAttribute(0x0B04, 0x050B) // ActivePower
 // Report/Read Attributes Reponse: ActivePower
 case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x050B] }:
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x050B] }:
+
+    // A ActivePower of 0xFFFF indicates that the power measurement is invalid
+    if (msg.value == '8000') {
+        log_warn "Ignored invalid power value: 0x${msg.value}"
+        return
+    }
+
     String power = new BigDecimal(Integer.parseInt(msg.value, 16) * (state.powerMultiplier ?: 1) / (state.powerDivisor ?: 1)).setScale(2, RoundingMode.HALF_UP).toPlainString()
     utils_sendEvent name:'power', value:power, unit:'W', descriptionText:"Power is ${power} W", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "ActivePower=${msg.value} (${power} W)"
