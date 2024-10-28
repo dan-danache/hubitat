@@ -148,6 +148,7 @@ metadata {
             name:'powerReportDelta', type:'enum', title:'Power report frequency', required:true,
             description:'<small>Configure when device reports current power demand.</small>',
             options:[
+                  '0':'Report all changes',
                   '1':'Report changes of +/- 1 watt',
                   '2':'Report changes of +/- 2 watts',
                   '5':'Report changes of +/- 5 watts',
@@ -166,6 +167,7 @@ metadata {
             name:'energyReportDelta', type:'enum', title:'Energy report frequency', required:true,
             description:'<small>Configure when device reports total consumed energy.</small>',
             options:[
+                   '0':'Report all changes',
                   '10':'Report changes of 10 Wh',
                   '20':'Report changes of 20 Wh',
                   '50':'Report changes of 50 Wh',
@@ -642,7 +644,21 @@ void parse(String description) {
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x050B] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x050B] }:
         
-            // A ActivePower of 0xFFFF indicates that the power measurement is invalid
+            // Parse additional attributes
+            msg.additionalAttrs?.each {
+                switch (it.attrInt) {
+                    case 0x0604:
+                        state.powerMultiplier = Integer.parseInt(it.value, 16)
+                        utils_processedZclMessage 'Read Attributes Response', "ACPowerMultiplier=${it.value}"
+                        break
+                    case 0x0605:
+                        state.powerDivisor = Integer.parseInt(it.value, 16)
+                        utils_processedZclMessage 'Read Attributes Response', "ACPowerDivisor=${it.value}"
+                        break
+                }
+            }
+        
+            // An ActivePower of 0xFFFF indicates that the power measurement is invalid
             if (msg.value == '8000') {
                 log_warn "Ignored invalid power value: 0x${msg.value}"
                 return

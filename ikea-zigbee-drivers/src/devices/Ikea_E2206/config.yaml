@@ -9,7 +9,7 @@ device:
     url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
-  - firmwares: 2.4.34 (117C-9F3E-02040034)
+  - firmwares: 2.4.45 (117C-9F3E-02040045)
     value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0702,0B04,1000,FC7C,FC85', outClusters:'0019', model:'INSPELNING Smart plug', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:

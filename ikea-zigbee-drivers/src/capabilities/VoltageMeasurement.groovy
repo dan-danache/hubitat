@@ -9,8 +9,6 @@ capability 'VoltageMeasurement'
 {{^ params.skipClusterBind}}
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
 {{/ params.skipClusterBind}}
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0600 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageMultiplier (uint16) (Δ = 1)
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0601 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageDivisor (uint16) (Δ = 1)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
@@ -20,6 +18,7 @@ input(
     name:'voltageReportDelta', type:'enum', title:'Voltage report frequency', required:true,
     description:'<small>Configure when device reports current voltage.</small>',
     options:[
+          '0':'Report all changes',
           '1':'Report changes of +/- 1 volt',
           '2':'Report changes of +/- 2 volts',
           '5':'Report changes of +/- 5 volts',
@@ -74,14 +73,12 @@ case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0505] }:
 
 // Read Attributes Reponse: ACVoltageMultiplier
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0600] }:
-case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0600] }:
     state.voltageMultiplier = Integer.parseInt(msg.value, 16)
     utils_processedZclMessage 'Read Attributes Response', "ACVoltageMultiplier=${msg.value}"
     return
 
 // Read Attributes Reponse: ACVoltageDivisor
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0601] }:
-case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0601] }:
     state.voltageDivisor = Integer.parseInt(msg.value, 16)
     utils_processedZclMessage 'Read Attributes Response', "ACVoltageDivisor=${msg.value}"
     return

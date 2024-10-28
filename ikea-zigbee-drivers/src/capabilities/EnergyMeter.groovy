@@ -16,6 +16,7 @@ input(
     name:'energyReportDelta', type:'enum', title:'Energy report frequency', required:true,
     description:'<small>Configure when device reports total consumed energy.</small>',
     options:[
+           '0':'Report all changes',
           '10':'Report changes of 10 Wh',
           '20':'Report changes of 20 Wh',
           '50':'Report changes of 50 Wh',

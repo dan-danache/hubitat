@@ -9,8 +9,6 @@ capability 'CurrentMeter'
 {{^ params.skipClusterBind}}
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04 {${device.zigbeeId}} {}" // Electrical Measurement cluster
 {{/ params.skipClusterBind}}
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0602 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentMultiplier (uint16) (Δ = 1)
-cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0603 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentDivisor (uint16) (Δ = 1)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
@@ -20,6 +18,8 @@ input(
     name:'amperageReportDelta', type:'enum', title:'Amperage report frequency', required:true,
     description:'<small>Configure when device reports current amperage.</small>',
     options:[
+          '0':'Report all changes',
+          '5':'Report changes of +/- 5 milliamperes',
          '10':'Report changes of +/- 10 milliamperes',
          '20':'Report changes of +/- 20 milliamperes',
          '50':'Report changes of +/- 50 milliamperes',
@@ -30,7 +30,7 @@ input(
        '2000':'Report changes of +/- 2 amperes',
        '5000':'Report changes of +/- 5 amperes',
     ],
-    defaultValue:'10'
+    defaultValue:'5'
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}
@@ -38,7 +38,7 @@ input(
 
 // Preferences for capability.CurrentMeter
 if (amperageReportDelta == null) {
-    amperageReportDelta = '10'
+    amperageReportDelta = '5'
     device.updateSetting 'amperageReportDelta', [value:amperageReportDelta, type:'enum']
 }
 log_info "🛠️ amperageReportDelta = +/- ${amperageReportDelta} milliamperes"
@@ -76,14 +76,12 @@ case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0508] }:
 
 // Read Attributes Reponse: ACCurrentMultiplier
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0602] }:
-case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0602] }:
     state.amperageMultiplier = Integer.parseInt(msg.value, 16)
     utils_processedZclMessage 'Read Attributes Response', "ACCurrentMultiplier=${msg.value}"
     return
 
 // Read Attributes Reponse: ACCurrentDivisor
 case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0603] }:
-case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0603] }:
     state.amperageDivisor = Integer.parseInt(msg.value, 16)
     utils_processedZclMessage 'Read Attributes Response', "ACCurrentDivisor=${msg.value}"
     return

@@ -38,7 +38,7 @@ metadata {
         capability 'HealthCheck'
         capability 'PowerSource'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0702,0B04,1000,FC7C,FC85', outClusters:'0019', model:'INSPELNING Smart plug', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // Firmware: 2.4.34 (117C-9F3E-02040034)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0702,0B04,1000,FC7C,FC85', outClusters:'0019', model:'INSPELNING Smart plug', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // Firmware: 2.4.45 (117C-9F3E-02040045)
         
         // Attributes for devices.Ikea_E2206
         attribute 'indicatorStatus', 'enum', ['on', 'off']
@@ -93,6 +93,7 @@ metadata {
             name:'powerReportDelta', type:'enum', title:'Power report frequency', required:true,
             description:'<small>Configure when device reports current power demand.</small>',
             options:[
+                  '0':'Report all changes',
                   '1':'Report changes of +/- 1 watt',
                   '2':'Report changes of +/- 2 watts',
                   '5':'Report changes of +/- 5 watts',
@@ -111,6 +112,8 @@ metadata {
             name:'amperageReportDelta', type:'enum', title:'Amperage report frequency', required:true,
             description:'<small>Configure when device reports current amperage.</small>',
             options:[
+                  '0':'Report all changes',
+                  '5':'Report changes of +/- 5 milliamperes',
                  '10':'Report changes of +/- 10 milliamperes',
                  '20':'Report changes of +/- 20 milliamperes',
                  '50':'Report changes of +/- 50 milliamperes',
@@ -121,7 +124,7 @@ metadata {
                '2000':'Report changes of +/- 2 amperes',
                '5000':'Report changes of +/- 5 amperes',
             ],
-            defaultValue:'10'
+            defaultValue:'5'
         )
         
         // Inputs for capability.VoltageMeasurement
@@ -129,6 +132,7 @@ metadata {
             name:'voltageReportDelta', type:'enum', title:'Voltage report frequency', required:true,
             description:'<small>Configure when device reports current voltage.</small>',
             options:[
+                  '0':'Report all changes',
                   '1':'Report changes of +/- 1 volt',
                   '2':'Report changes of +/- 2 volts',
                   '5':'Report changes of +/- 5 volts',
@@ -144,6 +148,7 @@ metadata {
             name:'energyReportDelta', type:'enum', title:'Energy report frequency', required:true,
             description:'<small>Configure when device reports total consumed energy.</small>',
             options:[
+                   '0':'Report all changes',
                   '10':'Report changes of 10 Wh',
                   '20':'Report changes of 20 Wh',
                   '50':'Report changes of 50 Wh',
@@ -216,7 +221,7 @@ List<String> updated(boolean auto = false) {
     
     // Preferences for capability.CurrentMeter
     if (amperageReportDelta == null) {
-        amperageReportDelta = '10'
+        amperageReportDelta = '5'
         device.updateSetting 'amperageReportDelta', [value:amperageReportDelta, type:'enum']
     }
     log_info "🛠️ amperageReportDelta = +/- ${amperageReportDelta} milliamperes"
@@ -336,12 +341,8 @@ void configureApply() {
     cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0605 0x21 0x0000 0x0000 {0100} {}" // Report ACPowerDivisor (uint16) (Δ = 1)
     
     // Configuration for capability.CurrentMeter
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0602 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentMultiplier (uint16) (Δ = 1)
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0603 0x21 0x0000 0x0E10 {0100} {}" // Report ACCurrentDivisor (uint16) (Δ = 1)
     
     // Configuration for capability.VoltageMeasurement
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0600 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageMultiplier (uint16) (Δ = 1)
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0601 0x21 0x0000 0x0E10 {0100} {}" // Report ACVoltageDivisor (uint16) (Δ = 1)
     
     // Configuration for capability.EnergyMeter
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0702 {${device.zigbeeId}} {}" // Metering (Smart Energy) cluster
@@ -572,7 +573,21 @@ void parse(String description) {
         case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x050B] }:
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x050B] }:
         
-            // A ActivePower of 0xFFFF indicates that the power measurement is invalid
+            // Parse additional attributes
+            msg.additionalAttrs?.each {
+                switch (it.attrInt) {
+                    case 0x0604:
+                        state.powerMultiplier = Integer.parseInt(it.value, 16)
+                        utils_processedZclMessage 'Read Attributes Response', "ACPowerMultiplier=${it.value}"
+                        break
+                    case 0x0605:
+                        state.powerDivisor = Integer.parseInt(it.value, 16)
+                        utils_processedZclMessage 'Read Attributes Response', "ACPowerDivisor=${it.value}"
+                        break
+                }
+            }
+        
+            // An ActivePower of 0xFFFF indicates that the power measurement is invalid
             if (msg.value == '8000') {
                 log_warn "Ignored invalid power value: 0x${msg.value}"
                 return
@@ -624,14 +639,12 @@ void parse(String description) {
         
         // Read Attributes Reponse: ACCurrentMultiplier
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0602] }:
-        case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0602] }:
             state.amperageMultiplier = Integer.parseInt(msg.value, 16)
             utils_processedZclMessage 'Read Attributes Response', "ACCurrentMultiplier=${msg.value}"
             return
         
         // Read Attributes Reponse: ACCurrentDivisor
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0603] }:
-        case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0603] }:
             state.amperageDivisor = Integer.parseInt(msg.value, 16)
             utils_processedZclMessage 'Read Attributes Response', "ACCurrentDivisor=${msg.value}"
             return
@@ -663,14 +676,12 @@ void parse(String description) {
         
         // Read Attributes Reponse: ACVoltageMultiplier
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0600] }:
-        case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0600] }:
             state.voltageMultiplier = Integer.parseInt(msg.value, 16)
             utils_processedZclMessage 'Read Attributes Response', "ACVoltageMultiplier=${msg.value}"
             return
         
         // Read Attributes Reponse: ACVoltageDivisor
         case { contains it, [clusterInt:0x0B04, commandInt:0x01, attrInt:0x0601] }:
-        case { contains it, [clusterInt:0x0B04, commandInt:0x0A, attrInt:0x0601] }:
             state.voltageDivisor = Integer.parseInt(msg.value, 16)
             utils_processedZclMessage 'Read Attributes Response', "ACVoltageDivisor=${msg.value}"
             return
