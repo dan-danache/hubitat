@@ -9,34 +9,26 @@ import java.math.RoundingMode
 
 // Inputs for devices.Xiaomi_LYWSD03MMC
 input(
-    name: 'temperatureCalibration', type: 'number',
-    title: 'Temperature calibration',
-    description: '<small>Temperature calibration offset. Range -10.00°C .. 10.00°C.</small>',
-    defaultValue: 0.00,
-    range: '-10..10',
-    required: true
+    name:'temperatureCalibration', type:'number', title:'Temperature calibration', required:true,
+    description:'<small>Temperature calibration offset. Range -10.00°C .. 10.00°C.</small>',
+    range:'-10..10',
+    defaultValue:0.00
 )
 input(
-    name: 'humidityCalibration', type: 'number',
-    title: 'Humidity calibration',
-    description: '<small>Humidity calibration offset. Range -10.00% .. 10.00%.</small>',
-    defaultValue: 0.00,
-    range: '-10..10',
-    required: true
+    name:'humidityCalibration', type:'number', title:'Humidity calibration', required:true,
+    description:'<small>Humidity calibration offset. Range -10.00% .. 10.00%.</small>',
+    range:'-10..10',
+    defaultValue:0.00
 )
 input(
-    name: 'enableDisplay', type: 'bool',
-    title: 'Enable device display',
-    description: '<small>Turn device display on.</small>',
-    defaultValue: true,
-    required: true
+    name:'enableDisplay', type:'bool', title:'Enable device display', required:true,
+    description:'<small>Turn device display on.</small>',
+    defaultValue:true
 )
 input(
-    name: 'showSmiley', type: 'bool',
-    title: 'Show smiley',
-    description: '<small>Show the smiley on the device screen.</small>',
-    defaultValue: true,
-    required: true
+    name:'showSmiley', type:'bool', title:'Show smiley', required:true,
+    description:'<small>Show the smiley on the device screen.</small>',
+    defaultValue:true
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}

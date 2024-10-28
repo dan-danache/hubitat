@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: Unknown
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0405,0402,0204', outClusters:'0019', model:'LYWSD03MMC', manufacturer:'Xiaomi'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0405,0402,0204', outClusters:'0019', model:'LYWSD03MMC', manufacturer:'Xiaomi', controllerType:'ZGB'
 
   capabilities:
     - name: Sensor

@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: Unknown
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0402,0405', outClusters:'0019,000A', model:'TS0201', manufacturer:'_TZ2000_a476raq2'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0402,0405', outClusters:'0019,000A', model:'TS0201', manufacturer:'_TZ2000_a476raq2', controllerType:'ZGB'
 
   capabilities:
     - name: Sensor

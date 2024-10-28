@@ -10,7 +10,9 @@ device:
 
   fingerprints:
   - firmwares: 1.0.47 (117C-11CD-01000047)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC7C', outClusters:'0003,0004,0006,0008,0019,1000', model:'RODRET Dimmer', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC7C', outClusters:'0003,0004,0006,0008,0019,1000', model:'RODRET Dimmer', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
+  - firmwares: 1.0.57 (117C-11CD-01000057)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,0020,1000,FC7C', outClusters:'0003,0004,0006,0008,0019,1000', model:'RODRET Dimmer', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Ikea_E2201/E2201.groovy

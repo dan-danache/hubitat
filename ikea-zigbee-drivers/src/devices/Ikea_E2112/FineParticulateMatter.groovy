@@ -14,7 +14,7 @@ attribute 'pm25', 'number'
 
 // Configuration for E2112.FineParticulateMatter
 cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x042A {${device.zigbeeId}} {}" // Particulate Matter 2.5 cluster
-cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x042A 0x0000 0x39 0x000A 0x0258 {40000000} {}" // Report MeasuredValue (single) at least every 10 minutes (Δ = ??)
+cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x042A 0x0000 0x39 0x000F 0x0E10 {40000000} {}" // Report MeasuredValue (single) at most every 15 seconds, at least every 1 hour (Δ = ??)
 {{/ @configure }}
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}

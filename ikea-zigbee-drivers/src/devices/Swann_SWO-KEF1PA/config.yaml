@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: TBD
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0500,0000', outClusters:'0003,0501', model:'SWO-KEF1PA', manufacturer:'SwannONe'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0500,0000', outClusters:'0003,0501', model:'SWO-KEF1PA', manufacturer:'SwannONe', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Swann_SWO-KEF1PA/SWO-KEF1PA.groovy

@@ -10,7 +10,7 @@ device:
 
   fingerprints:
   - firmwares: 2.3.019 (117C-11C9-23019631)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0009,0020,1000', outClusters:'0003,0004,0006,0008,0019,0102,1000', model:'KNYCKLAN Open/Close remote', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0009,0020,1000', outClusters:'0003,0004,0006,0008,0019,0102,1000', model:'KNYCKLAN Open/Close remote', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - file: src/devices/Ikea_E1841/E1841.groovy

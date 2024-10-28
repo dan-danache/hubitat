@@ -11,28 +11,28 @@ device:
   fingerprints:
   - type: LED2106R3
     firmwares: 3.0.10 (117C-2200-03000010)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57,FC7C', outClusters:'0019', model:'TRADFRI bulb GU10 WS 345lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57,FC7C', outClusters:'0019', model:'TRADFRI bulb GU10 WS 345lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED2101G4
     firmwares: 1.1.003 (117C-2204-00011003)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRI bulb E14 WS globe 470lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRI bulb E14 WS globe 470lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED1949C5
     firmwares: 1.1.003 (117C-2204-00011003)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbE14WScandleopal470lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbE14WScandleopal470lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED2002G5
     firmwares: 1.0.012 (117C-2205-00010012)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbE14WSglobeopal470lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbE14WSglobeopal470lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED2003G10
     firmwares: 1.0.012 (117C-2205-00010012)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbE27WSglobeopal1055lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbE27WSglobeopal1055lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED2005R5
     firmwares: 1.0.012 (117C-2205-00010012)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbGU10WS345lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC57', outClusters:'0019', model:'TRADFRIbulbGU10WS345lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED2201G8
     firmwares: 3.0.10 (117C-2206-03000010)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0019', model:'TRADFRI bulb E27 WS globe 1055lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0019', model:'TRADFRI bulb E27 WS globe 1055lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
   - type: LED1835C6
     firmwares: 2.3.087 (117C-4205-23087631)
-    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0005,0019,0020,1000', model:'TRADFRI bulb E14 WS 470lm', manufacturer:'IKEA of Sweden'
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,0008,0300,1000,FC7C', outClusters:'0005,0019,0020,1000', model:'TRADFRI bulb E14 WS 470lm', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
 
   capabilities:
     - file: src/capabilities/Switch.groovy

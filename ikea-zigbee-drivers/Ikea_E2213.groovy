@@ -3,6 +3,7 @@
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
@@ -36,7 +37,7 @@ metadata {
         capability 'PushableButton'
         capability 'ReleasableButton'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,0020,1000,FC7C,FC80', outClusters:'0003,0004,0006,0008,0019,1000,FC80', model:'SOMRIG shortcut button', manufacturer:'IKEA of Sweden' // Firmware: 1.0.20 (117C-3B08-01000020)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,0020,1000,FC7C,FC80', outClusters:'0003,0004,0006,0008,0019,1000,FC80', model:'SOMRIG shortcut button', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // Firmware: 1.0.20 (117C-3B08-01000020)
         
         // Attributes for capability.Battery
         attribute 'lastBattery', 'date'
@@ -50,8 +51,8 @@ metadata {
 
     preferences {
         input(
-            name: 'helpInfo', type: 'hidden',
-            title: '''
+            name:'helpInfo', type:'hidden',
+            title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2213.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
                 IKEA Somrig Shortcut Button (E2213) <small>v5.1.0</small><br>
                 <small><div>
@@ -62,12 +63,10 @@ metadata {
             '''
         )
         input(
-            name: 'logLevel', type: 'enum',
-            title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
-            options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
-            defaultValue: '1',
-            required: true
+            name:'logLevel', type:'enum', title:'Log verbosity', required:true,
+            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
+            defaultValue:'1'
         )
     }
 }
@@ -80,6 +79,7 @@ metadata {
 void installed() {
     log_warn 'Installing device ...'
     log_warn '[IMPORTANT] For battery-powered devices, make sure that you keep your device as close as you can (less than 2inch / 5cm) to your Hubitat hub for at least 30 seconds. Otherwise the device will successfully pair but it won\'t work properly!'
+    state.lastCx = DRIVER_VERSION
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -128,14 +128,10 @@ void healthCheck() {
 // capability.Configuration
 // Note: This method is also called when the device is initially installed
 void configure(boolean auto = false) {
-    log_warn "🎬 Configuring device${auto ? ' (auto)' : ''} ..."
+    log_warn "⚙️ Configuring device${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Configure" button immediately after pushing any button on the device in order to first wake it up!'
     }
-
-    // Apply preferences first
-    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {100002 0000213C00}"]
-    cmds += updated true
 
     // Clear data (keep firmwareMT information though)
     device.data*.key.each { if (it != 'firmwareMT') device.removeDataValue it }
@@ -145,6 +141,23 @@ void configure(boolean auto = false) {
     state.lastTx = 0
     state.lastRx = 0
     state.lastCx = DRIVER_VERSION
+
+    // Put device in identifying state (blinking LED)
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-refresh device state
+    cmds += refresh true
+    utils_sendZigbeeCommands cmds
+
+    // Apply configuration after the auto-refresh finishes
+    runIn(cmds.findAll { !it.startsWith('delay') }.size() + 1, 'configureApply')
+}
+void configureApply() {
+    log_info "⚙️ Finishing device configuration ..."
+    List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
+
+    // Auto-apply preferences
+    cmds += updated true
     
     // Configuration for devices.Ikea_E2213
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0xFC80 {${device.zigbeeId}} {}" // IKEA Button cluster (ep 01)
@@ -170,21 +183,20 @@ void configure(boolean auto = false) {
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, SWBuildID
     cmds += zigbee.readAttribute(0x0000, [0x0005]) // ModelIdentifier
     cmds += zigbee.readAttribute(0x0000, [0x000A]) // ProductCode
-    cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {100002 0000210000}"
-    utils_sendZigbeeCommands cmds
 
-    log_info 'Configuration done; refreshing device current state in 7 seconds ...'
-    runIn 7, 'refresh', [data:true]
+    // Stop blinking LED
+    cmds += "he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 0000}"
+    utils_sendZigbeeCommands cmds
 }
 /* groovylint-disable-next-line UnusedPrivateMethod */
 private void autoConfigure() {
-    log_warn "Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
+    log_warn "👁️ Detected that this device is not properly configured for this driver version (lastCx != ${DRIVER_VERSION})"
     configure true
 }
 
 // capability.Refresh
-void refresh(boolean auto = false) {
-    log_warn "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
+List<String> refresh(boolean auto = false) {
+    log_info "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
@@ -193,7 +205,10 @@ void refresh(boolean auto = false) {
     
     // Refresh for capability.Battery
     cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
+
+    if (auto) return cmds
     utils_sendZigbeeCommands cmds
+    return []
 }
 
 // Implementation for capability.DoubleTapableButton
@@ -378,6 +393,9 @@ void parse(String description) {
         case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0020] }:
             utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryVoltage, data=${msg.value}"
             return
+        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x003E] }:
+            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryAlarmState, data=${msg.value}"
+            return
         
         // Events for capability.HealthCheck
         // ===================================================================================================================
@@ -412,8 +430,8 @@ void parse(String description) {
 
         // Device_annce: Welcome back! let's sync state.
         case { contains it, [endpointInt:0x00, clusterInt:0x0013, commandInt:0x00] }:
-            log_warn 'Rejoined the Zigbee mesh; refreshing device state in 3 seconds ...'
-            runIn 3, 'refresh'
+            log_warn '🙋‍♂️ Rejoined the Zigbee mesh. Syncing device state ...'
+            utils_sendZigbeeCommands(refresh(true))
             return
 
         // Report/Read Attributes Response (Basic cluster)
@@ -426,7 +444,7 @@ void parse(String description) {
 
         // Mgmt_Leave_rsp
         case { contains it, [endpointInt:0x00, clusterInt:0x8034, commandInt:0x00] }:
-            log_warn 'Device is leaving the Zigbee mesh. See you later, Aligator!'
+            log_warn '💀 Device is leaving the Zigbee mesh. See you later, Aligator!'
             return
 
         // Ignore the following Zigbee messages
@@ -454,7 +472,7 @@ void parse(String description) {
         // Unexpected Zigbee message
         // ---------------------------------------------------------------------------------------------------------------
         default:
-            log_error "Sent unexpected Zigbee message: description=${description}, msg=${msg}"
+            log_error "🚩 Sent unexpected Zigbee message: description=${description}, msg=${msg}"
     }
 }
 

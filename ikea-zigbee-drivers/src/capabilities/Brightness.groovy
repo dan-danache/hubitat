@@ -9,32 +9,27 @@ capability 'SwitchLevel'
 
 // Inputs for capability.Brightness
 input(
-    name: 'levelStep', type: 'enum',
-    title: 'Brightness up/down shift',
-    description: '<small>Brightness +/- adjust for the shiftLevel() command.</small>',
-    options: ['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
-    defaultValue: '25',
-    required: true
+    name:'levelStep', type:'enum', title:'Brightness up/down shift', required:true,
+    description:'<small>Brightness +/- adjust for the shiftLevel() command.</small>',
+    options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
+    defaultValue:'25'
 )
 input(
-    name: 'levelChangeRate', type: 'enum',
-    title: 'Brightness change rate',
-    description: '<small>Brightness +/- adjust for the startLevelChange() command.</small>',
-    options: [
+    name:'levelChangeRate', type:'enum', title:'Brightness change rate', required:true,
+    description:'<small>Brightness +/- adjust for the startLevelChange() command.</small>',
+    options:[
          '10': '10% / sec - from 0% to 100% in 10 seconds',
          '20': '20% / sec - from 0% to 100% in 5 seconds',
          '33': '33% / sec - from 0% to 100% in 3 seconds',
          '50': '50% / secs - from 0% to 100% in 2 seconds',
         '100': '100% / sec - from 0% to 100% in 1 seconds',
     ],
-    defaultValue: '20',
-    required: true
+    defaultValue:'20'
 )
 input(
-    name: 'levelTransitionTime', type: 'enum',
-    title: 'Brightness transition time',
-    description: '<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
-    options: [
+    name:'levelTransitionTime', type:'enum', title:'Brightness transition time', required:true,
+    description:'<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
+    options:[
          '0': 'Instant',
          '5': '0.5 seconds',
         '10': '1 second',
@@ -45,37 +40,29 @@ input(
         '50': '5 seconds',
        '100': '10 seconds'
     ],
-    defaultValue: '5',
-    required: true
+    defaultValue:'5'
 )
 input(
-    name: 'turnOnBehavior', type: 'enum',
-    title: 'Turn On behavior',
-    description: '<small>Select what happens when the device is turned On.</small>',
-    options: [
+    name:'turnOnBehavior', type:'enum', title:'Turn On behavior', required:true,
+    description:'<small>Select what happens when the device is turned On.</small>',
+    options:[
         'RESTORE_PREVIOUS_LEVEL': 'Restore previous brightness',
         'FIXED_VALUE': 'Always start with the same fixed brightness'
     ],
-    defaultValue: 'RESTORE_PREVIOUS_LEVEL',
-    required: true
+    defaultValue:'RESTORE_PREVIOUS_LEVEL'
 )
 if (turnOnBehavior == 'FIXED_VALUE') {
     input(
-        name: 'onLevelValue',
-        type: 'number',
-        title: 'Fixed brightness value',
-        description: '<small>Range 1..100</small>',
-        defaultValue: 50,
-        range: '1..100',
-        required: true
+        name:'onLevelValue', type:'number', title:'Fixed brightness value', required:true,
+        description:'<small>Range 1..100</small>',
+        range:'1..100',
+        defaultValue:50
     )
 }
 input(
-    name: 'prestaging', type: 'bool',
-    title: 'Pre-staging',
-    description: '<small>Set brightness level without turning On the device (for later use).</small>',
-    defaultValue: false,
-    required: true
+    name:'prestaging', type:'bool', title:'Pre-staging', required:true,
+    description:'<small>Set brightness level without turning On the device (for later use).</small>',
+    defaultValue:false
 )
 {{/ @inputs }}
 {{!--------------------------------------------------------------------------}}

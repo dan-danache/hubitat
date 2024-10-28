@@ -1,19 +1,19 @@
 {{!--------------------------------------------------------------------------}}
 {{# @attributes }}
 
-// Attributes for devices.Ikea_E2204
+// Attributes for devices.Ikea_E2206
 attribute 'indicatorStatus', 'enum', ['on', 'off']
 {{/ @attributes }}
 {{!--------------------------------------------------------------------------}}
 {{# @commands }}
 
-// Commands for devices.Ikea_E2204
+// Commands for devices.Ikea_E2206
 command 'setIndicatorStatus', [[name:'Status*', type:'ENUM', description:'Select LED indicator status on the device', constraints:['on', 'off']]]
 {{/ @commands }}
 {{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
-// Inputs for devices.Ikea_E2204
+// Inputs for devices.Ikea_E2206
 input(
     name:'childLock', type:'bool', title:'Child lock',
     description:'<small>Lock physical button, safeguarding against accidental operation.</small>',
@@ -23,17 +23,24 @@ input(
 {{!--------------------------------------------------------------------------}}
 {{# @implementation }}
 
-// Implementation for devices.Ikea_E2204
+// Implementation for devices.Ikea_E2206
 void setIndicatorStatus(String status) {
     log_debug "🎬 Setting status indicator to: ${status}"
     utils_sendZigbeeCommands(zigbee.writeAttribute(0xFC85, 0x0001, 0x10, status == 'off' ? 0x00 : 0x01, [mfgCode:'0x117C']))
     utils_sendEvent name:'indicatorStatus', value:status, descriptionText:"Indicator status turned ${status}", type:'digital'
 }
+void refreshPowerAndAmperage(String newState, boolean delay = true) {
+    if (newState == 'on') return
+    List<String> cmds = []
+    cmds += zigbee.readAttribute(0x0B04, 0x050B) // ActivePower
+    cmds += zigbee.readAttribute(0x0B04, 0x0508) // RMSCurrent
+    utils_sendZigbeeCommands cmds
+}
 {{/ @implementation }}
 {{!--------------------------------------------------------------------------}}
 {{# @updated }}
 
-// Preferences for devices.Ikea_E2204
+// Preferences for devices.Ikea_E2206
 if (childLock == null) {
     childLock = false
     device.updateSetting 'childLock', [value:childLock, type:'bool']
@@ -44,14 +51,14 @@ cmds += zigbee.writeAttribute(0xFC85, 0x0000, 0x10, childLock ? 0x01 : 0x00, [mf
 {{!--------------------------------------------------------------------------}}
 {{# @refresh }}
 
-// Refresh for devices.Ikea_E2204
+// Refresh for devices.Ikea_E2206
 cmds += zigbee.readAttribute(0xFC85, 0x0000, [mfgCode:'0x117C'] ) // ChildLock
 cmds += zigbee.readAttribute(0xFC85, 0x0001, [mfgCode:'0x117C'] ) // IndicatorStatus
 {{/ @refresh }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 
-// Events for devices.Ikea_E2204
+// Events for devices.Ikea_E2206
 // ===================================================================================================================
 
 // Read Attributes: ChildLock
