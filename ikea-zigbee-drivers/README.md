@@ -749,7 +749,7 @@ Below you can find the details of each outlet device, including the features and
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2206.webp" style="width: 200px"> |
 | Product Code | `005.698.36`｜`905.698.46` |
-| Variants | E2220 🇺🇸｜E2222 🇫🇷 |
+| Variants | E2220 🇺🇸｜E2223 🇬🇧｜E2222 🇫🇷 |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2206.groovy` |
 | Tested firmwares | `2.4.45` |
 | Since version | `5.1.0` |
