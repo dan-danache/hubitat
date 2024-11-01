@@ -48,6 +48,15 @@ export class HubInfoPanel extends LitElement {
             color: red;
             line-height: 1em;
         }
+        nav {
+            position: absolute;
+            top: 0px; left: 2px;
+            cursor: pointer;
+            visibility: hidden;
+        }
+        :host(:hover) nav {
+            visibility: visible;
+        }
     `;
 
     static properties = {
@@ -68,12 +77,17 @@ export class HubInfoPanel extends LitElement {
                     })}
                 </tbody>
             </table>
+            <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
         `;
     }
 
     async connectedCallback() {
         super.connectedCallback()
         this.refresh()
+    }
+
+    editPanel() {
+        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: this.config }))
     }
 
     async refresh() {
@@ -93,12 +107,12 @@ export class HubInfoPanel extends LitElement {
 export class HubInfoPanelConfig extends LitElement {
 
     static properties = {
-        info: { type: Array, state: true },
+        config: { type: Object, reflect: true },
     }
 
     constructor() {
         super()
-        this.info = []
+        this.config = { info: [] }
     }
 
     render() {
@@ -107,7 +121,8 @@ export class HubInfoPanelConfig extends LitElement {
                 <label>Select details to display:</label>
                 ${Object.entries(FIELDS).map(([key, val]) => {
                     return html`<label><input value="${key}" type="checkbox"
-                        ?required=${this.info.length == 0}
+                        ?required=${this.config.info.length == 0}
+                        .checked=${this.config.info.includes(key)}
                         @change=${this.onFieldSelect}
                     > ${val.label}</label>`
                 })}
@@ -115,22 +130,36 @@ export class HubInfoPanelConfig extends LitElement {
         `
     }
 
+    connectedCallback() {
+        super.connectedCallback()
+        if (typeof this.config?.info == 'string') {
+            this.config = { ...this.config,
+                info: this.config.info.split(''),
+            }
+        }
+        if (this.config?.info === undefined) {
+            this.config = { ...this.config,
+                info: [],
+            }
+        }
+    }
+
     createRenderRoot() {
         return this
     }
 
     firstUpdated() {
-        console.log('firstUpdated')
         setTimeout(() => this.dispatchEvent(new CustomEvent('suggestTitle', { detail: 'Hub Information' })), 200)
     }
 
     onFieldSelect(event) {
-        console.log('onFieldSelect', event.target.value, event.target.checked)
-        if (event.target.checked) this.info = this.info.concat([event.target.value])
-        else this.info = this.info.filter(item => item !== event.target.value)
+        if (event.target.checked) this.config = { info: this.config.info.concat([event.target.value]) }
+        else this.config = { info: this.config.info.filter(item => item !== event.target.value) }
     }
 
     decorateConfig(config) {
-        return { ...config, info: this.info.join('') }
+        return { ...config,
+            info: this.config.info.join(''),
+        }
     }
 }

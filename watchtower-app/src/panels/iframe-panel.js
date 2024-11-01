@@ -9,6 +9,20 @@ export class IframePanel extends LitElement {
             left: 0;
             width: 100%;
             height: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+        }
+        iframe:hover {
+            scrollbar-color: initial;
+        }
+        nav {
+            position: absolute;
+            top: 0px; left: 2px;
+            cursor: pointer;
+            visibility: hidden;
+        }
+        :host(:hover) nav {
+            visibility: visible;
         }
     `
 
@@ -17,11 +31,18 @@ export class IframePanel extends LitElement {
     }
 
     render() {
-        return html`<iframe src=${this.config.url} frameborder="0" allowtransparency="true">Failed to load iframe</iframe>`
+        return html`
+            <iframe src=${this.config.url} frameborder="0" allowtransparency="true">Failed to load iframe</iframe>
+            <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
+        `
     }
 
     firstUpdated() {
         this.classList.remove('spinner')
+    }
+
+    editPanel() {
+        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: this.config }))
     }
 
     decorateConfig(config) {
@@ -36,31 +57,47 @@ export class IframePanel extends LitElement {
 
 export class IframePanelConfig extends LitElement {
     static properties = {
-        url: { type: String, state: true },
-        noBorder: { type: Boolean, state: true },
-        noRefresh: { type: Boolean, state: true },
+        config: { type: Object, reflect: true },
     }
 
     constructor() {
         super()
-        this.url = ''
+        this.config = {
+            url: '',
+            noBorder: false,
+            noRefresh: true,
+        }
     }
 
     render() {
         return html`
             <section>
                 <label for="url">URL to load:</label>
-                <input type="url" id="url" required="true" type="url" pattern="https?://.+" placeholder="Enter URL to load" autocomplete="off" @change=${event => this.url = event.target.value}/>
+                <input type="url" id="url" required="true" type="url" pattern="https?://.+" placeholder="Enter URL to load" autocomplete="off"
+                    .value=${this.config.url}
+                    @change=${event => this.config = {...this.config, url: event.target.value}}
+                />
             </section>
             <section>
                 <label><input value="true" type="checkbox"
-                    @change=${this.onNoBorderChecked}
+                    .checked=${this.config.noBorder}
+                    @change=${event => this.config = {...this.config, noBorder: event.target.checked}}
                 > Hide tile border</label>
                 <label><input value="true" type="checkbox"
-                    @change=${this.onNoRefreshChecked}
+                    .checked=${this.config.noRefresh}
+                    @change=${event => this.config = {...this.config, noRefresh: event.target.checked}}
                 > Disable auto-refresh</label>
             </section>
         `
+    }
+
+    connectedCallback() {
+        super.connectedCallback()
+        if (this.config?.url === undefined) {
+            this.config = { ...this.config,
+                url: '',
+            }
+        }
     }
 
     createRenderRoot() {
@@ -71,20 +108,11 @@ export class IframePanelConfig extends LitElement {
         setTimeout(() => this.renderRoot.querySelector('#url').focus(), 0)
     }
 
-    onNoBorderChecked(event) {
-        this.noBorder = event.target.checked
-    }
-    
-    onNoRefreshChecked(event) {
-        this.noRefresh = event.target.checked
-    }
-
     decorateConfig(config) {
-        return {
-            ...config,
-            url: this.url,
-            noBorder: this.noBorder,
-            noRefresh: this.noRefresh
+        return { ...config,
+            url: this.config.url,
+            noBorder: this.config.noBorder === true ? true : undefined,
+            noRefresh: this.config.noRefresh === true ? true : undefined,
         }
     }
 }

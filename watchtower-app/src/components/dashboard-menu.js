@@ -151,11 +151,9 @@ export class DashboardMenu extends LitElement {
     render() {
         return html`
             <nav>
-                ${this.mobileView ? '' : html`
-                    <button @click=${this.addTile} title="Add a new dashboard tile"><b>+</b> Add dashboard tile</button>
-                    <button @click=${this.compactTiles} title="Re-order dashboard tiles to fill any empty space">⋮⋮⋮ Compact space</button>
-                    <hr>
-                `}
+                <button @click=${this.addTile} title="Add a new dashboard tile"><b>+</b> Add dashboard tile</button>
+                <button @click=${this.compactTiles} title="Re-order dashboard tiles to fill any empty space">⋮⋮⋮ Compact space</button>
+                <hr>
                 <label for="refreshInterval">Auto-refresh</label>
                 <select id="refreshInterval" .value=${this.refreshInterval} @change=${this.changeRefreshInterval}>
                     <option value="0">no refresh</option>
@@ -182,11 +180,9 @@ export class DashboardMenu extends LitElement {
                     >
                     <input type="submit" value="➤" title="Apply cell height">
                 </form>
-                ${this.mobileView ? '' : html`
-                    <hr>
-                    <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
-                `}
-                <aside>v2.0.2</aside>
+                <hr>
+                <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
+                <aside>v2.1.0</aside>
             </nav>
         `;
     }

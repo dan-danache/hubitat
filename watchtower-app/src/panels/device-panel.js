@@ -23,7 +23,8 @@ export class DevicePanel extends LitElement {
             transform: translate(-50%, 0);
             visibility: hidden;
         }
-        :host(:hover) precision-selector {
+        :host(:hover) precision-selector,
+        :host(:hover) nav {
             visibility: visible;
         }
         aside {
@@ -50,6 +51,12 @@ export class DevicePanel extends LitElement {
             cursor: pointer;
             letter-spacing: 1px;
         }
+        nav {
+            position: absolute;
+            top: 0px; left: 2px;
+            cursor: pointer;
+            visibility: hidden;
+        }
     `;
 
     static properties = {
@@ -63,6 +70,7 @@ export class DevicePanel extends LitElement {
         return html`
             <canvas tabindex='1'></canvas>
             <precision-selector @change=${this.changePrecision} .precision=${this.config.precision}></precision-selector>
+            <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
             ${ this.nodata === true ? html`<aside>No data yet</aside>` : '' }
         `;
     }
@@ -84,9 +92,14 @@ export class DevicePanel extends LitElement {
         await this.initChart()
     }
 
+    editPanel() {
+        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: this.config }))
+    }
+
     async initChart() {
+        this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
-        const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.mm1, this.config.mm2, this.config.precision)
+        const data = await DatastoreHelper.fetchDeviceData(this.config)
         const colors = ColorHelper.colors()
         this.nodata = data.attr1.length == 0
 
@@ -215,6 +228,7 @@ export class DevicePanel extends LitElement {
             }
         }
 
+        this.chart.precision = this.config.precision
         this.chart.data = { datasets }
         this.chart.update('none')
         ChartHelper.updateChartType(this.chart)
@@ -228,17 +242,7 @@ export class DevicePanel extends LitElement {
     }
 
     async refresh() {
-        this.initChart()
-        // this.classList.add('spinner')
-        // const data = await DatastoreHelper.fetchDeviceData(this.config.dev, this.config.attr1, this.config.attr2, this.config.precision, this.config.mm)
-        // console.log('refresh data', data)
-        // this.nodata = data.attr1.length == 0
-        // this.chart.data.datasets[0].data = data.attr1
-        // if (this.config.attr2 !== undefined) this.chart.data.datasets[1].data = data.attr2
-        // //this.chart.config.type = data.attr1.length < 10 ? 'bar' : 'line'
-        // this.chart.update('none')
-        // ChartHelper.updateChartType(this.chart)
-        // setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
+        await this.initChart()
     }
 
     decorateConfig(config) {
@@ -267,26 +271,18 @@ export class DevicePanel extends LitElement {
 
 export class DevicePanelConfig extends LitElement {
     static properties = {
+        config: { type: Object, reflect: true },
         devices: { type: Object, state: true },
         supportedAttributes: { type: Object, state: true },
         attributes: { type: Object, state: true },
-
-        device: { type: String, state: true },
-        attr1: { type: String, state: true },
-        mm1: { type: Boolean, state: true },
-        attr2: { type: String, state: true },
-        mm2: { type: Boolean, state: true },
     }
 
     constructor() {
         super()
+        this.config = {}
         this.devices = undefined
         this.supportedAttributes = undefined
         this.attributes = undefined
-
-        this.dev = undefined
-        this.attr1 = this.attr2 = undefined
-        this.mm1 = this.mm2 = false
     }
 
     render() {
@@ -297,10 +293,15 @@ export class DevicePanelConfig extends LitElement {
         `
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback()
-        DatastoreHelper.fetchMonitoredDevices().then(devices => { this.devices = devices })
-        DatastoreHelper.fetchSupportedAttributes().then(attributes => { this.supportedAttributes = attributes })
+        await DatastoreHelper.fetchMonitoredDevices().then(devices => { this.devices = devices })
+        await DatastoreHelper.fetchSupportedAttributes().then(attributes => { this.supportedAttributes = attributes })
+        if (!this.config.dev) return
+
+        // Pre-load attributes
+        const device = this.devices.find(device => device.id == this.config.dev)
+        this.attributes = device.attrs.sort()
     }
 
     createRenderRoot() {
@@ -310,10 +311,10 @@ export class DevicePanelConfig extends LitElement {
     renderDevicesSelect() {
         return html`
             <section>
-                <select id="device" .value=${this.dev} @change=${this.onDeviceSelect} required="true">
-                    <option value=""></option>
+                <select id="device" @change=${this.onDeviceSelect} required="true">
+                    <option></option>
                     ${this.devices.map(device => html`
-                        <option value="${device.id}" .selected=${this.dev === device.id}>${device.name}</option>
+                        <option value="${device.id}" .selected=${this.config.dev == device.id}>${device.name}</option>
                     `
                     )}
                 </select>
@@ -325,23 +326,29 @@ export class DevicePanelConfig extends LitElement {
         return html`
             <section>
                 <label for="attr1">Select attribute to chart:</label>
-                <select id="attr1" .value=${this.attr1} @change=${event => { this.attr1 = event.target.value; this.mm1 = false }} required="true">
+                <select id="attr1" .value=${this.config.attr1} @change=${this.onAttribute1Select} required="true">
                     <option value=""></option>
-                    ${this.attributes.filter(attribute => attribute != this.attr2).map(attribute => html`
-                        <option value="${attribute}" .selected=${this.attr1 === attribute}>${attribute}</option>
+                    ${this.attributes.filter(attribute => attribute != this.config.attr2).map(attribute => html`
+                        <option value="${attribute}" .selected=${this.config.attr1 === attribute}>${attribute}</option>
                     `
                     )}
                 </select>
-                ${ this.attr1 && this.supportedAttributes[this.attr1].minMax == true ? html`
+                ${ this.config.attr1 ? html`
                     <div>
+                        ${ this.supportedAttributes[this.config.attr1].minMax == true ? html`
+                            <label><input type="checkbox"
+                                .checked="${this.config.mm1}"
+                                @change=${ event => this.config.mm1 = event.target.checked }
+                            > Chart ${this.config.attr1} min/max</label>
+                         ` : ''}
                         <label><input type="checkbox"
-                            .checked="${this.mm1}"
-                            @change=${ event => this.mm1 = event.target.checked }
-                        > Chart ${this.attr1} min/max</label>
+                            .checked="${this.config.z1}"
+                            @change=${ event => this.config.z1 = event.target.checked }
+                        > Render zero for missing values</label>
                     </div>
                 ` : ''}
             </section>
-            ${ this.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
+            ${ this.config.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
         `
     }
 
@@ -349,19 +356,25 @@ export class DevicePanelConfig extends LitElement {
         return html`
             <section>
                 <label for="attr2">Select additional attribute:</label>
-                <select id="attr2" .value=${this.attr2} @change=${event => { this.attr2 = event.target.value; this.mm2 = false }}>
+                <select id="attr2" .value=${this.config.attr2} @change=${this.onAttribute2Select}>
                     <option value="">[optional]</option>
-                    ${this.attributes.filter(attribute => attribute != this.attr1).map(attribute => html`
-                        <option value="${attribute}" .selected=${this.attr2 === attribute}>${attribute}</option>
+                    ${this.attributes.filter(attribute => attribute != this.config.attr1).map(attribute => html`
+                        <option value="${attribute}" .selected=${this.config.attr2 === attribute}>${attribute}</option>
                     `
                     )}
                 </select>
-                ${ this.attr2 && this.supportedAttributes[this.attr2].minMax == true ? html`
+                ${ this.config.attr2 ? html`
                     <div>
+                        ${ this.supportedAttributes[this.config.attr2].minMax == true ? html`
+                            <label><input type="checkbox"
+                                .checked="${this.config.mm2}"
+                                @change=${ event => this.config.mm2 = event.target.checked }
+                            > Chart ${this.config.attr2} min/max</label>
+                         ` : ''}
                         <label><input type="checkbox"
-                            .checked="${this.mm2}"
-                            @change=${ event => this.mm2 = event.target.checked }
-                        > Chart ${this.attr2} min/max</label>
+                            .checked="${this.config.z2}"
+                            @change=${ event => this.config.z2 = event.target.checked }
+                        > Render zero for missing values</label>
                     </div>
                 ` : ''}
             </section>
@@ -369,26 +382,60 @@ export class DevicePanelConfig extends LitElement {
     }
 
     onDeviceSelect(event) {
-        this.attr1 = this.attr2 = undefined
-        this.mm1 = this.mm2 = false
+        const dev = event.target.value !== '' ? event.target.value : undefined
+        if (dev == this.config.dev) return
 
-        this.dev = event.target.value !== '' ? event.target.value : undefined
-        if (this.dev === undefined) {
+        this.config = { ...this.config,
+            dev,
+            attr1: undefined,
+            attr2: undefined,
+            mm1: false,
+            mm2: false,
+            z1: false,
+            z2: false
+        }
+
+        if (this.config.dev === undefined) {
             this.attributes = undefined
             return
         }
 
-        const device = this.devices.find(device => device.id == this.dev)
+        const device = this.devices.find(device => device.id == dev)
         this.attributes = device.attrs.sort()
         this.dispatchEvent(new CustomEvent('suggestTitle', { detail: device.name }))
     }
 
+    onAttribute1Select(event) {
+        const attr1 = event.target.value !== '' ? event.target.value : undefined
+        if (attr1 == this.config.attr1) return
+        this.config = { ...this.config,
+            attr1,
+            mm1: false,
+            z1: false,
+        }
+    }
+
+    onAttribute2Select(event) {
+        const attr2 = event.target.value !== '' ? event.target.value : undefined
+        if (attr2 == this.config.attr2) return
+        this.config = { ...this.config,
+            attr2,
+            mm2: false,
+            z2: false,
+        }
+    }
+
     decorateConfig(config) {
-        return { ...config, dev: this.dev, precision: '5m',
-            attr1: this.attr1,
-            attr2: this.attr2,
-            mm1: this.mm1 === true ? true : undefined,
-            mm2: this.mm2 === true ? true : undefined,
+        return {
+            ...config,
+            dev: parseInt(this.config.dev),
+            precision: '5m',
+            attr1: this.config.attr1,
+            attr2: this.config.attr2,
+            mm1: this.config.mm1 === true ? true : undefined,
+            mm2: this.config.mm2 === true ? true : undefined,
+            z1: this.config.z1 === true ? true : undefined,
+            z2: this.config.z2 === true ? true : undefined,
         }
     }
 }

@@ -53,7 +53,11 @@ export class WatchtowerApp extends LitElement {
 
     render() {
         return this.halt !== false ? '' : html`
-            <dashboard-grid name=${this.name} class="${this.embedded ? 'embedded' : ''}"></dashboard-grid>
+            <dashboard-grid
+                name=${this.name}
+                class="${this.embedded ? 'embedded' : ''}"
+                @edit=${this.editPanel}
+            ></dashboard-grid>
             ${this.embedded === true ? '' : html`
                 <dashboard-menu
                     @add=${this.showAddDialog}
@@ -130,6 +134,12 @@ export class WatchtowerApp extends LitElement {
     }
 
     showAddDialog() {
+        this.dialogElm.config = undefined
+        this.dialogElm.setAttribute('open', true)
+    }
+
+    editPanel(event) {
+        this.dialogElm.config = JSON.parse(JSON.stringify(event.detail))
         this.dialogElm.setAttribute('open', true)
     }
 

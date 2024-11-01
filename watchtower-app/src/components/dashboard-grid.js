@@ -82,7 +82,7 @@ export class DashboardGrid extends LitElement {
 
     render() {
         return html`
-            <div class="grid-stack spinner" ?mobile-view=${this.mobileView}></div>
+            <div class="grid-stack spinner" @edit=${this.editPanel} ?mobile-view=${this.mobileView}></div>
         `;
     }
 
@@ -129,7 +129,6 @@ export class DashboardGrid extends LitElement {
                         <li>Click the <b>Add dashboard tile</b> button to add new tiles to your dashboard.
                         <li>Rearrange tiles by dragging their titles. Resize tiles by dragging the bottom-right corner.
                         <li>Remove tiles by dragging them outside the dashboard grid.
-                        <li>Tiles cannot be edited; remove and add them again if needed.
                         <li>Remember to click the <b>Save dashboard</b> button when you're happy with the layout.
                     </ul>
                     For more information, refer to the <a href="https://dan-danache.github.io/hubitat/watchtower-app/" target="_blank">official documentation</a>.
@@ -138,6 +137,7 @@ export class DashboardGrid extends LitElement {
         } else {
             this.grid.batchUpdate(true)
             panels.forEach(panel => {
+                panel.config.id = this.randomUUID()
                 this.addPanel(panel.config, panel.w, panel.h, panel.x, panel.y)
             })
             this.grid.batchUpdate(false)
@@ -172,14 +172,28 @@ export class DashboardGrid extends LitElement {
         this.grid.cellHeight(cellHeight, true)
     }
 
-    addPanel(config, w = 2, h = 1, x = undefined, y = undefined) {
+    addPanel(config, ww = 2, wh = 1, wx = undefined, wy = undefined) {
+        let w = ww, h = wh, x = wx, y = wy
+
+        // Remove widget, if exists
+        const old = this.grid.engine.nodes.find(node => node.config?.id == config.id)
+        if (old) {
+            w = old.w, h = old.h, x = old.x, y = old.y
+            this.grid.removeWidget(old.el)
+        }
+
+        // Add gridstack widget
         const content = `
             <div class="panel-container">
                 <${config.type} config='${JSON.stringify(config).replace(/'/g, '&apos;')}' class="panel empty spinner"></${config.type}>
                 <div class="panel-title">${config.title || '&nbsp' }</div>
             </div>
         `
-        this.grid.addWidget({w, h, x, y, config, content, id:`${config.noBorder === true ? 'tr-' : ''}${this.randomUUID()}`})
+        this.grid.addWidget({w, h, x, y, config, content, id:`${config.noBorder === true ? 'tr-' : ''}${config.id}`})
+    }
+
+    editPanel(event) {
+        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: event.detail }))
     }
 
     randomUUID() {

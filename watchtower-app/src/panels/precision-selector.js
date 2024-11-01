@@ -1,5 +1,12 @@
 import { html, css, LitElement } from '../vendor/vendor.min.js';
 
+export const precisions = {
+    '5m': { amount: 5, unit: 'minute', description: 'View data with 5 minutes precision' },
+    '1h': { amount: 1, unit: 'hour', description: 'View data with 1 hour precision' },
+    '1d': { amount: 1, unit: 'day', description: 'View data with 1 day precision' },
+    '1w': { amount: 1, unit: 'week', description: 'View data with 1 week precision' },
+}
+
 export class PrecisionSelector extends LitElement {
     static styles = css`
         ul {
@@ -37,13 +44,6 @@ export class PrecisionSelector extends LitElement {
         .ui-resizable-handle { opacity:0 }
     `;
 
-    static precisions = {
-        '5m': 'View data with 5 minutes precision',
-        '1h': 'View data with 1 hour precision',
-        '1d': 'View data with 1 day precision',
-        '1w': 'View data with 1 week precision',
-    }
-
     static properties = {
         precision: { type: Object, state: true },
     }
@@ -51,7 +51,7 @@ export class PrecisionSelector extends LitElement {
     render() {
         return html`
             <nav><ul>
-                ${Object.entries(PrecisionSelector.precisions).map(([key, val]) => html`<li @click=${this.selectPrecision} ?data-selected=${this.precision == key} ?inert=${this.precision == key} title="${val}">${key}</li>`)}
+                ${Object.entries(precisions).map(([key, val]) => html`<li @click=${this.selectPrecision} ?data-selected=${this.precision == key} ?inert=${this.precision == key} title="${val.description}">${key}</li>`)}
             </ul></nav>
         `;
     }

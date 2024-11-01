@@ -153,44 +153,43 @@ export class DashboardAddDialog extends LitElement {
 
     static properties = {
         open: { type: Boolean, reflect: true },
-        title: { type: String, title: true },
-        type: { type: String, state: true },
+        config: { type: Object, state: true },
     }
 
     constructor() {
         super()
-        this.title = ''
-        this.type = undefined
+        this.resetForm()
     }
 
     render() {
+        if (this.config === undefined) this.resetForm()
         setTimeout(() => this.renderRoot.querySelector('.panel-config')?.addEventListener('suggestTitle', event => this.suggestTitle(event)), 0)
         return html`
             <article role="dialog" aria-modal="true" aria-labelledby="d-title">
                 <form @submit=${this.submit}>
-                    <header id="d-title">Add dashboard tile</header>
+                    <header id="d-title">${this.config.id ? 'Edit': 'Add'} Dashboard Tile</header>
                     <section class="modal-body">
                         <section>
                             <label for="title">Title title:</label>
-                            <input type="text" id="title" .value=${this.title} autocomplete="off" @change=${event => this.title = event.target.value} placeholder="[optional]">
+                            <input type="text" id="title" .value=${this.config.title} autocomplete="off" @change=${event => this.config.title = event.target.value} placeholder="[optional]">
                         </section>
                         <section>
                             <label for="type">Tile type:</label>
-                            <select id="type" .value=${this.type} @change=${event => this.type = event.target.value} required="true">
+                            <select id="type" .value=${this.config.type} @change=${this.onTileTypeChange} required="true">
                                 <option value=""></option>
                                 ${Object.entries(DashboardAddDialog.panels).map(([key, val]) => html`
-                                    <option value="${key}" .selected=${this.type === key}>${val}</option>
+                                    <option value="${key}" .selected=${this.config.type === key}>${val}</option>
                                 `
                                 )}
                             </select>
                         </section>
                         <section>
-                            ${this.type ? this.renderPanelConfig() : ''}
+                            ${this.config.type ? this.renderPanelConfig() : ''}
                         </section>
                     </section>
                     <footer>
                         <button type="reset" @click=${this.close}>Cancel</button>
-                        <button type="submit">Add tile</button>
+                        <button type="submit">${this.config.id ? 'Update': 'Add'} tile</button>
                     </footer>
                 </form>
             </article>
@@ -198,37 +197,51 @@ export class DashboardAddDialog extends LitElement {
     }
 
     renderPanelConfig() {
-        return unsafeHTML(`<${this.type}-config class="panel-config"></${this.type}-config>`)
+        return unsafeHTML(`<${this.config.type}-config class="panel-config" config='${JSON.stringify(this.config).replace(/'/g, '&apos;')}'></${this.config.type}-config>`)
     }
 
     connectedCallback() {
         super.connectedCallback()
-        window.addEventListener('keydown', event => event.key === 'Escape' && this.close())
+        window.addEventListener('keydown', event => event.key === 'Escape' && this.close(event))
+    }
+
+    onTileTypeChange(event) {
+        this.config = {
+            id: this.config.id,
+            title: this.config.title,
+            type: event.target.value
+        }
     }
 
     suggestTitle(event) {
-        if (this.title == '') this.title = event.detail
+        if (this.config.title == '') this.config.title = event.detail
     }
 
     updated(changedProperties) {
         if (changedProperties.size == 0 || changedProperties.open === true) return
-        setTimeout(() => this.renderRoot.querySelector('#title').focus(), 0)
     }
 
     resetForm() {
-        this.title = ''
-        this.type = undefined
+        this.config = {
+            title: ''
+        }
     }
 
-    close() {
+    close(event) {
+        event?.stopPropagation()
         this.resetForm()
         this.open = false
     }
 
     submit(event) {
         event.preventDefault()
-        const config = this.renderRoot.querySelector('.panel-config').decorateConfig({title: this.title, type: this.type})
-        console.info('Adding panel with config', config)
+        const config = this.renderRoot.querySelector('.panel-config').decorateConfig({
+            id: this.config.id,
+            title: this.config.title,
+            type: this.config.type
+        })
+        Object.keys(config).forEach(key => config[key] === undefined && delete config[key])
+        console.info('**** Adding panel with config', config)
 
         this.close()
         this.resetForm()

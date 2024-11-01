@@ -72,10 +72,11 @@ export class DatastoreHelper {
         return this.CACHE[fileName]
     }
 
-    static async fetchDeviceData(deviceId, attr1, attr2, mm1, mm2, precision) {
+    static async fetchDeviceData({dev, precision, attr1, attr2, mm1, mm2, z1, z2}) {
+        //console.log('fetchDeviceData', dev, precision, attr1, attr2, mm1, mm2, z1, z2)
         const data = { attr1: [], attr2: [], min1: [], max1: [], min2: [], max2: [] }
         try {
-            const response = await fetch(new Request(this.buildCsvUrl(deviceId, precision)), { cache: 'no-store' })
+            const response = await fetch(new Request(this.buildCsvUrl(dev, precision)), { cache: 'no-store' })
 
             // Data not available yet
             if (response.status == 404) return data
@@ -99,16 +100,16 @@ export class DatastoreHelper {
             lines.forEach(line => {
                 const vals = line.split(',')
                 const x = parseInt(vals[0]) * 1000
-                data.attr1.push({x, y: (vals[attr1Idx] === '' || vals[attr1Idx] === '-' ? null : parseFloat(vals[attr1Idx]))})
-                if (attr2Idx !== -1) data.attr2.push({x, y: (vals[attr2Idx] === '' || vals[attr2Idx] === '-' ? null : parseFloat(vals[attr2Idx]))})
+                data.attr1.push({x, y: (vals[attr1Idx] === '' || vals[attr1Idx] === '-' ? (z1 === true ? 0 : null) : parseFloat(vals[attr1Idx]))})
+                if (attr2Idx !== -1) data.attr2.push({x, y: (vals[attr2Idx] === '' || vals[attr2Idx] === '-' ? (z2 === true ? 0 : null) : parseFloat(vals[attr2Idx]))})
 
                 if (addMinMax1) {
-                    data.min1.push({x, y: (vals[min1Idx] === undefined || vals[min1Idx] === '' || vals[min1Idx] === '-' ? null : parseFloat(vals[min1Idx]))})
-                    data.max1.push({x, y: (vals[max1Idx] === undefined || vals[max1Idx] === '' || vals[max1Idx] === '-' ? null : parseFloat(vals[max1Idx]))})
+                    data.min1.push({x, y: (vals[min1Idx] === undefined || vals[min1Idx] === '' || vals[min1Idx] === '-' ? (z1 === true ? 0 : null) : parseFloat(vals[min1Idx]))})
+                    data.max1.push({x, y: (vals[max1Idx] === undefined || vals[max1Idx] === '' || vals[max1Idx] === '-' ? (z1 === true ? 0 : null) : parseFloat(vals[max1Idx]))})
                 }
                 if (addMinMax2) {
-                    data.min2.push({x, y: (vals[min2Idx] === undefined || vals[min2Idx] === '' || vals[min2Idx] === '-' ? null : parseFloat(vals[min2Idx]))})
-                    data.max2.push({x, y: (vals[max2Idx] === undefined || vals[max2Idx] === '' || vals[max2Idx] === '-' ? null : parseFloat(vals[max2Idx]))})
+                    data.min2.push({x, y: (vals[min2Idx] === undefined || vals[min2Idx] === '' || vals[min2Idx] === '-' ? (z2 === true ? 0 : null) : parseFloat(vals[min2Idx]))})
+                    data.max2.push({x, y: (vals[max2Idx] === undefined || vals[max2Idx] === '' || vals[max2Idx] === '-' ? (z2 === true ? 0 : null) : parseFloat(vals[max2Idx]))})
                 }
             })
             return data
@@ -124,11 +125,16 @@ export class DatastoreHelper {
         return `./watchtower.csv?device=${deviceId}&precision=${precision}&access_token=${this.accessToken()}`
     }
 
-    static async fetchAttributeData(attribute, deviceIds, precision) {
+    static async fetchAttributeData({ attr, devs, precision, z }) {
         const data = {}
-        for (const deviceId of deviceIds) {
-            const deviceData = await this.fetchDeviceData(deviceId, attribute, undefined, false, false, precision)
-            data[`dev_${deviceId}`] = deviceData.attr1
+        for (const dev of devs) {
+            const deviceData = await this.fetchDeviceData({
+                dev,
+                precision,
+                attr1: attr,
+                z1: z
+            })
+            data[`dev_${dev}`] = deviceData.attr1
         }
         return data
     }

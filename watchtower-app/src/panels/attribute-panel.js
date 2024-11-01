@@ -23,7 +23,8 @@ export class AttributePanel extends LitElement {
             transform: translate(-50%, 0);
             visibility: hidden;
         }
-        :host(:hover) precision-selector {
+        :host(:hover) precision-selector,
+        :host(:hover) nav {
             visibility: visible;
         }
         aside {
@@ -50,6 +51,17 @@ export class AttributePanel extends LitElement {
             cursor: pointer;
             letter-spacing: 1px;
         }
+        aside {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        nav {
+            position: absolute;
+            top: 0px; left: 2px;
+            cursor: pointer;
+            visibility: hidden;
+        }
     `
 
     static properties = {
@@ -63,6 +75,7 @@ export class AttributePanel extends LitElement {
         return html`
             <canvas></canvas>
             <precision-selector @change=${this.changePrecision} .precision=${this.config.precision}></precision-selector>
+            <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
             ${ this.nodata === true ? html`<aside>No data yet</aside>` : '' }
         `;
     }
@@ -84,10 +97,15 @@ export class AttributePanel extends LitElement {
         await this.initChart()
     }
 
+    editPanel() {
+        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: this.config }))
+    }
+
     async initChart() {
+        this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
         const monitoredDevices = await DatastoreHelper.fetchMonitoredDevices()
-        const data = await DatastoreHelper.fetchAttributeData(this.config.attr, this.config.devs, this.config.precision)
+        const data = await DatastoreHelper.fetchAttributeData(this.config)
         const colors = ColorHelper.colors()
         //this.nodata = data.attr1.length == 0
 
@@ -132,6 +150,7 @@ export class AttributePanel extends LitElement {
             if (this.attrMax !== undefined) this.chart.options.scales.y.suggestedMax = this.attrMax
         }
 
+        this.chart.precision = this.config.precision
         this.chart.data = { datasets }
         this.chart.update('none')
         ChartHelper.updateChartType(this.chart)
@@ -146,13 +165,7 @@ export class AttributePanel extends LitElement {
     }
 
     async refresh() {
-        this.classList.add('spinner')
-        const data = await DatastoreHelper.fetchAttributeData(this.config.attr, this.config.devs, this.config.precision)
-        //this.nodata = data.attr1.length == 0
-        this.chart.data.datasets.forEach(dataset => dataset.data = data[dataset.ref])
-        this.chart.update('none')
-        ChartHelper.updateChartType(this.chart)
-        this.classList.remove('spinner')
+        await this.initChart()
     }
 
     decorateConfig(config) {
@@ -175,39 +188,34 @@ export class AttributePanel extends LitElement {
 
 export class AttributePanelConfig extends LitElement {
     static properties = {
+        config: { type: Object, reflect: true },
         devices: { type: Object, state: true },
         attributes: { type: Object, state: true },
-
-        attr: { type: String, state: true },
-        devs: { type: Object, state: true },
     }
 
     constructor() {
         super()
+        this.config = {
+            devs: []
+        }
         this.devices = undefined
         this.attributes = undefined
-
-        this.attr = undefined
-        this.devs = []
     }
 
     render() {
         return html`
             <label for="device">Select attribute to chart:</label>
             ${this.attributes ? this.renderAttributesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
-            ${this.attr ? this.renderDevicesSelect() : '' }
+            ${this.config.attr && this.devices ? this.renderDevicesSelect() : '' }
         `
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback()
-        DatastoreHelper.fetchMonitoredDevices().then(devices => {
-            this.devices = devices
-
-            const attrs = new Set()
-            devices.forEach(device => device.attrs.forEach(attr => attrs.add(attr)))
-            this.attributes = [...attrs].sort()
-        })
+        this.devices = await DatastoreHelper.fetchMonitoredDevices();
+        const attrs = new Set()
+        this.devices.forEach(device => device.attrs.forEach(attr => attrs.add(attr)))
+        this.attributes = [...attrs].sort()
     }
 
     createRenderRoot() {
@@ -215,28 +223,36 @@ export class AttributePanelConfig extends LitElement {
     }
 
     renderAttributesSelect() {
-        setTimeout(() => this.renderRoot.querySelector('#attr').focus(), 0)
         return html`
             <section>
-                <select id="attr" .value=${this.attr} @change=${this.onAttributeSelect} required="true">
+                <select id="attr" @change=${this.onAttributeSelect} required="true">
                     <option value=""></option>
                     ${this.attributes.map(attribute => html`
-                        <option value="${attribute}" .selected=${this.attr === attribute}>${attribute}</option>
+                        <option value="${attribute}" .selected=${this.config.attr === attribute}>${attribute}</option>
                     `
                     )}
                 </select>
+                ${ this.config.attr ? html`
+                    <div>
+                        <label><input type="checkbox"
+                            .checked="${this.config.z}"
+                            @change=${ event => this.config.z = event.target.checked }
+                        > Render zero for missing values</label>
+                    </div>
+                ` : ''}
             </section>
         `
     }
 
     renderDevicesSelect() {
-        const devices = this.devices.filter(device => device.attrs.includes(this.attr))
+        const devices = this.devices.filter(device => device.attrs.includes(this.config.attr))
         return html`
-            <section>
+            <section id="devlist">
                 <label>Select devices (at least one):</label>
                 ${devices.map(device => {
                     return html`<label><input value="${device.id}" type="checkbox"
-                        ?required=${this.devs.length == 0}
+                        .checked="${this.config.devs.find(dev => dev == device.id)}"
+                        ?required=${this.config.devs.length == 0}
                         @change=${this.onDeviceSelect}
                     > ${device.name}</label>`
                 })}
@@ -245,16 +261,27 @@ export class AttributePanelConfig extends LitElement {
     }
 
     onAttributeSelect(event) {
-        this.attr = event.target.value !== '' ? event.target.value : undefined
-        this.devs = []
-        if (this.attr) this.dispatchEvent(new CustomEvent('suggestTitle', { detail: ChartHelper.prettyName(this.attr) }))
+        const attr = event.target.value !== '' ? event.target.value : undefined
+        this.config = { ...this.config,
+            attr,
+            z: false,
+            devs: [],
+        }
+        if (attr) this.dispatchEvent(new CustomEvent('suggestTitle', { detail: ChartHelper.prettyName(attr) }))
     }
 
     onDeviceSelect() {
-        this.devs = [...this.renderRoot.querySelectorAll('input[type="checkbox"]:checked')].map(input => input.value)
+        this.config = { ...this.config,
+            devs: [...this.renderRoot.querySelectorAll('#devlist input[type="checkbox"]:checked')].map(input => input.value),
+        }
     }
 
     decorateConfig(config) {
-        return { ...config, attr: this.attr, devs: this.devs }
+        return {
+            ...config,
+            attr: this.config.attr,
+            devs: this.config.devs.map(deviceId => parseInt(deviceId)),
+            z: this.config.z === true ? true : undefined,
+        }
     }
 }

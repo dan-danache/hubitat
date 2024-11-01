@@ -233,8 +233,6 @@ The following dashboard tile types are currently supported:
 
 - Remove tiles by moving them outside the dashboard grid.
 
-- Dashboard tiles cannot be edited. If you selected the wrong device/attribute or want to change the tile title, remove it and add it again with the correct configuration.
-
 > **Important**: Changes are not automatically saved! Remember to click the **Save dashboard** button when you are satisfied with the dashboard layout.
 
 ### Chart Time Resolution

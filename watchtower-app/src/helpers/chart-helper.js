@@ -2,6 +2,7 @@ import '../vendor/vendor.min.js'
 import { ColorHelper } from './color-helper.js'
 //import ToggleScaleVisibilityPlugin from '../plugins/toggle-scale-visibility.js'
 import CrosshairPlugin from '../plugins/crosshair.js'
+import { precisions } from '../panels/precision-selector.js'
 
 // Register custom plugins
 //Chart.register(ToggleScaleVisibilityPlugin)
@@ -15,6 +16,11 @@ positioners.custom = function(elements, eventPosition) {
     if (pos.y < chartArea.top + 25) { pos.yAlign = 'top'; pos.xAlign = pos.x < (chartArea.left + chartArea.right) / 2 ? 'left' : 'right' }
     else if (pos.y > chartArea.bottom - 25) { pos.yAlign = 'bottom'; pos.xAlign = pos.x < (chartArea.left + chartArea.right) / 2 ? 'left' : 'right' }
     return pos
+}
+
+const adapter = Chart._adapters._date.prototype
+function tooltipTitle(time, precision, formats) {
+    return `${adapter.format(adapter.add(time, 0 - precision.amount, precision.unit), formats[precision.unit])} - ${adapter.format(time, formats[precision.unit])}`
 }
 
 export class ChartHelper {
@@ -41,9 +47,9 @@ export class ChartHelper {
                             displayFormats: {
                                 minute: 'd LLL HH:mm',
                                 hour: 'd LLL HH:mm',
-                                day: 'd LLL'
-                            },
-                            tooltipFormat: 'd LLL HH:mm'
+                                day: 'd LLL',
+                                week: 'd LLL'
+                            }
                         },
                         title: { display: false },
                         ticks: {
@@ -63,7 +69,10 @@ export class ChartHelper {
                     legend: { display: false },
                     tooltip: {
                         itemSort: (a, b) => b.raw.y - a.raw.y,
-                        callbacks: { label: t => ` ${t.dataset.label}: ${t.parsed.y}${t.dataset.unit}` },
+                        callbacks: {
+                            title: context => tooltipTitle(context[0].parsed.x, precisions[context[0].chart.precision], context[0].chart.options.scales.x.time.displayFormats),
+                            label: context => ` ${context.dataset.label}: ${context.parsed.y}${context.dataset.unit}`,
+                        },
                         backgroundColor: colors.BgColorDarker,
                         titleColor: colors.TextColor,
                         bodyColor: colors.TextColorDarker,
