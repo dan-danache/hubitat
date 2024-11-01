@@ -180,6 +180,8 @@ export class DashboardGrid extends LitElement {
         if (old) {
             w = old.w, h = old.h, x = old.x, y = old.y
             this.grid.removeWidget(old.el)
+        } else {
+            config.id = this.randomUUID()
         }
 
         // Add gridstack widget
