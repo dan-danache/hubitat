@@ -35,7 +35,7 @@ export class ChartHelper {
                 responsive: true,
                 maintainAspectRatio: false,
                 onResize: chart => ChartHelper.updateChartType(chart),
-                animation: { duration: 0, onComplete: ({ initial, chart }) => (initial ? ChartHelper.updateChartType(chart) : undefined) },
+                animation: { duration: 500, onComplete: ({ initial, chart }) => (initial ? ChartHelper.updateChartType(chart) : undefined) },
                 layout: { padding: { top: 25, bottom: 4 }},
                 stacked: false,
                 pointStyle: false,
@@ -133,17 +133,5 @@ export class ChartHelper {
         return (camelCase[0].toUpperCase() + camelCase.slice(1))
             .replace(/([A-Z])(?=[A-Z][a-z])|([a-z])(?=[A-Z])/g, '$& ')
             .replace('Hub ', '')
-    }
-
-    static setupZoomPan(canvas, chart) {
-        const old = chart.crosshair.reset
-        chart.crosshair.reset = () => {
-            console.log('reset() called')
-            old()
-        }
-        canvas.addEventListener('keydown', event => {
-            if (event.keyCode === 37) chart.crosshair.panZoom('left')
-            else if(event.keyCode === 39) chart.crosshair.panZoom('right')
-        })
     }
 }

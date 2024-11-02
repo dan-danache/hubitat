@@ -80,6 +80,11 @@ export class DashboardGrid extends LitElement {
         mobileView: { type: Boolean, state: true }
     }
 
+    constructor() {
+        super()
+        this.yScale = undefined
+    }
+
     render() {
         return html`
             <div class="grid-stack spinner" @edit=${this.editPanel} ?mobile-view=${this.mobileView}></div>
@@ -136,10 +141,7 @@ export class DashboardGrid extends LitElement {
             }, 2, 2, 1, 0)
         } else {
             this.grid.batchUpdate(true)
-            panels.forEach(panel => {
-                panel.config.id = this.randomUUID()
-                this.addPanel(panel.config, panel.w, panel.h, panel.x, panel.y)
-            })
+            panels.forEach(panel => this.addPanel(panel.config, panel.w, panel.h, panel.x, panel.y))
             this.grid.batchUpdate(false)
         }
 
@@ -165,6 +167,7 @@ export class DashboardGrid extends LitElement {
     }
 
     setYScale(yScale) {
+        this.yScale = yScale
         this.renderRoot.querySelectorAll('device-panel, attribute-panel').forEach(panel => panel.setYScale(yScale))
     }
 
@@ -187,7 +190,7 @@ export class DashboardGrid extends LitElement {
         // Add gridstack widget
         const content = `
             <div class="panel-container">
-                <${config.type} config='${JSON.stringify(config).replace(/'/g, '&apos;')}' class="panel empty spinner"></${config.type}>
+                <${config.type} config='${JSON.stringify(config).replace(/'/g, '&apos;')}' yScale="${this.yScale}" class="panel empty spinner"></${config.type}>
                 <div class="panel-title">${config.title || '&nbsp' }</div>
             </div>
         `

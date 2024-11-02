@@ -14,6 +14,7 @@ export class DevicePanel extends LitElement {
         canvas {
             width: 100%;
             height: 100%;
+            touch-action: pan-y;
         }
         :host(.empty) canvas { visibility: hidden }
         precision-selector {
@@ -61,6 +62,7 @@ export class DevicePanel extends LitElement {
 
     static properties = {
         config: { type: Object, reflect: true },
+        yScale: { type: String, reflect: true },
         mobileView: { type: Boolean, state: true },
         chart: { type: Object, state: true },
         nodata: { type: Boolean, state: true },
@@ -68,7 +70,7 @@ export class DevicePanel extends LitElement {
 
     render() {
         return html`
-            <canvas tabindex='1'></canvas>
+            <canvas tabindex='1' @keydown=${this.onKeyDown}></canvas>
             <precision-selector @change=${this.changePrecision} .precision=${this.config.precision}></precision-selector>
             <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
             ${ this.nodata === true ? html`<aside>No data yet</aside>` : '' }
@@ -85,18 +87,19 @@ export class DevicePanel extends LitElement {
     }
 
     async firstUpdated() {
-        const canvas = this.renderRoot.querySelector('canvas')
-        this.chart = new Chart(canvas, ChartHelper.defaultConfig(this.mobileView))
-        this.chart.canvas.style.touchAction = 'pan-y'
-        ChartHelper.setupZoomPan(canvas, this.chart)
         await this.initChart()
     }
 
-    editPanel() {
-        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: this.config }))
+    onKeyDown(event) {
+        if (this.chart === undefined) return
+        if (event.keyCode === 37) this.chart.crosshair.panZoom('left')
+        else if(event.keyCode === 39) this.chart.crosshair.panZoom('right')
     }
 
     async initChart() {
+        if (this.chart !== undefined) this.chart.destroy()
+        this.chart = new Chart(this.renderRoot.querySelector('canvas'), ChartHelper.defaultConfig(this.mobileView))
+
         this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
         const data = await DatastoreHelper.fetchDeviceData(this.config)
@@ -160,7 +163,7 @@ export class DevicePanel extends LitElement {
         }
         this.attr1Min = supportedAttributes[this.config.attr1].min
         this.attr1Max = supportedAttributes[this.config.attr1].max
-        if (this.scale === 'fixed') {
+        if (this.yScale === 'fixed') {
             if (this.attr1Min !== undefined) this.chart.options.scales.attr1.suggestedMin = this.attr1Min
             if (this.attr1Max !== undefined) this.chart.options.scales.attr1.suggestedMax = this.attr1Max
         }
@@ -222,7 +225,7 @@ export class DevicePanel extends LitElement {
             }
             this.attr2Min = supportedAttributes[this.config.attr2].min
             this.attr2Max = supportedAttributes[this.config.attr2].max
-            if (this.scale === 'fixed') {
+            if (this.yScale === 'fixed') {
                 if (this.attr2Min !== undefined) this.chart.options.scales.attr2.suggestedMin = this.attr2Min
                 if (this.attr2Max !== undefined) this.chart.options.scales.attr2.suggestedMax = this.attr2Max
             }
@@ -230,7 +233,7 @@ export class DevicePanel extends LitElement {
 
         this.chart.precision = this.config.precision
         this.chart.data = { datasets }
-        this.chart.update('none')
+        this.chart.update()
         ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
@@ -245,14 +248,18 @@ export class DevicePanel extends LitElement {
         await this.initChart()
     }
 
+    editPanel() {
+        this.dispatchEvent(new CustomEvent('edit', { bubbles: true, detail: this.config }))
+    }
+
     decorateConfig(config) {
         return { ...config, ...this.config }
     }
 
-    setYScale(scale) {
-        this.scale = scale
+    setYScale(yScale) {
+        this.yScale = yScale
         if (!this.chart) return
-        if (scale == 'auto') {
+        if (yScale == 'auto') {
             delete this.chart.options.scales.attr1.suggestedMin
             delete this.chart.options.scales.attr1.suggestedMax
             if (this.config.attr2 !== undefined) {
@@ -297,7 +304,7 @@ export class DevicePanelConfig extends LitElement {
         super.connectedCallback()
         await DatastoreHelper.fetchMonitoredDevices().then(devices => { this.devices = devices })
         await DatastoreHelper.fetchSupportedAttributes().then(attributes => { this.supportedAttributes = attributes })
-        if (!this.config.dev) return
+        if (this.config.dev === undefined) return
 
         // Pre-load attributes
         const device = this.devices.find(device => device.id == this.config.dev)

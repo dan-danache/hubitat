@@ -31,8 +31,8 @@ export default {
 
         chart.crosshair = {
             x: null,
-            originalData: [],
-            originalXRange: {},
+            originalXRange: null,
+            button: null,
             dragStarted: false,
             dragStartX: null,
             dragEndX: null,
@@ -46,24 +46,27 @@ export default {
     },
 
     panZoom: function(chart, direction) {
-        if (chart.crosshair.originalData.length === 0) return
-        const diff = chart.crosshair.end - chart.crosshair.start
-        var min = chart.crosshair.min
-        var max = chart.crosshair.max
+
+        // Chart is not zoomed in
+        if (chart.crosshair.originalXRange === null) return
+        const {min, max} = chart.crosshair.originalXRange
+        const start = chart.options.scales.x.min
+        const end = chart.options.scales.x.max
 
         // Short-circuit
-        if (chart.crosshair.start === min && direction === 'left') return
-        if (chart.crosshair.end === max && direction === 'right') return
+        if (start === min && direction === 'left') return
+        if (end === max && direction === 'right') return
 
-        const increment = Math.round(diff / 10)
+        const diff = end - start
+        const increment = diff / 10
         if (direction === 'left') {
-            chart.crosshair.start = Math.max(chart.crosshair.start - increment, min)
-            chart.crosshair.end = chart.crosshair.start === min ? min + diff : chart.crosshair.end - increment
+            chart.options.scales.x.min = Math.max(start - increment, min)
+            chart.options.scales.x.max = chart.options.scales.x.min + diff
         } else {
-            chart.crosshair.end = Math.min(chart.crosshair.end + increment, chart.crosshair.max)
-            chart.crosshair.start = chart.crosshair.end === max ? max - diff : chart.crosshair.start + increment
+            chart.options.scales.x.max = Math.min(end + increment, max)
+            chart.options.scales.x.min = chart.options.scales.x.max - diff
         }
-        this.doZoom(chart, chart.crosshair.start, chart.crosshair.end)
+        chart.update()
     },
 
     getOption: function(chart, category, name) {
@@ -93,7 +96,11 @@ export default {
             return
         }
 
+        const minX = xScale.getPixelForValue(xScale.min)
+        const maxX = xScale.getPixelForValue(xScale.max)
+
         let e = event.event
+        e.x = Math.min(Math.max(e.x, minX), maxX)
         //console.log('event', chart.crosshair.dragStarted, chart.crosshair.canStartDrag, e)
 
         // Suppress tooltips for linked charts
@@ -132,14 +139,10 @@ export default {
 
             var start = xScale.getValueForPixel(chart.crosshair.dragStartX)
             var end = xScale.getValueForPixel(chart.crosshair.x)
-
-            if (Math.abs(chart.crosshair.dragStartX - chart.crosshair.x) > 1) {
-                this.doZoom(chart, start, end)
-            }
-            chart.update('none')
+            this.doZoom(chart, start, end)
         }
 
-        chart.crosshair.x = Math.min(Math.max(e.x, xScale.getPixelForValue(xScale.min)), xScale.getPixelForValue(xScale.max))
+        chart.crosshair.x = e.x
         chart.draw()
     },
 
@@ -157,39 +160,28 @@ export default {
     },
 
     resetZoom: function(chart) {
-        if (chart.crosshair.originalData.length > 0) {
-
-            // Reset original data
-            for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
-                var dataset = chart.data.datasets[datasetIndex]
-                dataset.data = chart.crosshair.originalData.shift(0)
-            }
-        }
-
-        // Reset original xRange
-        if (chart.crosshair.originalXRange.min) {
-            chart.options.scales.x.min = chart.crosshair.originalXRange.min
-            chart.crosshair.originalXRange.min = null
-        } else {
-            delete chart.options.scales.x.min
-        }
-        if (chart.crosshair.originalXRange.max) {
-            chart.options.scales.x.max = chart.crosshair.originalXRange.max
-            chart.crosshair.originalXRange.max = null
-        } else {
-            delete chart.options.scales.x.max
-        }
+        if (chart.crosshair.originalXRange === null) return
+        chart.options.scales.x.min = chart.crosshair.originalXRange.x
+        chart.options.scales.x.max = chart.crosshair.originalXRange.y
 
         if (chart.crosshair.button && chart.crosshair.button.parentNode) {
             chart.crosshair.button.parentNode.removeChild(chart.crosshair.button)
-            chart.crosshair.button = false
+            chart.crosshair.button = null
         }
 
-        chart.update('none')
+        chart.update()
         this.getOption(chart, 'callbacks', 'afterZoom')({chart})
     },
 
     doZoom: function(chart, start, end) {
+        chart.crosshair.dragStarted = false
+        if (start == end) return
+
+        // Store orginal bounds
+        if (chart.crosshair.originalXRange === null) chart.crosshair.originalXRange = {
+            min: chart.scales.x.min,
+            max: chart.scales.x.max,
+        }
 
         // Swap start/end if user dragged from right to left
         if (start > end) {
@@ -198,17 +190,12 @@ export default {
             end = tmp
         }
 
-        chart.crosshair.dragStarted = false
-
-        if (chart.options.scales.x.min && chart.crosshair.originalData.length === 0) {
-            chart.crosshair.originalXRange.min = chart.options.scales.x.min
-        }
-        if (chart.options.scales.x.max && chart.crosshair.originalData.length === 0) {
-            chart.crosshair.originalXRange.max = chart.options.scales.x.max
-        }
+        // Check bounds
+        start = Math.max(start, chart.crosshair.originalXRange.min)
+        end = Math.min(end, chart.crosshair.originalXRange.max)
 
         // Add restore zoom button
-        if (!chart.crosshair.button) {
+        if (chart.crosshair.button == null) {
             var button = document.createElement('button')
 
             var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText')
@@ -223,60 +210,14 @@ export default {
             chart.crosshair.button = button
         }
 
-        // Set axis scale
+        // Update chart bounds
         chart.options.scales.x.min = start
         chart.options.scales.x.max = end
-
-        // Make a copy of the original data for later restoration
-        var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false
-        var filterDataset = (chart.config.options.scales.x.type !== 'category')
-
-        if (filterDataset) {
-            for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
-                var newData = []
-                var index = 0
-                var started = false
-                var stop = false
-                if (storeOriginals) chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data
-                var sourceDataset = chart.crosshair.originalData[datasetIndex]
-
-                for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
-
-                    var oldData = sourceDataset[oldDataIndex]
-                    // var oldDataX = this.getXScale(chart).getRightValue(oldData)
-                    var oldDataX = oldData.x !== undefined ? oldData.x : NaN
-
-                    // Append one value outside of bounds
-                    if (oldDataX >= start && !started && index > 0) {
-                        newData.push(sourceDataset[index - 1])
-                        started = true
-                    }
-                    if (oldDataX >= start && oldDataX <= end) {
-                        newData.push(oldData)
-                    }
-                    if (oldDataX > end && !stop && index < sourceDataset.length) {
-                        newData.push(oldData)
-                        stop = true
-                    }
-                    index += 1
-                }
-
-                chart.data.datasets[datasetIndex].data = newData
-            }
-        }
-
-        chart.crosshair.start = Math.round(start)
-        chart.crosshair.end = Math.round(end)
-
-        if (storeOriginals) {
-            var xAxes = this.getXScale(chart)
-            chart.crosshair.min = xAxes.min
-            chart.crosshair.max = xAxes.max
-        }
-
-        chart.crosshair.ignoreNextEvents = 2 // ignore next 2 events to prevent starting a new zoom action after updating the chart
-
         chart.update()
+
+        // Ignore next 2 events to prevent starting a new zoom action after updating the chart
+        chart.crosshair.ignoreNextEvents = 2
+
         this.getOption(chart, 'callbacks', 'afterZoom')(start, end)
     },
 
