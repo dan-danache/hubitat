@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Inspelning Smart Plug (E2206)'
-@Field static final String DRIVER_VERSION = '5.1.0'
+@Field static final String DRIVER_VERSION = '5.2.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -65,7 +65,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2206.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Inspelning Smart Plug (E2206) <small>v5.1.0</small><br>
+                IKEA Inspelning Smart Plug (E2206) <small>v5.2.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#inspelning-smart-plug-e2206" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

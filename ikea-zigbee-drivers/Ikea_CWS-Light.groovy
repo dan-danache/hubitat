@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Color White Spectrum Light'
-@Field static final String DRIVER_VERSION = '5.1.0'
+@Field static final String DRIVER_VERSION = '5.2.0'
 
 // Fields for capability.ColorControl
 @Field static final Map<String, Integer> COLOR_LOOP_SPEED = [
@@ -79,7 +79,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_CWS-Light.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Color White Spectrum Light <small>v5.1.0</small><br>
+                IKEA Color White Spectrum Light <small>v5.2.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#color-white-spectrum-light" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

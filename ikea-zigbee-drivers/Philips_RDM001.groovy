@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'Philips Hue Wall Switch Module (RDM001)'
-@Field static final String DRIVER_VERSION = '5.1.0'
+@Field static final String DRIVER_VERSION = '5.2.0'
 
 // Fields for devices.Philips_RDM001
 @Field static final Map<Integer, String> RDM001_SWITCH_STYLE = [
@@ -66,7 +66,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Philips_RDM001.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Philips Hue Wall Switch Module (RDM001) <small>v5.1.0</small><br>
+                Philips Hue Wall Switch Module (RDM001) <small>v5.2.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#philips-hue-wall-switch-module-rdm001" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

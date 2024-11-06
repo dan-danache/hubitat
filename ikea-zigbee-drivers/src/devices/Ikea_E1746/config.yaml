@@ -1,0 +1,23 @@
+device:
+  model: IKEA Tradfri Signal Repeater (E1746)
+  importUrl: https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1746.groovy
+  image: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1746.webp
+  links:
+  - name: device details
+    url: https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-signal-repeater-E1746
+  - name: community page
+    url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
+
+  fingerprints:
+  - firmwares: 2.3.086 (117C-1102-23086631)
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0009,0B05,1000,FC7C', outClusters:'0019,0020,1000', model:'TRADFRI Signal Repeater', manufacturer:'IKEA of Sweden', controllerType:'ZGB'
+
+  capabilities:
+    - file: src/devices/Ikea_E1746/E1746.groovy
+    - file: src/capabilities/HealthCheck.groovy
+      params:
+        schedule: 0 0 0/1 ? * * *
+        checkInterval: 3600  # every hour
+        thereshold: 3600     # report device as offline if no message was received in the last 60 minutes (device should report On/Off status every 10 minutes)
+    - file: src/capabilities/PowerSource.groovy
+    - file: src/capabilities/FirmwareUpdate.groovy

@@ -36,6 +36,7 @@ Outlets:
 Appliances:
 * [Knycklan Water Valve Receiver (E1842)](#knycklan-water-valve-receiver-e1842)
 * [Starkvind Air Purifier (E2006)](#starkvind-air-purifier-e2006)
+* [Tradfri Signal Repeater (E1746)](#tradfri-signal-repeater-e1746)
 
 Devices from other vendors (not in HPM):
 * [Aqara Dual Relay Module T2 (DCM-K01)](#aqara-dual-relay-module-t2-dcm-k01)
@@ -838,6 +839,43 @@ Below you can find the details of each appliance device, including the features 
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. Put back the lid and fix it in place.
 1. You're all set! Enjoy using your Starkvind Air Purifier.
+
+### Tradfri Signal Repeater (E1746)
+
+| Parameter | Details |
+|-----------|---------|
+| Product Image | <img src="img/Ikea_E1746.webp" style="width: 200px"> |
+| Product Code | `804.242.55` |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1746.groovy` |
+| Tested firmwares | `2.3.086` |
+| Since version | `5.2.0` |
+
+#### Features
+* **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
+* **Device State Refresh**: Refreshes the device state on demand for real-time status updates.
+
+#### Attributes
+* **resets**: A counter that is incremented each time the device resets. A reset is defined as any time the device restarts. This is not the same as a reset to factory defaults, which SHOULD clear this and all values
+* **macRxBcast**: A counter that is incremented each time the MAC layer receives a broadcast.
+* **macTxBcast**: A counter that is incremented each time the MAC layer transmits a broadcast.
+* **apsRxBcast**: A counter that is incremented each time the APS layer receives a broadcast.
+* **apsTxBcast**: A counter that is incremented each time the APS layer transmits a broadcast.
+* **nwkDropped**: A counter that is incremented each time a message is dropped at the network layer because the APS frame counter was not higher than the last message seen from that source.
+* **memFailures**: A counter that is incremented each time the stack failed to allocate a packet buffers. This doesn't necessarily mean that the packet buffer count was 0 at the time, but that the number requested was greater than the number free.
+* **macRetries**: A counter that is equal to the average number of MAC retries needed to send an APS message.
+* **lqi**: This is the Link Quality Indicator for the last message received. There is no current agreed upon standard for calculating the LQI. For some implementations LQI is related directly to RSSI for others it is a function of the number of errors received over a fixed number of bytes in a given message. The one thing that has been agreed is that the Link Quality Indicator is a value between 0 and 255 where 0 indicates the worst possible link and 255 indicates the best possible link.
+* **rssi**: This is the receive signal strength indication for the last message received.
+
+#### Pairing Instructions
+1. Find the small reset hole on the side of the device and make sure you have at hand a pin that can fit the reset hole
+   (e.g.: a paper clip or SIM card eject pin).
+1. If the device is already plugged in, unplug it for 20 seconds (power-cycle) before each pairing attempt.
+1. Plug the device back into an outlet.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Insert the pin into the reset hole and press it for at least 5 seconds; upon release, the LED light will start
+   blinking.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Tradfri Signal Repeater.
 
 ## Devices from other vendors
 Below you can find the details of each device, including the features and pairing instructions.

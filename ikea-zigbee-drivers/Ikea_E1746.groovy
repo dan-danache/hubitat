@@ -1,5 +1,5 @@
 /**
- * IKEA Tradfri Remote Control (E1810)
+ * IKEA Tradfri Signal Repeater (E1746)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
-@Field static final String DRIVER_NAME = 'IKEA Tradfri Remote Control (E1810)'
+@Field static final String DRIVER_NAME = 'IKEA Tradfri Signal Repeater (E1746)'
 @Field static final String DRIVER_VERSION = '5.2.0'
 
 // Fields for capability.HealthCheck
@@ -16,33 +16,28 @@ import groovy.time.TimeCategory
 
 @Field static final Map<String, String> HEALTH_CHECK = [
     'schedule': '0 0 0/1 ? * * *', // Health will be checked using this cron schedule
-    'thereshold': '43200' // When checking, mark the device as offline if no Zigbee message was received in the last 43200 seconds
-]
-
-// Fields for capability.PushableButton
-@Field static final Map<String, List<String>> BUTTONS = [
-    'POWER': ['1', 'Power'],
-    'PLUS': ['2', '🔆'],
-    'MINUS': ['3', '🔅'],
-    'NEXT': ['4', 'Next'],
-    'PREV': ['5', 'Prev'],
+    'thereshold': '3600' // When checking, mark the device as offline if no Zigbee message was received in the last 3600 seconds
 ]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1810.groovy') {
+    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1746.groovy') {
         capability 'Configuration'
         capability 'Refresh'
-        capability 'Battery'
+        capability 'SignalStrength'
         capability 'HealthCheck'
-        capability 'HoldableButton'
         capability 'PowerSource'
-        capability 'PushableButton'
-        capability 'ReleasableButton'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,1000,FC57,FC7C', outClusters:'0003,0004,0005,0006,0008,0019,1000', model:'TRADFRI remote control', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // Firmware: 24.4.5 (117C-11C1-24040005)
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0009,0B05,1000,FC7C', outClusters:'0019,0020,1000', model:'TRADFRI Signal Repeater', manufacturer:'IKEA of Sweden', controllerType:'ZGB' // Firmware: 2.3.086 (117C-1102-23086631)
         
-        // Attributes for capability.Battery
-        attribute 'lastBattery', 'date'
+        // Attributes for devices.Ikea_E1746
+        attribute 'resets', 'number'
+        attribute 'macRxBcast', 'number'
+        attribute 'macTxBcast', 'number'
+        attribute 'apsRxBcast', 'number'
+        attribute 'apsTxBcast', 'number'
+        attribute 'nwkDropped', 'number'
+        attribute 'memFailures', 'number'
+        attribute 'macRetries', 'number'
         
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
@@ -55,10 +50,10 @@ metadata {
         input(
             name:'helpInfo', type:'hidden',
             title:'''
-            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1810.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Tradfri Remote Control (E1810) <small>v5.2.0</small><br>
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1746.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                IKEA Tradfri Signal Repeater (E1746) <small>v5.2.0</small><br>
                 <small><div>
-                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-remote-control-e1810" target="_blank">device details</a><br>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-signal-repeater-E1746" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
                 </div></small>
             </div>
@@ -69,14 +64,6 @@ metadata {
             description:'<small>Select what type of messages appear in the "Logs" section.</small>',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
-        )
-        
-        // Inputs for capability.ZigbeeBindings
-        input(
-            name:'controlDevice', type:'enum', title:'Control Zigbee device', required:false,
-            description:'<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
-            options:['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
-            defaultValue:'----'
         )
     }
 }
@@ -106,24 +93,11 @@ List<String> updated(boolean auto = false) {
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
     
+    // Preferences for devices.Ikea_E1746
+    schedule '0 */10 * ? * *', 'refresh'
+    
     // Preferences for capability.HealthCheck
     schedule HEALTH_CHECK.schedule, 'healthCheck'
-    
-    // Preferences for capability.ZigbeeBindings
-    if (controlDevice != null && controlDevice != '----') {
-        if (controlDevice == '0000') {
-            log_info '🛠️ Clearing all device bindings'
-            state.stopControlling = 'devices'
-        } else {
-            log_info "🛠️ Adding binding to device #${controlDevice} for clusters [0x0005 0x0006 0x0008]"
-    
-            cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0005'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0005
-            cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0006'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0006
-            cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0021 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload "${device.endpointId}"} ${utils_payload '0x0008'} 03 ${utils_payload "${controlDevice}"} 01} {0x0000}" // Add device binding for cluster 0x0008
-        }
-        device.updateSetting 'controlDevice', [value:'----', type:'enum']
-        cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}"
-    }
 
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
@@ -185,15 +159,6 @@ void configureApply() {
     // Auto-apply preferences
     cmds += updated true
     
-    // Configuration for devices.Ikea_E1810
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0005 {${device.zigbeeId}} {}" // Scenes cluster
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0006 {${device.zigbeeId}} {}" // On/Off cluster
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0008 {${device.zigbeeId}} {}" // Level Control cluster
-    
-    // Configuration for capability.Battery
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
-    
     // Configuration for capability.HealthCheck
     sendEvent name:'healthStatus', value:'online', descriptionText:'Health status initialized to online'
     sendEvent name:'checkInterval', value:3600, unit:'second', descriptionText:'Health check interval is 3600 seconds'
@@ -201,10 +166,6 @@ void configureApply() {
     // Configuration for capability.PowerSource
     sendEvent name:'powerSource', value:'unknown', type:'digital', descriptionText:'Power source initialized to unknown'
     cmds += zigbee.readAttribute(0x0000, 0x0007) // PowerSource
-    
-    // Configuration for capability.PushableButton
-    Integer numberOfButtons = BUTTONS.count { true }
-    sendEvent name:'numberOfButtons', value:numberOfButtons, descriptionText:"Number of buttons is ${numberOfButtons}"
 
     // Query Basic cluster attributes
     cmds += zigbee.readAttribute(0x0000, [0x0001, 0x0003, 0x0004, 0x4000]) // ApplicationVersion, HWVersion, ManufacturerName, SWBuildID
@@ -230,11 +191,8 @@ List<String> refresh(boolean auto = false) {
 
     List<String> cmds = []
     
-    // Refresh for capability.Battery
-    cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
-    
-    // Refresh for capability.ZigbeeBindings
-    cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 00} {0x0000}" // Start querying the Bindings Table
+    // Refresh for devices.Ikea_E1746
+    cmds += zigbee.readAttribute(0x0B05, [0x0000, 0x0100, 0x0101, 0x0106, 0x0107, 0x0112, 0x0117, 0x011B, 0x011C, 0x011D])
 
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
@@ -265,55 +223,6 @@ void pingExecute() {
 
     String offlineMarkAgo = TimeCategory.minus(thereshold, now).toString().replace('.000 seconds', ' seconds')
     log_info "Will be marked as offline if no message is received until ${thereshold.format('yyyy-MM-dd HH:mm:ss', location.timeZone)} (${offlineMarkAgo} from now)"
-}
-
-// Implementation for capability.HoldableButton
-void hold(String buttonNumber) { hold Integer.parseInt(buttonNumber) }
-void hold(BigDecimal buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) {
-        log_warn "Cannot hold button ${buttonNumber} because it is not defined"
-        return
-    }
-    utils_sendEvent name:'held', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was held"
-}
-
-// Implementation for capability.PushableButton
-void push(String buttonNumber) { push Integer.parseInt(buttonNumber) }
-void push(BigDecimal buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) {
-        log_warn "Cannot push button ${buttonNumber} because it is not defined"
-        return
-    }
-    utils_sendEvent name:'pushed', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was pressed"
-}
-
-// Implementation for capability.ReleasableButton
-void release(String buttonNumber) { release Integer.parseInt(buttonNumber) }
-void release(BigDecimal buttonNumber) {
-    String buttonName = BUTTONS.find { it.value[0] == "${buttonNumber}" }?.value?.getAt(1)
-    if (buttonName == null) {
-        log_warn "Cannot release button ${buttonNumber} because it is not defined"
-        return
-    }
-    utils_sendEvent name:'released', value:buttonNumber, type:'digital', isStateChange:true, descriptionText:"Button ${buttonNumber} (${buttonName}) was released"
-}
-
-// Implementation for capability.ZigbeeBindings
-private Map<String, String> retrieveSwitchDevices() {
-    try {
-        List<Integer> switchDeviceIds = httpGet([uri:'http://127.0.0.1:8080/device/listJson?capability=capability.switch']) { it.data*.id }
-        httpGet([uri:'http://127.0.0.1:8080/hub/zigbeeDetails/json']) { response ->
-            response.data.devices
-                .findAll { switchDeviceIds.contains(it.id) }
-                .sort { it.name }
-                .collectEntries { [(it.zigbeeId): it.name] }
-        }
-    /* groovylint-disable-next-line CatchException */
-    } catch (Exception ex) {
-        return ['ZZZZ': "Exception: ${ex}"]
-    }
 }
 
 // Implementation for capability.FirmwareUpdate
@@ -363,88 +272,53 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.Ikea_E1810
+        // Events for devices.Ikea_E1746
         // ===================================================================================================================
-        
-        // Button Prev/Next was pressed
-        case { contains it, [clusterInt:0x0005, commandInt:0x07] }:
-            List<String> button = msg.data[0] == '00' ? BUTTONS.NEXT : BUTTONS.PREV
-            utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
-            return
-        
-        // Button Prev/Next was held
-        case { contains it, [clusterInt:0x0005, commandInt:0x08] }:
-            List<String> button = msg.data[0] == '00' ? BUTTONS.NEXT : BUTTONS.PREV
-            utils_sendEvent name:'held', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held"
-            return
-        
-        // Button Prev/Next was released
-        case { contains it, [clusterInt:0x0005, commandInt:0x09] }:
-            List<String> button = device.currentValue('held', true) == 4 ? BUTTONS.NEXT : BUTTONS.PREV
-            utils_sendEvent name:'released', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released"
-            return
-        
-        // Power button was pushed
-        case { contains it, [clusterInt:0x0006, commandInt:0x02] }:
-            List<String> button = BUTTONS.POWER
-            utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
-            return
-        
-        // Plus/Minus button was pushed
-        case { contains it, [clusterInt:0x0008, commandInt:0x02] }:
-        case { contains it, [clusterInt:0x0008, commandInt:0x06] }:
-            List<String> button = msg.commandInt == 0x02 ? BUTTONS.MINUS : BUTTONS.PLUS
-            utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
-            return
-        
-        // Plus/Minus button was held
-        case { contains it, [clusterInt:0x0008, commandInt:0x01] }:
-        case { contains it, [clusterInt:0x0008, commandInt:0x05] }:
-            List<String> button = msg.commandInt == 0x01 ? BUTTONS.MINUS : BUTTONS.PLUS
-            utils_sendEvent name:'held', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was held"
-            return
-        
-        // Plus/Minus button was released
-        case { contains it, [clusterInt:0x0008, commandInt:0x03] }:
-        case { contains it, [clusterInt:0x0008, commandInt:0x07] }:
-            List<String> button = msg.commandInt == 0x03 ? BUTTONS.MINUS : BUTTONS.PLUS
-            utils_sendEvent name:'released', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was released"
-            return
-        
-        // Events for capability.Battery
-        // ===================================================================================================================
-        
-        // Report/Read Attributes Reponse: BatteryPercentage
-        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
-        case { contains it, [clusterInt:0x0001, commandInt:0x01] }:
-        
-            // Hubitat fails to parse some Read Attributes Responses
-            if (msg.value == null && msg.data != null && msg.data[0] == '21' && msg.data[1] == '00') {
-                msg.value = msg.data[2]
+        case { contains it, [clusterInt:0x0B05, commandInt:0x01, attrInt:0x0000] }:
+            Integer resets = Integer.parseInt msg.value, 16
+            utils_sendEvent name:'resets', value:resets, descriptionText:"Device resets = ${resets}", type:type
+            
+            msg.additionalAttrs?.each {
+                switch (it.attrInt) {
+                    case 0x0100:
+                        Long macRxBcast = Long.parseLong it.value, 16
+                        utils_sendEvent name:'macRxBcast', value:macRxBcast, descriptionText:"macRxBcast = ${macRxBcast}", type:type
+                        return
+                    case 0x0101:
+                        Long macTxBcast = Long.parseLong it.value, 16
+                        utils_sendEvent name:'macTxBcast', value:macTxBcast, descriptionText:"macTxBcast = ${macTxBcast}", type:type
+                        return
+                    case 0x0106:
+                        Integer apsRxBcast = Integer.parseInt it.value, 16
+                        utils_sendEvent name:'apsRxBcast', value:apsRxBcast, descriptionText:"apsRxBcast = ${apsRxBcast}", type:type
+                        return
+                    case 0x0107:
+                        Integer apsTxBcast = Integer.parseInt it.value, 16
+                        utils_sendEvent name:'apsTxBcast', value:apsTxBcast, descriptionText:"apsTxBcast = ${apsTxBcast}", type:type
+                        return
+                    case 0x0112:
+                        Integer nwkDropped = Integer.parseInt it.value, 16
+                        utils_sendEvent name:'nwkDropped', value:nwkDropped, descriptionText:"nwkDropped = ${nwkDropped}", type:type
+                        return
+                    case 0x0117:
+                        Integer memFailures = Integer.parseInt it.value, 16
+                        utils_sendEvent name:'memFailures', value:memFailures, descriptionText:"memFailures = ${memFailures}", type:type
+                        return
+                    case 0x011B:
+                        Integer macRetries = Integer.parseInt it.value, 16
+                        utils_sendEvent name:'macRetries', value:macRetries, descriptionText:"macRetries = ${macRetries}", type:type
+                        return
+                    case 0x011C:
+                        Integer lqi = Integer.parseInt it.value, 16
+                        utils_sendEvent name:'lqi', value:lqi, descriptionText:"Signal LQI is ${lqi}", type:type
+                        return
+                    case 0x011D:
+                        byte rssi = (byte) Integer.parseInt(it.value, 16)
+                        utils_sendEvent name:'rssi', value:rssi, descriptionText:"Signal RSSI is ${rssi}", type:type
+                        return
+                }
             }
-        
-            // The value 0xff indicates an invalid or unknown reading
-            if (msg.value == 'FF') {
-                log_warn "Ignored invalid remaining battery percentage value: 0x${msg.value}"
-                return
-            }
-        
-            Integer percentage = Integer.parseInt(msg.value, 16) / 2
-            Date lastBattery = new Date()
-            utils_sendEvent name:'battery', value:percentage, unit:'%', descriptionText:"Battery is ${percentage}% full", type:type
-            utils_sendEvent name:'lastBattery', value:lastBattery, descriptionText:"Last battery report time is ${lastBattery}", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "BatteryPercentage=${percentage}%"
-            return
-        
-        // Other events that we expect but are not usefull
-        case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
-            utils_processedZclMessage 'Configure Reporting Response', "attribute=BatteryPercentage, data=${msg.data}"
-            return
-        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0020] }:
-            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryVoltage, data=${msg.value}"
-            return
-        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x003E] }:
-            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryAlarmState, data=${msg.value}"
+            utils_processedZclMessage "Read Attributes Response", "resets=${resets}"
             return
         
         // Events for capability.HealthCheck
@@ -472,84 +346,6 @@ void parse(String description) {
             }
             utils_sendEvent name:'powerSource', value:powerSource, type:'digital', descriptionText:"Power source is ${powerSource}"
             utils_processedZclMessage 'Read Attributes Response', "PowerSource=${msg.value}"
-            return
-        
-        // Events for capability.ZigbeeBindings
-        // ===================================================================================================================
-        
-        // Mgmt_Bind_rsp := { 08:Status, 08:BindingTableEntriesTotal, 08:StartIndex, 08:BindingTableEntriesIncluded, 112/168*n:BindingTableList }
-        // BindingTableList: { 64:SrcAddr, 08:SrcEndpoint, 16:ClusterId, 08:DstAddrMode, 16/64:DstAddr, 0/08:DstEndpoint }
-        // Example: [71, 00, 01, 00, 01,  C6, 9C, FE, FE, FF, F9, E3, B4,  01,  06, 00,  03,  E9, A6, C9, 17, 00, 6F, 0D, 00,  01]
-        case { contains it, [endpointInt:0x00, clusterInt:0x8033] }:
-            if (msg.data[1] != '00') {
-                utils_processedZdpMessage 'Mgmt_Bind_rsp', "Status=FAILED, data=${msg.data}"
-                return
-            }
-            Integer totalEntries = Integer.parseInt msg.data[2], 16
-            Integer startIndex = Integer.parseInt msg.data[3], 16
-            Integer includedEntries = Integer.parseInt msg.data[4], 16
-            if (startIndex == 0) {
-                state.remove 'ctrlDev'
-                state.remove 'ctrlGrp'
-            }
-            if (includedEntries == 0) {
-                utils_processedZdpMessage 'Mgmt_Bind_rsp', "totalEntries=${totalEntries}, startIndex=${startIndex}, includedEntries=${includedEntries}"
-                return
-            }
-        
-            Integer pos = 5
-            Integer deleted = 0
-            Map<String, String> allDevices = retrieveSwitchDevices()
-            Set<String> devices = []
-            Set<String> groups = []
-            List<String> cmds = []
-            for (int idx = 0; idx < includedEntries; idx++) {
-                String srcDeviceId = msg.data[(pos)..(pos + 7)].reverse().join()
-                String srcEndpoint = msg.data[pos + 8]
-                String cluster = msg.data[(pos + 9)..(pos + 10)].reverse().join()
-                String dstAddrMode = msg.data[pos + 11]
-                if (dstAddrMode != '01' && dstAddrMode != '03') continue
-        
-                // Found device binding
-                if (dstAddrMode == '03') {
-                    String dstDeviceId = msg.data[(pos + 12)..(pos + 19)].reverse().join()
-                    String dstEndpoint = msg.data[pos + 20]
-                    String dstDeviceName = allDevices.getOrDefault(dstDeviceId, "Unknown (${dstDeviceId})")
-                    pos += 21
-        
-                    // Remove all binds that are not targeting the hub
-                    if (state.stopControlling == 'devices') {
-                        if (dstDeviceId != "${location.hub.zigbeeEui}") {
-                            log_debug "Removing binding for device ${dstDeviceName} on cluster 0x${cluster}"
-                            cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${utils_payload srcDeviceId} ${srcEndpoint} ${utils_payload cluster} 03 ${utils_payload dstDeviceId} ${dstEndpoint}} {0x0000}"
-                            deleted++
-                        }
-                        continue
-                    }
-        
-                    log_debug "Found binding for device ${dstDeviceName} on cluster 0x${cluster}"
-                    devices.add dstDeviceName
-                    continue
-                }
-        
-                // Found group binding
-                pos += 14
-            }
-        
-            Set<String> ctrlDev = (state.ctrlDev ?: []).toSet()
-            ctrlDev.addAll(devices.findAll { !it.startsWith('Unknown') })
-            if (ctrlDev.size() > 0) state.ctrlDev = ctrlDev.unique()
-        
-            // Get next batch
-            if (startIndex + includedEntries < totalEntries) {
-                cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0033 {57 ${Integer.toHexString(startIndex + includedEntries - deleted).padLeft(2, '0')}} {0x0000}"
-            } else {
-                log_info "Current device bindings: ${state.ctrlDev ?: 'None'}"
-                log_info "Current group bindings: ${state.ctrlGrp ?: 'None'}"
-                state.remove 'stopControlling'
-            }
-            utils_sendZigbeeCommands cmds
-            utils_processedZdpMessage 'Mgmt_Bind_rsp', "totalEntries=${totalEntries}, startIndex=${startIndex}, devices=${devices}, groups=${groups}"
             return
 
         // ---------------------------------------------------------------------------------------------------------------

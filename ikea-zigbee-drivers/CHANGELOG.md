@@ -5,10 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0] - 2024-11-10
+
+### Added
+- Add driver for Tradfri Signal Repeater (E1746)
+
 ## [5.1.0] - 2024-10-28
 
 ### Added
-- Add driver for IKEA Inspelning Smart Plug (E2206)
+- Add driver for Inspelning Smart Plug (E2206)
 - Add driver for Xiaomi Mi Temperature & Humidity Monitor 2 (LYWSD03MMC)
 - Add driver for Gewiss 2-channel Contact Interface (GWA1501)
 
