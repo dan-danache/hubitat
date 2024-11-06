@@ -2658,7 +2658,14 @@ private void state_addBinding(Integer index, List<String> binding) {
             0x0018: [req:'opt', acc:'rw-', name:'Max Cool Setpoint Limit', decorate: { value -> "${(utils_hexStringToSignedNumber(value) / 100)}°C" }],
             0x0019: [req:'opt', acc:'rw-', name:'Min Setpoint Dead Band'],
             0x001A: [req:'opt', acc:'rw-', name:'Remote Sensing'],
-            0x001B: [req:'req', acc:'rw-', name:'Control Sequence Of Operation'],
+            0x001B: [req:'req', acc:'rw-', name:'Control Sequence Of Operation', constraints: [
+                0x00: 'Cooling Only',
+                0x01: 'Cooling With Reheat',
+                0x02: 'Heating Only',
+                0x03: 'Heating With Reheat',
+                0x04: 'Cooling and Heating 4-pipes',
+                0x06: 'Cooling and Heating 4-pipes with Reheat'
+            ]],
             0x001C: [req:'req', acc:'rws', name:'System Mode', constraints: [
                 0x00: 'Off',
                 0x01: 'Auto',
@@ -2671,8 +2678,11 @@ private void state_addBinding(Integer index, List<String> binding) {
                 0x09: 'Sleep'
             ]],
             0x001D: [req:'opt', acc:'r--', name:'Alarm Mask'],
-            0x001E: [req:'opt', acc:'r--', name:'Thermostat Running Mode'],
-
+            0x001E: [req:'opt', acc:'r--', name:'Thermostat Running Mode', constraints: [
+                0x00: 'Off',
+                0x03: 'Cool',
+                0x04: 'Heat'
+            ]],
             0x0020: [req:'opt', acc:'r--', name:'Start Of Week'],
             0x0021: [req:'opt', acc:'r--', name:'Number Of Weekly Transitions'],
             0x0022: [req:'opt', acc:'r--', name:'Number Of Daily Transitions'],
