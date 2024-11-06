@@ -53,7 +53,7 @@ metadata {
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1746.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
                 IKEA Tradfri Signal Repeater (E1746) <small>v5.2.0</small><br>
                 <small><div>
-                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-signal-repeater-E1746" target="_blank">device details</a><br>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-signal-repeater-e1746" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
                 </div></small>
             </div>
