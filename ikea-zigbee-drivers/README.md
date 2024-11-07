@@ -272,7 +272,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1841.webp" style="width: 200px"> |
-| Product Code | `204.257.24` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1841.groovy` |
 | Tested firmwares | `2.3.019` |
 | Since version | `5.0.0` |
@@ -298,7 +297,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2201.webp" style="width: 200px"> |
-| Product Code | `205.281.28`｜`805.597.96` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2201.groovy` |
 | Tested firmwares | `1.0.47`｜`1.0.57` |
 | Since version | `2.0.0` |
@@ -325,7 +323,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2213.webp" style="width: 200px"> |
-| Product Code | `305.603.54` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2213.groovy` |
 | Tested firmwares | `1.0.20`｜`1.0.21` |
 | Since version | `3.6.0` |
@@ -352,7 +349,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2002.webp" style="width: 200px"> |
-| Product Code | `304.883.63` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2002.groovy` |
 | Tested firmwares | `1.0.024`｜`2.4.5`｜`2.4.11` |
 | Since version | `2.0.0` |
@@ -382,7 +378,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2123.webp" style="width: 200px"> |
-| Product Code | `305.273.12` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2123.groovy` |
 | Tested firmwares | `1.0.012`｜`1.0.35` |
 | Since version | `1.0.0` |
@@ -412,7 +407,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1743.webp" style="width: 200px"> |
-| Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1743.groovy` |
 | Tested firmwares | `2.2.010`｜`24.4.6` |
 | Since version | `2.0.0` |
@@ -438,7 +432,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1766.webp" style="width: 200px"> |
-| Product Code | |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1766.groovy` |
 | Tested firmwares | `24.4.6` |
 | Since version | `3.3.0` |
@@ -464,7 +457,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1810.webp" style="width: 200px"> |
-| Product Code | `304.431.24`｜`004.431.30` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1810.groovy` |
 | Tested firmwares | `24.4.5` |
 | Since version | `1.1.0` |
@@ -493,7 +485,6 @@ Below you can find the details of each remote device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1812.webp" style="width: 200px"> |
-| Product Code | `203.563.82`｜`404.677.65`｜`403.563.81` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1812.groovy` |
 | Tested firmwares | `2.3.015`｜`24.4.6` |
 | Since version | `2.0.0` |
@@ -522,7 +513,6 @@ Below you can find the details of each sensor device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2202.webp" style="width: 200px"> |
-| Product Code | `605.043.52` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2202.groovy` |
 | Tested firmwares | `1.0.7` |
 | Since version | `3.9.0` |
@@ -546,7 +536,6 @@ Below you can find the details of each sensor device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2013.webp" style="width: 200px"> |
-| Product Code | `805.043.08` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2013.groovy` |
 | Tested firmwares | `1.0.19` |
 | Since version | `3.6.0` |
@@ -573,7 +562,6 @@ Below you can find the details of each sensor device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1745.webp" style="width: 200px"> |
-| Product Code | `704.299.13` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1745.groovy` |
 | Tested firmwares | `24.4.5` |
 | Since version | `2.3.0` |
@@ -606,7 +594,6 @@ This device offers a range of features:
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2134.webp" style="width: 200px"> |
-| Product Code | `405.043.48` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2134.groovy` |
 | Tested firmwares | `1.0.57`｜`1.0.64` |
 | Since version | `3.6.0` |
@@ -635,7 +622,6 @@ This device offers a range of features:
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2112.webp" style="width: 200px"> |
-| Product Code | `404.982.34` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2112.groovy` |
 | Tested firmwares | `1.0.10`｜`1.0.11` |
 | Since version | `3.8.0` |
@@ -663,7 +649,6 @@ Below you can find the details of each outlet device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1836.webp" style="width: 200px"> |
-| Product Code | `504.638.80` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1836.groovy` |
 | Tested firmwares | `1.0.002` |
 | Since version | `3.1.0` |
@@ -690,7 +675,7 @@ Below you can find the details of each outlet device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1603.webp" style="width: 200px"> |
-| Product Code | `304.883.63`｜`303.561.69` |
+| Variants | E1706 🇺🇸｜E1708 🇦🇺 |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1603.groovy` |
 | Tested firmwares | `2.0.0244`｜`2.3.089` |
 | Since version | `2.0.0` |
@@ -719,8 +704,7 @@ Below you can find the details of each outlet device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2204.webp" style="width: 200px"> |
-| Product Code | `805.403.49`｜`405.565.11` |
-| Variants | E2205 🇺🇸｜E2240 🇬🇧｜E2209 🇫🇷 |
+| Variants | E2205 🇺🇸｜E2240 🇬🇧｜E2209 🇫🇷｜E2217 🇦🇺 |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2204.groovy` |
 | Tested firmwares | `2.4.4`｜`2.4.25` |
 | Since version | `4.0.0` |
@@ -749,8 +733,7 @@ Below you can find the details of each outlet device, including the features and
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2206.webp" style="width: 200px"> |
-| Product Code | `005.698.36`｜`905.698.46` |
-| Variants | E2220 🇺🇸｜E2223 🇬🇧｜E2222 🇫🇷 |
+| Variants | E2220 🇺🇸｜E2223 🇬🇧｜E2222 🇫🇷｜E2225 🇦🇺 |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2206.groovy` |
 | Tested firmwares | `2.4.45` |
 | Since version | `5.1.0` |
@@ -791,7 +774,6 @@ Below you can find the details of each appliance device, including the features 
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1842.webp" style="width: 200px"> |
-| Product Code | `204.257.24` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1842.groovy` |
 | Tested firmwares | `2.3.024` |
 | Since version | `5.0.0` |
@@ -815,7 +797,6 @@ Below you can find the details of each appliance device, including the features 
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E2006.webp" style="width: 200px"> |
-| Product Code | `194.442.19` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2006.groovy` |
 | Tested firmwares | `1.0.033`｜`1.1.001` |
 | Since version | `3.5.0` |
@@ -845,7 +826,6 @@ Below you can find the details of each appliance device, including the features 
 | Parameter | Details |
 |-----------|---------|
 | Product Image | <img src="img/Ikea_E1746.webp" style="width: 200px"> |
-| Product Code | `804.242.55` |
 | Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E1746.groovy` |
 | Tested firmwares | `2.3.086` |
 | Since version | `5.2.0` |

@@ -197,7 +197,8 @@ private void autoConfigure() {
 
 // capability.Refresh
 List<String> refresh(boolean auto = false) {
-    log_info "🎬 Refreshing device state${auto ? ' (auto)' : ''} ..."
+    if (auto) log_debug '🎬 Refreshing device state (auto) ...'
+    else log_info '🎬 Refreshing device state ...'
     if (!auto && device.currentValue('powerSource', true) == 'battery') {
         log_warn '[IMPORTANT] Click the "Refresh" button immediately after pushing any button on the device in order to first wake it up!'
     }
