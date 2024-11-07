@@ -194,7 +194,7 @@ case { contains it, [endpointInt:0x00, clusterInt:0x8031] }:
             case 0x04:
                 relationship = 'Previous Child'; break
         }
-        neighbor += ['Rel', relationship]
+        neighbor += ['Relation', relationship]
 
         // Depth, LQI
         neighbor += ['LQI', Integer.parseInt(msg.data[pos + 21], 16)]
@@ -226,7 +226,7 @@ case { contains it, [endpointInt:0x00, clusterInt:0x8032] }:
     (0..(includedEntries - 1)).each {
         List<String> route = []
         route += ['Destination', state.devs[msg.data[pos..(pos + 1)].reverse().join()]]
-        route += ['Next Hop', state.devs[msg.data[(pos + 3)..(pos + 4)].reverse().join()]]
+        route += ['First Hop', state.devs[msg.data[(pos + 3)..(pos + 4)].reverse().join()]]
 
         String octet = Integer.toBinaryString(Integer.parseInt(msg.data[pos + 2], 16)).padLeft(8, '0').reverse()
         String routeStatusBinary = octet.substring(0, 3).reverse()
@@ -248,7 +248,7 @@ case { contains it, [endpointInt:0x00, clusterInt:0x8032] }:
                 routeStatus = 'Validation underway'
                 break
         }
-        route += ['Route Status', routeStatus]
+        route += ['Status', routeStatus]
         pos += 5
 
         state["ka_route_${startIndex++}"] = route
