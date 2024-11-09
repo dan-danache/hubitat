@@ -29,9 +29,9 @@ Sensors:
 
 Outlets:
 * [Askvader On/Off Switch (E1836)](#askvader-onoff-switch-e1836)
+* [Inspelning Smart Plug (E2206)](#inspelning-smart-plug-e2206)
 * [Tradfri Control Outlet (E1603, E1706)](#tradfri-control-outlet-e1603-e1706)
 * [Tretakt Smart Plug (E2204)](#tretakt-smart-plug-e2204)
-* [Inspelning Smart Plug (E2206)](#inspelning-smart-plug-e2206)
 
 Appliances:
 * [Knycklan Water Valve Receiver (E1842)](#knycklan-water-valve-receiver-e1842)
@@ -670,6 +670,44 @@ Below you can find the details of each outlet device, including the features and
 1. You're all set! Enjoy using your Askvader On/Off Switch.
 
 
+### Inspelning Smart Plug (E2206)
+
+| Parameter | Details |
+|-----------|---------|
+| Product Image | <img src="img/Ikea_E2206.webp" style="width: 200px"> |
+| Variants | E2220 🇺🇸｜E2223 🇬🇧｜E2222 🇫🇷｜E2225 🇦🇺 |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2206.groovy` |
+| Tested firmwares | `2.4.45` |
+| Since version | `5.1.0` |
+
+#### Features
+* **Command Controls**: Includes "On", "Off", "Toggle", and "On with Timed Off" commands.
+* **Power Outage Configuration**: Configures the state after a power outage (options include "Power On", "Power Off", and "Restore previous state").
+* **Current Reporting**: Reports the current (in Amperes).
+* **Voltage Reporting**: Reports the volatage (in Volts).
+* **Power Reporting**: Reports the power (in Watts).
+* **Energy Consumption Reporting**: Reports the energy consumption (in kWh).
+* **Child Lock**: Allows the enabling or disabling of the physical button on the device, providing an additional layer of safety.
+* **Dark Mode**: Allows the LED indicator on the device to be turned off, ensuring total darkness when needed.
+* **Health Status**: Indicates whether the device is online or offline.
+* **Device State Refresh**: Refreshes the device state on demand for real-time status updates.
+* **Zigbee Group Membership**: The device can be a member of Zigbee groups. This allows for efficient management of multiple devices.
+
+#### Known Issues
+* Voltage reporting is broken in old firmware versions (below 2.4.45). You can update the device firmware [directly from Hubitat](https://community.hubitat.com/t/guide-ikea-firmware-updates/127191).
+
+* By default, the Inspelning Smart Plug generates frequent updates when the connected device doesn’t maintain a constant power draw. These settings are suitable for phone chargers and small appliances. If you notice an excessive number of "info" entries in the Live logs, you can reduce the smart plug’s "sensitivity" using the dropdown menus in the "Preferences" section.
+
+#### Pairing Instructions
+1. Find the small reset button near on/off button and make sure you have a pointy object at hand.
+1. If the device is already plugged in, unplug it for 20 seconds (power-cycle) before each pairing attempt.
+1. Plug the device back into an outlet.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. Push the small reset button on top of the smart plug with a pointy object for at least 5 seconds until the LED starts pulsating.
+1. Return to the pairing page, provide a name for your device, and assign it to a room.
+1. You're all set! Enjoy using your Inspelning Smart Plug.
+
+
 ### Tradfri Control Outlet (E1603, E1706)
 
 | Parameter | Details |
@@ -726,44 +764,6 @@ Below you can find the details of each outlet device, including the features and
 1. Push the small reset button on top of the smart plug with a pointy object for at least 5 seconds until the LED starts pulsating.
 1. Return to the pairing page, provide a name for your device, and assign it to a room.
 1. You're all set! Enjoy using your Tretakt Smart Plug.
-
-
-### Inspelning Smart Plug (E2206)
-
-| Parameter | Details |
-|-----------|---------|
-| Product Image | <img src="img/Ikea_E2206.webp" style="width: 200px"> |
-| Variants | E2220 🇺🇸｜E2223 🇬🇧｜E2222 🇫🇷｜E2225 🇦🇺 |
-| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Ikea_E2206.groovy` |
-| Tested firmwares | `2.4.45` |
-| Since version | `5.1.0` |
-
-#### Features
-* **Command Controls**: Includes "On", "Off", "Toggle", and "On with Timed Off" commands.
-* **Power Outage Configuration**: Configures the state after a power outage (options include "Power On", "Power Off", and "Restore previous state").
-* **Current Reporting**: Reports the current (in Amperes).
-* **Voltage Reporting**: Reports the volatage (in Volts).
-* **Power Reporting**: Reports the power (in Watts).
-* **Energy Consumption Reporting**: Reports the energy consumption (in kWh).
-* **Child Lock**: Allows the enabling or disabling of the physical button on the device, providing an additional layer of safety.
-* **Dark Mode**: Allows the LED indicator on the device to be turned off, ensuring total darkness when needed.
-* **Health Status**: Indicates whether the device is online or offline.
-* **Device State Refresh**: Refreshes the device state on demand for real-time status updates.
-* **Zigbee Group Membership**: The device can be a member of Zigbee groups. This allows for efficient management of multiple devices.
-
-#### Known Issues
-* Voltage reporting is broken in old firmware versions (below 2.4.45). You can update the device firmware [directly from Hubitat](https://community.hubitat.com/t/guide-ikea-firmware-updates/127191).
-
-* By default, the Inspelning Smart Plug generates frequent updates when the connected device doesn’t maintain a constant power draw. These settings are suitable for phone chargers and small appliances. If you notice an excessive number of "info" entries in the Live logs, you can reduce the smart plug’s "sensitivity" using the dropdown menus in the "Preferences" section.
-
-#### Pairing Instructions
-1. Find the small reset button near on/off button and make sure you have a pointy object at hand.
-1. If the device is already plugged in, unplug it for 20 seconds (power-cycle) before each pairing attempt.
-1. Plug the device back into an outlet.
-1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
-1. Push the small reset button on top of the smart plug with a pointy object for at least 5 seconds until the LED starts pulsating.
-1. Return to the pairing page, provide a name for your device, and assign it to a room.
-1. You're all set! Enjoy using your Inspelning Smart Plug.
 
 
 ## Appliances

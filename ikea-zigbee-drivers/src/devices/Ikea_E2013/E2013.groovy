@@ -1,4 +1,10 @@
 {{!--------------------------------------------------------------------------}}
+{{# @commands }}
+
+// Commands for devices.Ikea_E2013
+command 'setContact', [[name:'State*', type:'ENUM', constraints:['open', 'closed']]]
+{{/ @commands }}
+{{!--------------------------------------------------------------------------}}
 {{# @inputs }}
 
 // Inputs for devices.Ikea_E2013
@@ -18,6 +24,14 @@ if (swapOpenClosed == null) {
 }
 log_info "🛠️ swapOpenClosed = ${swapOpenClosed}"
 {{/ @updated }}
+{{!--------------------------------------------------------------------------}}
+{{# @implementation }}
+
+// Implementation for devices.Ikea_E2013
+void setContact(String contact) {
+    utils_sendEvent name:'contact', value:contact, descriptionText:"Is ${contact}", type:'digital'
+}
+{{/ @implementation }}
 {{!--------------------------------------------------------------------------}}
 {{# @events }}
 

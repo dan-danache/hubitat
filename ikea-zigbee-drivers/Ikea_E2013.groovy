@@ -49,6 +49,9 @@ metadata {
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
     }
     
+    // Commands for devices.Ikea_E2013
+    command 'setContact', [[name:'State*', type:'ENUM', constraints:['open', 'closed']]]
+    
     // Commands for capability.FirmwareUpdate
     command 'updateFirmware'
 
@@ -275,6 +278,11 @@ List<String> refresh(boolean auto = false) {
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
     return []
+}
+
+// Implementation for devices.Ikea_E2013
+void setContact(String contact) {
+    utils_sendEvent name:'contact', value:contact, descriptionText:"Is ${contact}", type:'digital'
 }
 
 // Implementation for capability.HealthCheck
