@@ -73,7 +73,6 @@ export class DatastoreHelper {
     }
 
     static async fetchDeviceData({dev, precision, attr1, attr2, mm1, mm2, z1, z2}) {
-        //console.log('fetchDeviceData', dev, precision, attr1, attr2, mm1, mm2, z1, z2)
         const data = { attr1: [], attr2: [], min1: [], max1: [], min2: [], max2: [] }
         try {
             const response = await fetch(new Request(this.buildCsvUrl(dev, precision)), { cache: 'no-store' })
@@ -137,6 +136,82 @@ export class DatastoreHelper {
             data[`dev_${dev}`] = deviceData.attr1
         }
         return data
+    }
+
+    static async fetchStatusmapData({ ds, precision }) {
+        const requests = {}
+        const retVal = {}
+        ds.forEach(dsr => {
+            if (requests[dsr.dev] === undefined) requests[dsr.dev] = new Set()
+            requests[dsr.dev].add(dsr.attr)
+            retVal[`${dsr.dev}_${dsr.attr}`] = []
+        })
+        Object.keys(requests).forEach(dev => requests[dev] = Array.from(requests[dev]))
+
+        const parseVal = val => val === '' || val === '-' ? 0 : parseFloat(val)
+        for (const [dev, attrs] of Object.entries(requests)) {
+            const attrsLen = attrs.length
+            try {
+                const response = await fetch(new Request(this.buildCsvUrl(dev, precision)), { cache: 'no-store' })
+    
+                // Data not available yet
+                if (response.status == 404) continue
+    
+                // Data transfer failed
+                if (!response.ok) {
+                    throw new Error(`DatastoreHelper.fetchStatusmapData() - HTTP error, status = ${response.status}`)
+                }
+                const lines = (await response.text()).split("\n")
+                const header = lines.shift().split(',')
+                const attrsIdx = attrs.map(attr => header.indexOf(attr))
+
+                // Init last with first line data
+                const firstVals = lines.shift().split(',')
+                const last = attrsIdx.map(attrIdx => { return {
+                    x: parseInt(firstVals[0]) * 1000,
+                    v: parseVal(firstVals[attrIdx]),
+                }})
+
+                // Process all remaining lines
+                lines.forEach(line => {
+                    const vals = line.split(',')
+                    const x = parseInt(vals[0]) * 1000
+
+                    for (let idx = 0; idx < attrsLen; idx++) {
+                        const attr = attrs[idx]
+                        const attrIdx = attrsIdx[idx]
+                        const v = parseVal(vals[attrIdx])
+
+                        // Attribute has the same value
+                        if (v === last[idx].v) continue
+
+                        // Add to result
+                        retVal[`${dev}_${attr}`].push({
+                            x: [last[idx].x, x],
+                            v: last[idx].v,
+                        })
+                        last[idx] = {x, v}
+                    }
+                })
+
+                // Add last records (if the case)
+                const lastVals = lines.pop().split(',')
+                attrsIdx.forEach((attrIdx, idx) => {
+                    const x = parseInt(lastVals[0]) * 1000
+                    const v = parseVal(lastVals[attrIdx])
+                    if (x == last[idx].x) return
+                    const attr = attrs[idx]
+                    retVal[`${dev}_${attr}`].push({
+                        x:[last[idx].x, x],
+                        v,
+                    })
+                })
+            } catch (ex) {
+                console.error(ex)
+                alert(ex.message)
+            }
+        }
+        return retVal
     }
 
     static async fetchHubInfo() {

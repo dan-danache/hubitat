@@ -207,9 +207,15 @@ The following dashboard tile types are currently supported:
 
 - **Attribute** - Renders a chart with the selected attribute, from multiple devices.
 
-   Example usage: chart temperature from 2 devices (inside vs. outside).
+   Example usage: chart temperature for 2 devices (inside vs. outside).
 
    ![Attribute tile](img/tile-attribute.png)
+
+- **Status Map** - Renders a status/heatmap chart with multiple attribute from multiple devices.
+
+   Example usage: chart the switch status (on/off) for multiple devices.
+
+   ![Attribute tile](img/tile-statusmap.png)
 
 - **Text** - This tile type renders plain or HTML text.
 

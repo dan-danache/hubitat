@@ -75,11 +75,13 @@ export class TextPanelConfig extends LitElement {
 
     render() {
         return html`
-            <label for="message">Message to display:</label>
-            <input type="text" id="message" required="true" placeholder="Enter text to display" autocomplete="off"
-                .value=${this.config.message}
-                @change=${event => this.config = { message: event.target.value}}
-            />
+            <fieldset>
+                <label for="message">Message to display:</label>
+                <input type="text" id="message" required="true" placeholder="Enter text to display" autocomplete="off"
+                    .value=${this.config.message}
+                    @change=${event => this.config = { message: event.target.value}}
+                />
+            </fieldset>
         `
     }
 

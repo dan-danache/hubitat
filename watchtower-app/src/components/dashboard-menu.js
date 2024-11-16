@@ -182,14 +182,13 @@ export class DashboardMenu extends LitElement {
                 </form>
                 <hr>
                 <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
-                <aside>v2.2.0</aside>
+                <aside>v2.3.0</aside>
             </nav>
         `;
     }
 
     connectedCallback() {
         super.connectedCallback();
-        window.addEventListener('keydown', event => event.key === 'Escape' && (this.open = !this.open));
         window.addEventListener('touchstart', event => this.touchStart(event));
         window.addEventListener('touchend', event => this.touchEnd(event));
     }

@@ -161,14 +161,15 @@ export default {
 
     resetZoom: function(chart) {
         if (chart.crosshair.originalXRange === null) return
-        chart.options.scales.x.min = chart.crosshair.originalXRange.x
-        chart.options.scales.x.max = chart.crosshair.originalXRange.y
+
+        chart.options.scales.x.min = chart.crosshair.originalXRange.min
+        chart.options.scales.x.max = chart.crosshair.originalXRange.max
 
         if (chart.crosshair.button && chart.crosshair.button.parentNode) {
             chart.crosshair.button.parentNode.removeChild(chart.crosshair.button)
             chart.crosshair.button = null
         }
-
+        
         chart.update()
         this.getOption(chart, 'callbacks', 'afterZoom')({chart})
     },
@@ -184,11 +185,7 @@ export default {
         }
 
         // Swap start/end if user dragged from right to left
-        if (start > end) {
-            var tmp = start
-            start = end
-            end = tmp
-        }
+        if (start > end) [start, end] = [end, start]
 
         // Check bounds
         start = Math.max(start, chart.crosshair.originalXRange.min)
@@ -222,17 +219,15 @@ export default {
     },
 
     drawZoombox: function(chart) {
-        var yScale = this.getYScale(chart)
-
         var borderColor = this.getOption(chart, 'zoom', 'zoomboxBorderColor')
         var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor')
 
         chart.ctx.beginPath()
         chart.ctx.rect(
             chart.crosshair.dragStartX,
-            yScale.getPixelForValue(yScale.max),
+            chart.chartArea.top,
             chart.crosshair.x - chart.crosshair.dragStartX,
-            yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max)
+            chart.chartArea.bottom - chart.chartArea.top,
         )
         chart.ctx.lineWidth = 1
         chart.ctx.strokeStyle = borderColor
@@ -244,21 +239,20 @@ export default {
     },
 
     drawTraceLine: function(chart) {
-        var yScale = this.getYScale(chart)
         var lineWidth = this.getOption(chart, 'line', 'width')
         var color = this.getOption(chart, 'line', 'color')
         var dashPattern = this.getOption(chart, 'line', 'dashPattern')
         var snapEnabled = this.getOption(chart, 'snap', 'enabled')
 
         var lineX = chart.crosshair.x
-        if (snapEnabled && chart._active.length) lineX = chart._active[0].element.x
+        //if (snapEnabled && chart._active.length) lineX = chart._active[0].element.x
 
         chart.ctx.beginPath()
         chart.ctx.setLineDash(dashPattern)
-        chart.ctx.moveTo(lineX, yScale.getPixelForValue(yScale.max))
+        chart.ctx.moveTo(lineX, chart.chartArea.top)
         chart.ctx.lineWidth = lineWidth
         chart.ctx.strokeStyle = color
-        chart.ctx.lineTo(lineX, yScale.getPixelForValue(yScale.min))
+        chart.ctx.lineTo(lineX, chart.chartArea.bottom)
         chart.ctx.stroke()
         chart.ctx.setLineDash([])
     }

@@ -97,13 +97,13 @@ export class DevicePanel extends LitElement {
     }
 
     async initChart() {
-        if (this.chart !== undefined) this.chart.destroy()
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), ChartHelper.defaultConfig(this.mobileView))
+        const chartConfig = ChartHelper.lineConfig()
 
         this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
-        const data = await DatastoreHelper.fetchDeviceData(this.config)
         const colors = ColorHelper.colors()
+
+        const data = await DatastoreHelper.fetchDeviceData(this.config)
         this.nodata = data.attr1.length == 0
 
         const attr1Label = ChartHelper.prettyName(this.config.attr1)
@@ -150,7 +150,7 @@ export class DevicePanel extends LitElement {
             })
         }
 
-        this.chart.options.scales.attr1 = {
+        chartConfig.options.scales.attr1 = {
             position: 'left',
             display: true,
             title: {
@@ -164,8 +164,8 @@ export class DevicePanel extends LitElement {
         this.attr1Min = supportedAttributes[this.config.attr1].min
         this.attr1Max = supportedAttributes[this.config.attr1].max
         if (this.yScale === 'fixed') {
-            if (this.attr1Min !== undefined) this.chart.options.scales.attr1.suggestedMin = this.attr1Min
-            if (this.attr1Max !== undefined) this.chart.options.scales.attr1.suggestedMax = this.attr1Max
+            if (this.attr1Min !== undefined) chartConfig.options.scales.attr1.suggestedMin = this.attr1Min
+            if (this.attr1Max !== undefined) chartConfig.options.scales.attr1.suggestedMax = this.attr1Max
         }
 
         if (this.config.attr2 !== undefined) {
@@ -212,7 +212,7 @@ export class DevicePanel extends LitElement {
                 })
             }
 
-            this.chart.options.scales.attr2 = {
+            chartConfig.options.scales.attr2 = {
                 position: 'right',
                 display: true,
                 title: {
@@ -226,14 +226,16 @@ export class DevicePanel extends LitElement {
             this.attr2Min = supportedAttributes[this.config.attr2].min
             this.attr2Max = supportedAttributes[this.config.attr2].max
             if (this.yScale === 'fixed') {
-                if (this.attr2Min !== undefined) this.chart.options.scales.attr2.suggestedMin = this.attr2Min
-                if (this.attr2Max !== undefined) this.chart.options.scales.attr2.suggestedMax = this.attr2Max
+                if (this.attr2Min !== undefined) chartConfig.options.scales.attr2.suggestedMin = this.attr2Min
+                if (this.attr2Max !== undefined) chartConfig.options.scales.attr2.suggestedMax = this.attr2Max
             }
         }
 
+        chartConfig.data = { datasets }
+
+        if (this.chart !== undefined) this.chart.destroy()
+        this.chart = new Chart(this.renderRoot.querySelector('canvas'), chartConfig)
         this.chart.precision = this.config.precision
-        this.chart.data = { datasets }
-        this.chart.update()
         ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
@@ -294,9 +296,14 @@ export class DevicePanelConfig extends LitElement {
 
     render() {
         return html`
-            <label for="device">Select device:</label>
-            ${this.devices && this.supportedAttributes ? this.renderDevicesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
-            ${this.attributes ? this.renderAttributesSelect() : '' }
+            <fieldset>
+                <section>
+                    <label for="device">Select device:</label>
+                    ${this.devices && this.supportedAttributes ? this.renderDevicesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
+                    ${this.attributes ? this.renderAttributesSelect() : '' }
+                </section>
+            </fieldset>
+            ${ this.config.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
         `
     }
 
@@ -343,48 +350,61 @@ export class DevicePanelConfig extends LitElement {
                 ${ this.config.attr1 ? html`
                     <div>
                         ${ this.supportedAttributes[this.config.attr1].minMax == true ? html`
-                            <label><input type="checkbox"
-                                .checked="${this.config.mm1}"
-                                @change=${ event => this.config.mm1 = event.target.checked }
-                            > Chart ${this.config.attr1} min/max</label>
+                            <div class="checkbox">
+                                <input type="checkbox" id="mm1"
+                                    .checked="${this.config.mm1}"
+                                    @change=${ event => this.config.mm1 = event.target.checked }
+                                >
+                                <label for="mm1">Chart ${this.config.attr1} min/max</label>
+                            </div>
                          ` : ''}
-                        <label><input type="checkbox"
-                            .checked="${this.config.z1}"
-                            @change=${ event => this.config.z1 = event.target.checked }
-                        > Render zero for missing values</label>
+                        <div class="checkbox">
+                            <input type="checkbox" id="z1"
+                                .checked="${this.config.z1}"
+                                @change=${ event => this.config.z1 = event.target.checked }
+                            >
+                            <label for="z1">Render zero for missing values</label>
+                        </div>
                     </div>
                 ` : ''}
             </section>
-            ${ this.config.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
         `
     }
 
     renderOptionalAttributesSelect() {
         return html`
-            <section>
-                <label for="attr2">Select additional attribute:</label>
-                <select id="attr2" .value=${this.config.attr2} @change=${this.onAttribute2Select}>
-                    <option value="">[optional]</option>
-                    ${this.attributes.filter(attribute => attribute != this.config.attr1).map(attribute => html`
-                        <option value="${attribute}" .selected=${this.config.attr2 === attribute}>${attribute}</option>
-                    `
-                    )}
-                </select>
-                ${ this.config.attr2 ? html`
-                    <div>
-                        ${ this.supportedAttributes[this.config.attr2].minMax == true ? html`
-                            <label><input type="checkbox"
-                                .checked="${this.config.mm2}"
-                                @change=${ event => this.config.mm2 = event.target.checked }
-                            > Chart ${this.config.attr2} min/max</label>
-                         ` : ''}
-                        <label><input type="checkbox"
-                            .checked="${this.config.z2}"
-                            @change=${ event => this.config.z2 = event.target.checked }
-                        > Render zero for missing values</label>
-                    </div>
-                ` : ''}
-            </section>
+            <fieldset>
+                <section>
+                    <label for="attr2">Select additional attribute:</label>
+                    <select id="attr2" .value=${this.config.attr2} @change=${this.onAttribute2Select}>
+                        <option value="">[optional]</option>
+                        ${this.attributes.filter(attribute => attribute != this.config.attr1).map(attribute => html`
+                            <option value="${attribute}" .selected=${this.config.attr2 === attribute}>${attribute}</option>
+                        `
+                        )}
+                    </select>
+                    ${ this.config.attr2 ? html`
+                        <div>
+                            ${ this.supportedAttributes[this.config.attr2].minMax == true ? html`
+                                <div class="checkbox">
+                                    <input type="checkbox" id="mm2"
+                                        .checked="${this.config.mm2}"
+                                        @change=${ event => this.config.mm2 = event.target.checked }
+                                    >
+                                    <label for="mm2">Chart ${this.config.attr2} min/max</label>
+                                </div>
+                            ` : ''}
+                            <div class="checkbox">
+                                <input type="checkbox" id="z2"
+                                    .checked="${this.config.z2}"
+                                    @change=${ event => this.config.z2 = event.target.checked }
+                                >
+                                <label for="z2">Render zero for missing values</label>
+                            </div>
+                        </div>
+                    ` : ''}
+                </section>
+            </fieldset>
         `
     }
 
@@ -410,6 +430,12 @@ export class DevicePanelConfig extends LitElement {
         const device = this.devices.find(device => device.id == dev)
         this.attributes = device.attrs.sort()
         this.dispatchEvent(new CustomEvent('suggestTitle', { detail: device.name }))
+
+        setTimeout(() => {
+            const elm = this.renderRoot.querySelector('#attr1')
+            elm.scrollIntoView({behavior: 'smooth', block: 'center'});
+            elm.focus({preventScroll: true});
+        }, 0)
     }
 
     onAttribute1Select(event) {
@@ -420,6 +446,11 @@ export class DevicePanelConfig extends LitElement {
             mm1: false,
             z1: false,
         }
+        setTimeout(() => {
+            const elm = this.renderRoot.querySelector('#attr1')
+            elm.scrollIntoView({behavior: 'smooth', block: 'center'});
+            elm.focus({preventScroll: true});
+        }, 0)
     }
 
     onAttribute2Select(event) {
@@ -430,6 +461,11 @@ export class DevicePanelConfig extends LitElement {
             mm2: false,
             z2: false,
         }
+        setTimeout(() => {
+            const elm = this.renderRoot.querySelector('#attr2')
+            elm.scrollIntoView({behavior: 'smooth', block: 'center'});
+            elm.focus({preventScroll: true});
+        }, 0)
     }
 
     decorateConfig(config) {

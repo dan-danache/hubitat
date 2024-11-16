@@ -102,16 +102,15 @@ export class AttributePanel extends LitElement {
     }
 
     async initChart() {
-        if (this.chart !== undefined) this.chart.destroy()
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), ChartHelper.defaultConfig(this.mobileView))
-
         this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
         const monitoredDevices = await DatastoreHelper.fetchMonitoredDevices()
-        const data = await DatastoreHelper.fetchAttributeData(this.config)
         const colors = ColorHelper.colors()
+
+        const data = await DatastoreHelper.fetchAttributeData(this.config)
         //this.nodata = data.attr1.length == 0
 
+        const chartConfig = ChartHelper.lineConfig()
         const datasets = []
         for (const deviceId of this.config.devs) {
             datasets.push({
@@ -135,7 +134,7 @@ export class AttributePanel extends LitElement {
         }
 
         const attrLabel = ChartHelper.prettyName(this.config.attr)
-        this.chart.options.scales.y = {
+        chartConfig.options.scales.y = {
             position: 'left',
             display: true,
             title: {
@@ -149,13 +148,15 @@ export class AttributePanel extends LitElement {
         this.attrMin = supportedAttributes[this.config.attr].min
         this.attrMax = supportedAttributes[this.config.attr].max
         if (this.yScale === 'fixed') {
-            if (this.attrMin !== undefined) this.chart.options.scales.y.suggestedMin = this.attrMin
-            if (this.attrMax !== undefined) this.chart.options.scales.y.suggestedMax = this.attrMax
+            if (this.attrMin !== undefined) chartConfig.options.scales.y.suggestedMin = this.attrMin
+            if (this.attrMax !== undefined) chartConfig.options.scales.y.suggestedMax = this.attrMax
         }
 
+        chartConfig.data = { datasets }
+
+        if (this.chart !== undefined) this.chart.destroy()
+        this.chart = new Chart(this.renderRoot.querySelector('canvas'), chartConfig)
         this.chart.precision = this.config.precision
-        this.chart.data = { datasets }
-        this.chart.update()
         ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
@@ -211,8 +212,12 @@ export class AttributePanelConfig extends LitElement {
 
     render() {
         return html`
-            <label for="device">Select attribute to chart:</label>
-            ${this.attributes ? this.renderAttributesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
+            <fieldset>
+                <section>
+                    <label for="device">Select attribute to chart:</label>
+                    ${this.attributes ? this.renderAttributesSelect() : html`<aside class="spinner">Loading devices ...</aside>`}
+                </section>
+            </fieldset>
             ${this.config.attr && this.devices ? this.renderDevicesSelect() : '' }
         `
     }
@@ -241,10 +246,13 @@ export class AttributePanelConfig extends LitElement {
                 </select>
                 ${ this.config.attr ? html`
                     <div>
-                        <label><input type="checkbox"
-                            .checked="${this.config.z}"
-                            @change=${ event => this.config.z = event.target.checked }
-                        > Render zero for missing values</label>
+                        <div class="checkbox">
+                            <input type="checkbox" id="z"
+                                .checked="${this.config.z}"
+                                @change=${ event => this.config.z = event.target.checked }
+                            >
+                            <label for="z">Render zero for missing values</label>
+                        </div>
                     </div>
                 ` : ''}
             </section>
@@ -254,16 +262,23 @@ export class AttributePanelConfig extends LitElement {
     renderDevicesSelect() {
         const devices = this.devices.filter(device => device.attrs.includes(this.config.attr))
         return html`
-            <section id="devlist">
-                <label>Select devices (at least one):</label>
-                ${devices.map(device => {
-                    return html`<label><input value="${device.id}" type="checkbox"
-                        .checked="${this.config.devs.find(dev => dev == device.id)}"
-                        ?required=${this.config.devs.length == 0}
-                        @change=${this.onDeviceSelect}
-                    > ${device.name}</label>`
-                })}
-            </section>
+            <fieldset>
+                <section id="devlist">
+                    <label>Select devices (at least one):</label>
+                    ${devices.map(device => {
+                        return html`
+                            <div class="checkbox">
+                                <input type="checkbox" value="${device.id}" id="d${device.id}"
+                                    .checked="${this.config.devs.find(dev => dev == device.id)}"
+                                    ?required=${this.config.devs.length == 0}
+                                    @change=${this.onDeviceSelect}
+                                >
+                                <label for="d${device.id}">${device.name}</label>
+                            </div>
+                        `
+                    })}
+                </section>
+            </fieldset>
         `
     }
 

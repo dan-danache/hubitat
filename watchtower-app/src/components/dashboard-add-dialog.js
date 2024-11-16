@@ -1,4 +1,4 @@
-import { html, css, LitElement, unsafeHTML } from '../vendor/vendor.min.js';
+import { html, css, LitElement, unsafeHTML, nothing } from '../vendor/vendor.min.js';
 
 export class DashboardAddDialog extends LitElement {
     static styles = css`
@@ -63,8 +63,28 @@ export class DashboardAddDialog extends LitElement {
             overflow-y: auto;
             padding: 0 1em;
         }
-        section.modal-body section {
-            margin-bottom: 1em;
+        section.modal-body fieldset {
+            border: 0;
+            border-radius: 5px;
+            background-color: var(--bg-color);
+            padding: 10px;
+        }
+        section.modal-body fieldset:not(:last-child) {
+            margin-bottom: 10px;
+        }
+        section.modal-body fieldset nav {
+            text-align: right;
+            border-top: 1px var(--border-color) solid;
+            margin-top: 5px;
+            padding-top: 5px;
+            color: var(--border-color);
+        }
+        section.modal-body fieldset a {
+            color: var(--Blue);
+            text-decoration: none;
+        }
+        fieldset section:not(:last-child) {
+            margin-bottom: 10px;
         }
         section.modal-body section > div {
             margin-top: .3em;
@@ -73,59 +93,68 @@ export class DashboardAddDialog extends LitElement {
             padding: 1em;
             text-align: right;
         }
-        footer button {
+        button {
             padding: .5em 1em;
             cursor: pointer;
-            margin-left: 1em;
             background-color: var(--bg-color);
             color: var(--text-color);
             border: 1px var(--border-color) solid;
             border-radius: 5px;
             box-shadow: 0 0 0.3em var(--shadow-color);
         }
-        footer button:hover {
+        button:not(:first-child) {
+            margin-left: 10px;
+        }
+        button:hover {
             background-color: var(--Blue);
             color: var(--Base3);
         }
-        label { display: block; margin-bottom: .3em; user-select: none }
-        select {
-            display: block;
-        }
+        label { display: block; user-select: none; margin-bottom: 5px }
+        select { display: block; line-height: 32px }
         input, select {
             box-sizing: border-box;
             display: block;
             width: 100%;
+            height: 32px;
             background-color: var(--bg-color-darker);
             color: var(--text-color);
             border: 1px var(--border-color) solid;
             border-radius: 5px;
-            padding: .5em;
+            padding: 6px;
             margin: 0;
         }
-        input[type="checkbox"] {
-            appearance: none;
-            display: inline-block;
-            margin: 0;
-            background-color: var(--bg-color);
-            border: 1px var(--border-color) solid;
-            font: inherit;
-            width: 1.15em;
-            height: 1.15em;
-            transform: translate(0, 3px);
+        .checkbox:not(:last-child) { margin-bottom: 9px }
+        .checkbox input { display: none }
+        .checkbox label {
+            align-items: center;
             cursor: pointer;
+            display: flex;
+            line-height: 15px;
+            height: 15px;
+            position: relative;
+            magin-bottom: 0;
         }
-        input[type="checkbox"]:checked {
-            background-color: var(--Blue)
+        .checkbox label::before, .checkbox label::after { content: ''; display: block }
+        .checkbox label::before {
+            background-color: var(--Base00);
+            border-radius: 500px;
+            height: 15px;
+            margin-right: 8px;
+            width: 25px;
         }
-        input[type="checkbox"]:checked::before {
-            content: "";
-            display: block;
-            width: calc(100% - 4px);
-            height: calc(100% - 4px);
-            margin: 2px;
-            background-color: var(--Base3);
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        .checkbox input:user-invalid + label::before { background-color: var(--Red) }
+        .checkbox label::after {
+            background-color: #fff;
+            border-radius: 13px;
+            height: 13px;
+            left: 1px;
+            position: absolute;
+            top: 1px;
+            transition: transform 0.125s ease-out;
+            width: 13px;
         }
+        .checkbox input:checked + label::before { background-color: var(--Blue) }
+        .checkbox input:checked + label::after { transform: translate3d(10px, 0, 0) }
         input:focus, select:focus, button:focus {
             outline: 1px var(--Blue) solid;
             border-color: var(--Blue)
@@ -146,6 +175,7 @@ export class DashboardAddDialog extends LitElement {
     static panels = {
         'device-panel': 'Device',
         'attribute-panel': 'Attribute',
+        'statusmap-panel': 'Status Map',
         'text-panel': 'Text',
         'iframe-panel': 'Iframe',
         'hub-info-panel': 'Hub Info',
@@ -158,34 +188,34 @@ export class DashboardAddDialog extends LitElement {
 
     constructor() {
         super()
+        this.open = false
         this.resetForm()
     }
 
     render() {
-        if (this.config === undefined) this.resetForm()
         setTimeout(() => this.renderRoot.querySelector('.panel-config')?.addEventListener('suggestTitle', event => this.suggestTitle(event)), 0)
-        return html`
+        return this.open ? html`
             <article role="dialog" aria-modal="true" aria-labelledby="d-title">
                 <form @submit=${this.submit}>
                     <header id="d-title">${this.config.id ? 'Edit': 'Add'} Dashboard Tile</header>
                     <section class="modal-body">
-                        <section>
-                            <label for="title">Title title:</label>
-                            <input type="text" id="title" .value=${this.config.title} autocomplete="off" @change=${event => this.config.title = event.target.value} placeholder="[optional]">
-                        </section>
-                        <section>
-                            <label for="type">Tile type:</label>
-                            <select id="type" .value=${this.config.type} @change=${this.onTileTypeChange} required="true">
-                                <option value=""></option>
-                                ${Object.entries(DashboardAddDialog.panels).map(([key, val]) => html`
-                                    <option value="${key}" .selected=${this.config.type === key}>${val}</option>
-                                `
-                                )}
-                            </select>
-                        </section>
-                        <section>
-                            ${this.config.type ? this.renderPanelConfig() : ''}
-                        </section>
+                        <fieldset>
+                            <section>
+                                <label for="title">Tile name:</label>
+                                <input type="text" id="title" .value=${this.config.title} autocomplete="off" @change=${event => this.config.title = event.target.value} placeholder="[optional]">
+                            </section>
+                            <section>
+                                <label for="type">Tile type:</label>
+                                <select id="type" .value=${this.config.type} @change=${this.onTileTypeChange} required="true">
+                                    <option value=""></option>
+                                    ${Object.entries(DashboardAddDialog.panels).map(([key, val]) => html`
+                                        <option value="${key}" .selected=${this.config.type === key}>${val}</option>
+                                    `
+                                    )}
+                                </select>
+                            </section>
+                        </fieldset>
+                        ${this.config.type ? this.renderPanelConfig() : nothing}
                     </section>
                     <footer>
                         <button type="reset" @click=${this.close}>Cancel</button>
@@ -193,11 +223,16 @@ export class DashboardAddDialog extends LitElement {
                     </footer>
                 </form>
             </article>
-        `;
+        ` : nothing;
     }
 
     renderPanelConfig() {
-        return unsafeHTML(`<${this.config.type}-config class="panel-config" config='${JSON.stringify(this.config).replace(/'/g, '&apos;')}'></${this.config.type}-config>`)
+        return unsafeHTML(`
+            <${this.config.type}-config class="panel-config"
+                config='${JSON.stringify(this.config).replace(/'/g, '&apos;')}'></${this.config.type}-config
+                @suggestTitle=${this.suggestTitle}
+            ></${this.config.type}-config>
+        `)
     }
 
     connectedCallback() {
@@ -227,8 +262,7 @@ export class DashboardAddDialog extends LitElement {
         }
     }
 
-    close(event) {
-        event?.stopPropagation()
+    close() {
         this.resetForm()
         this.open = false
     }

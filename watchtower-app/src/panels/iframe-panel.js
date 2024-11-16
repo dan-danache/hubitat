@@ -71,23 +71,31 @@ export class IframePanelConfig extends LitElement {
 
     render() {
         return html`
-            <section>
-                <label for="url">URL to load:</label>
-                <input type="url" id="url" required="true" type="url" pattern="https?://.+" placeholder="Enter URL to load" autocomplete="off"
-                    .value=${this.config.url}
-                    @change=${event => this.config = {...this.config, url: event.target.value}}
-                />
-            </section>
-            <section>
-                <label><input value="true" type="checkbox"
-                    .checked=${this.config.noBorder}
-                    @change=${event => this.config = {...this.config, noBorder: event.target.checked}}
-                > Hide tile border</label>
-                <label><input value="true" type="checkbox"
-                    .checked=${this.config.noRefresh}
-                    @change=${event => this.config = {...this.config, noRefresh: event.target.checked}}
-                > Disable auto-refresh</label>
-            </section>
+            <fieldset>
+                <section>
+                    <label for="url">URL to load:</label>
+                    <input type="url" id="url" required="true" type="url" pattern="https?://.+" placeholder="Enter URL to load" autocomplete="off"
+                        .value=${this.config.url}
+                        @change=${event => this.config = {...this.config, url: event.target.value}}
+                    />
+                </section>
+                <section>
+                    <div class="checkbox">
+                        <input type="checkbox" value="true" id="noBorder"
+                            .checked=${this.config.noBorder}
+                            @change=${event => this.config = {...this.config, noBorder: event.target.checked}}
+                        >
+                        <label for="noBorder">Hide tile border</label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" value="true" id="noRefresh"
+                            .checked=${this.config.noRefresh}
+                            @change=${event => this.config = {...this.config, noRefresh: event.target.checked}}
+                        >
+                        <label for="noRefresh">Disable auto-refresh</label>
+                    </div>
+                </section>
+            </fieldset>
         `
     }
 

@@ -117,16 +117,23 @@ export class HubInfoPanelConfig extends LitElement {
 
     render() {
         return html`
-            <section>
-                <label>Select details to display:</label>
-                ${Object.entries(FIELDS).map(([key, val]) => {
-                    return html`<label><input value="${key}" type="checkbox"
-                        ?required=${this.config.info.length == 0}
-                        .checked=${this.config.info.includes(key)}
-                        @change=${this.onFieldSelect}
-                    > ${val.label}</label>`
-                })}
-            </section>
+            <fieldset>
+                <label>Select hub details to display:</label>
+                <div>
+                    ${Object.entries(FIELDS).map(([key, val]) => {
+                        return html`
+                            <div class="checkbox">
+                                <input type="checkbox" value="${key}" id="h${key}"
+                                    ?required=${this.config.info.length == 0}
+                                    .checked=${this.config.info.includes(key)}
+                                    @change=${this.onFieldSelect}
+                                >
+                                <label for="h${key}">${val.label}</label>
+                            </div>
+                        `
+                    })}
+                </div>
+            </fieldset>
         `
     }
 

@@ -74,6 +74,7 @@ export class WatchtowerApp extends LitElement {
 
     connectedCallback() {
         super.connectedCallback()
+        window.addEventListener('keydown', event => this.onKeyDown(event));
         document.body.classList.remove('spinner')
     }
 
@@ -108,6 +109,15 @@ export class WatchtowerApp extends LitElement {
         this.applyMobileView()
     }
 
+    onKeyDown(event) {
+        if (event.key !== 'Escape') return
+        if (this.dialogElm.open) {
+            this.dialogElm.open = false
+            return
+        }
+        this.menuElm.open = !this.menuElm.open
+    }
+
     bailOut(errCode) {
         alert(`
             This file is part of the Watchtower application.
@@ -134,7 +144,7 @@ export class WatchtowerApp extends LitElement {
     }
 
     showAddDialog() {
-        this.dialogElm.config = undefined
+        this.dialogElm.resetForm()
         this.dialogElm.setAttribute('open', true)
     }
 
