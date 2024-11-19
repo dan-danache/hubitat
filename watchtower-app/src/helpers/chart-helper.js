@@ -156,12 +156,7 @@ export class ChartHelper {
                         intersect: true,
                     },
                     crosshair: {
-                        line: {
-                            color: colors.Red,
-                            width: 1,
-                        },
-                        zoom: { zoomButtonText: '◀•••▶' },
-                        callbacks: { afterZoom: start => this.updateChartType(start.chart) },
+                        callbacks: { afterZoom: start => this.updatePointStyle(start.chart) },
                     },
                 }
             }

@@ -1,21 +1,6 @@
 var defaultOptions = {
-    line: {
-        color: '#F66',
-        width: 1,
-        dashPattern: []
-    },
-    zoom: {
-        enabled: true,
-        zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',
-        zoomboxBorderColor: '#48F',
-        zoomButtonText: 'Reset Zoom',
-        zoomButtonClass: 'reset-zoom',
-    },
-    snap: {
-        enabled: true,
-    },
     callbacks: {
-        afterZoom: function(start, end) {}
+        afterZoom: function() {}
     }
 }
 
@@ -36,13 +21,38 @@ export default {
             dragStarted: false,
             dragStartX: null,
             dragEndX: null,
-            suppressTooltips: false,
             ignoreNextEvents: 0,
             canStartDrag: false,
             timeout: null,
             resetZoom: () => this.resetZoom(chart),
             panZoom: direction => this.panZoom(chart, direction)
         }
+
+        // Listen to incoming sync messages
+        window.addEventListener('crosshair', event => this.sync(chart, event.detail))
+    },
+
+    sync(chart, {id, time}) {
+
+        // Ignore messages from myself
+        if (chart.id === id) return
+
+        var xScale = this.getXScale(chart)
+        if (!xScale) return
+
+        // Stop drawing crosshair
+        if (time === null) {
+            chart.crosshair.x = null
+            chart.draw()
+            return
+        }
+
+        // Draw crosshair
+        time = Math.min(Math.max(time, xScale.min), xScale.max)
+        const lineX = xScale.getPixelForValue(time)
+        if (chart.crosshair.x == lineX) return
+        chart.crosshair.x = lineX
+        chart.draw()
     },
 
     panZoom: function(chart, direction) {
@@ -82,7 +92,7 @@ export default {
         return chart.scales[chart.getDatasetMeta(0).yAxisID]
     },
 
-    afterEvent: function(chart, event) {
+    afterEvent: function(chart, args, opts) {
         if (chart.config.options.scales.x.length == 0) return
 
         var xScaleType = chart.config.options.scales.x.type
@@ -99,12 +109,9 @@ export default {
         const minX = xScale.getPixelForValue(xScale.min)
         const maxX = xScale.getPixelForValue(xScale.max)
 
-        let e = event.event
+        let e = args.event
         e.x = Math.min(Math.max(e.x, minX), maxX)
-        //console.log('event', chart.crosshair.dragStarted, chart.crosshair.canStartDrag, e)
-
-        // Suppress tooltips for linked charts
-        chart.crosshair.enabled = true //(e.type !== 'mouseout' && (e.x > xScale.getPixelForValue(xScale.min) && e.x < xScale.getPixelForValue(xScale.max)))
+        const time = xScale.getValueForPixel(e.x)
 
         // Enable drag on mobile phones on second quick touch
         if (e.type === 'click') {
@@ -122,14 +129,17 @@ export default {
             chart.crosshair.x = e.x
             chart.crosshair.dragStartX = e.x
             chart.crosshair.dragStarted = true
+            chart.draw()
             return
         }
 
         // Remove drag box and trace line if out of bounds
         if (e.type === 'mouseout') {
-            chart.crosshair.enabled = false
+            chart.crosshair.x = null
             chart.crosshair.canStartDrag = false
             chart.crosshair.dragStarted = false
+            chart.draw()
+            window.dispatchEvent(new CustomEvent('crosshair', { detail: {id: chart.id, time: null }}))
             return
         }
 
@@ -138,25 +148,26 @@ export default {
             chart.crosshair.dragStarted = false
 
             var start = xScale.getValueForPixel(chart.crosshair.dragStartX)
-            var end = xScale.getValueForPixel(chart.crosshair.x)
-            this.doZoom(chart, start, end)
+            this.doZoom(chart, start, time)
+            return
         }
 
+        // Draw crosshair
+        if (chart.crosshair.x == e.x) return
         chart.crosshair.x = e.x
         chart.draw()
+
+        // Sync other crosshairs
+        window.dispatchEvent(new CustomEvent('crosshair', { detail: {id: chart.id, time: xScale.getValueForPixel(e.x) }}))
     },
 
     afterDraw: function(chart) {
-        if (!chart.crosshair.enabled) return
+        if (chart.crosshair.x === null) return
+
         if (chart.crosshair.dragStarted) this.drawZoombox(chart)
         else this.drawTraceLine(chart)
+
         return true
-    },
-
-    beforeTooltipDraw: function(chart) {
-
-        // Suppress tooltips on dragging
-        return !chart.crosshair.dragStarted && !chart.crosshair.suppressTooltips
     },
 
     resetZoom: function(chart) {
@@ -169,7 +180,7 @@ export default {
             chart.crosshair.button.parentNode.removeChild(chart.crosshair.button)
             chart.crosshair.button = null
         }
-        
+
         chart.update()
         this.getOption(chart, 'callbacks', 'afterZoom')({chart})
     },
@@ -194,13 +205,9 @@ export default {
         // Add restore zoom button
         if (chart.crosshair.button == null) {
             var button = document.createElement('button')
-
-            var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText')
-            var buttonClass = this.getOption(chart, 'zoom', 'zoomButtonClass')
-
-            var buttonLabel = document.createTextNode(buttonText)
+            var buttonLabel = document.createTextNode('◀•••▶')
             button.appendChild(buttonLabel)
-            button.className = buttonClass
+            button.className = 'reset-zoom'
             button.setAttribute('title', 'Reset Zoom')
             button.addEventListener('click', () => this.resetZoom(chart))
             chart.canvas.parentNode.appendChild(button)
@@ -219,9 +226,6 @@ export default {
     },
 
     drawZoombox: function(chart) {
-        var borderColor = this.getOption(chart, 'zoom', 'zoomboxBorderColor')
-        var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor')
-
         chart.ctx.beginPath()
         chart.ctx.rect(
             chart.crosshair.dragStartX,
@@ -230,8 +234,8 @@ export default {
             chart.chartArea.bottom - chart.chartArea.top,
         )
         chart.ctx.lineWidth = 1
-        chart.ctx.strokeStyle = borderColor
-        chart.ctx.fillStyle = fillColor
+        chart.ctx.strokeStyle = '#48F'
+        chart.ctx.fillStyle = 'rgba(66,133,244,0.2)'
         chart.ctx.fill()
         chart.ctx.fillStyle = ''
         chart.ctx.stroke()
@@ -239,20 +243,14 @@ export default {
     },
 
     drawTraceLine: function(chart) {
-        var lineWidth = this.getOption(chart, 'line', 'width')
-        var color = this.getOption(chart, 'line', 'color')
-        var dashPattern = this.getOption(chart, 'line', 'dashPattern')
-        var snapEnabled = this.getOption(chart, 'snap', 'enabled')
-
-        var lineX = chart.crosshair.x
-        //if (snapEnabled && chart._active.length) lineX = chart._active[0].element.x
+        if (chart.crosshair.x == null) return
 
         chart.ctx.beginPath()
-        chart.ctx.setLineDash(dashPattern)
-        chart.ctx.moveTo(lineX, chart.chartArea.top)
-        chart.ctx.lineWidth = lineWidth
-        chart.ctx.strokeStyle = color
-        chart.ctx.lineTo(lineX, chart.chartArea.bottom)
+        chart.ctx.setLineDash([])
+        chart.ctx.moveTo(chart.crosshair.x, chart.chartArea.top)
+        chart.ctx.lineWidth = 1
+        chart.ctx.strokeStyle = '#dc322f'
+        chart.ctx.lineTo(chart.crosshair.x, chart.chartArea.bottom)
         chart.ctx.stroke()
         chart.ctx.setLineDash([])
     }
