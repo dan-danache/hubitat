@@ -38,7 +38,7 @@ export class ChartHelper {
         return {
             type: 'line',
             options: {
-                events: ['mousedown', 'mousemove', 'mouseup', 'mouseout', 'click', 'touchstart', 'touchmove', 'touchend'],
+                events: ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseout', 'touchstart', 'touchmove', 'touchend'],
                 parsing: false,
                 normalized: true,
                 responsive: true,

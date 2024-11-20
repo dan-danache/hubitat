@@ -29,10 +29,10 @@ export default {
         }
 
         // Listen to incoming sync messages
-        window.addEventListener('crosshair', event => this.sync(chart, event.detail))
+        window.addEventListener('crosshair', event => this.syncCrosshair(chart, event.detail))
     },
 
-    sync(chart, {id, time}) {
+    syncCrosshair(chart, {id, time}) {
 
         // Ignore messages from myself
         if (chart.id === id) return
@@ -42,6 +42,7 @@ export default {
 
         // Stop drawing crosshair
         if (time === null) {
+            if (chart.crosshair.x === null) return
             chart.crosshair.x = null
             chart.draw()
             return
@@ -49,7 +50,7 @@ export default {
 
         // Draw crosshair
         time = Math.min(Math.max(time, xScale.min), xScale.max)
-        const lineX = xScale.getPixelForValue(time)
+        const lineX = Math.round(xScale.getPixelForValue(time))
         if (chart.crosshair.x == lineX) return
         chart.crosshair.x = lineX
         chart.draw()
@@ -92,26 +93,26 @@ export default {
         return chart.scales[chart.getDatasetMeta(0).yAxisID]
     },
 
-    afterEvent: function(chart, args, opts) {
-        if (chart.config.options.scales.x.length == 0) return
+    afterEvent: function(chart, args) {
+        if (chart.config.options.scales.x.length == 0) return false
 
-        var xScaleType = chart.config.options.scales.x.type
-        if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic') return
+        // var xScaleType = chart.config.options.scales.x.type
+        // if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic') return false
 
         var xScale = this.getXScale(chart)
-        if (!xScale) return
+        if (!xScale) return false
 
         if (chart.crosshair.ignoreNextEvents > 0) {
             chart.crosshair.ignoreNextEvents -= 1
-            return
+            return false
         }
 
         const minX = xScale.getPixelForValue(xScale.min)
         const maxX = xScale.getPixelForValue(xScale.max)
 
-        let e = args.event
-        e.x = Math.min(Math.max(e.x, minX), maxX)
-        const time = xScale.getValueForPixel(e.x)
+        const e = args.event
+        e.x = Math.round(Math.min(Math.max(e.x, minX), maxX))
+        const time = Math.round(xScale.getValueForPixel(e.x))
 
         // Enable drag on mobile phones on second quick touch
         if (e.type === 'click') {
@@ -147,22 +148,34 @@ export default {
         if (chart.crosshair.dragStarted && e.type === 'mouseup') {
             chart.crosshair.dragStarted = false
 
+            // This is actually a click; reset drag
+            if (Math.abs(chart.crosshair.dragStartX - e.x) < 3) {
+                chart.draw()
+                return false
+            }
+
             var start = xScale.getValueForPixel(chart.crosshair.dragStartX)
             this.doZoom(chart, start, time)
+
+            // Sync zoom
+            if (e.native.ctrlKey) Chart.helpers.each(Chart.instances, instance => {
+                if (instance.id == chart.id) return
+                this.doZoom(instance, start, time)
+            })
             return
         }
 
         // Draw crosshair
-        if (chart.crosshair.x == e.x) return
+        if (chart.crosshair.x == e.x) return false
         chart.crosshair.x = e.x
         chart.draw()
 
         // Sync other crosshairs
-        window.dispatchEvent(new CustomEvent('crosshair', { detail: {id: chart.id, time: xScale.getValueForPixel(e.x) }}))
+        window.dispatchEvent(new CustomEvent('crosshair', { detail: {id: chart.id, time }}))
     },
 
     afterDraw: function(chart) {
-        if (chart.crosshair.x === null) return
+        if (chart.crosshair.x === null) return false
 
         if (chart.crosshair.dragStarted) this.drawZoombox(chart)
         else this.drawTraceLine(chart)
@@ -170,7 +183,7 @@ export default {
         return true
     },
 
-    resetZoom: function(chart) {
+    resetZoom: function(chart, sync = false) {
         if (chart.crosshair.originalXRange === null) return
 
         chart.options.scales.x.min = chart.crosshair.originalXRange.min
@@ -183,11 +196,17 @@ export default {
 
         chart.update()
         this.getOption(chart, 'callbacks', 'afterZoom')({chart})
+
+        // Sync other charts
+        if (sync) Chart.helpers.each(Chart.instances, instance => {
+            if (instance.id == chart.id) return
+            this.resetZoom(instance)
+        })
     },
 
     doZoom: function(chart, start, end) {
         chart.crosshair.dragStarted = false
-        if (start == end) return
+        if (start == end) return false
 
         // Store orginal bounds
         if (chart.crosshair.originalXRange === null) chart.crosshair.originalXRange = {
@@ -201,6 +220,7 @@ export default {
         // Check bounds
         start = Math.max(start, chart.crosshair.originalXRange.min)
         end = Math.min(end, chart.crosshair.originalXRange.max)
+        if (start > end) return false
 
         // Add restore zoom button
         if (chart.crosshair.button == null) {
@@ -209,7 +229,7 @@ export default {
             button.appendChild(buttonLabel)
             button.className = 'reset-zoom'
             button.setAttribute('title', 'Reset Zoom')
-            button.addEventListener('click', () => this.resetZoom(chart))
+            button.addEventListener('click', event => this.resetZoom(chart, event.ctrlKey))
             chart.canvas.parentNode.appendChild(button)
             chart.crosshair.button = button
         }
@@ -243,6 +263,7 @@ export default {
     },
 
     drawTraceLine: function(chart) {
+        //console.log(`Chart #${chart.id}: drawTraceLine()`, chart.crosshair.x)
         if (chart.crosshair.x == null) return
 
         chart.ctx.beginPath()

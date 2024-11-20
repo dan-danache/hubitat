@@ -5,8 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.0] - 2024-11-18
-### Fixed
+## [2.5.0] - 2024-11-20
+### Added
+- Sync zoom/reset zoom between all dashboard charts (if CTRL key is pressed) - `@tj4293`
+
+## [2.4.0] - 2024-11-19
+### Added
 - Sync crosshair between all dashboard charts - `@Sebastien`
 
 ## [2.3.1] - 2024-11-18

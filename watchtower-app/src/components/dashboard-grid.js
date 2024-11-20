@@ -130,7 +130,7 @@ export class DashboardGrid extends LitElement {
                 message: `
                     <b>😎 Welcome to your new dashboard!</b>
                     <ul>
-                        <li>Press the <b>ESC</b> (Escape) key on your keyboard to show or hide the left menu.
+                        <li>Press the <b>ESC</b> (Escape) key on your keyboard, or swipe from the left margin, to show or hide the left menu.
                         <li>Click the <b>Add dashboard tile</b> button to add new tiles to your dashboard.
                         <li>Rearrange tiles by dragging their titles. Resize tiles by dragging the bottom-right corner.
                         <li>Remove tiles by dragging them outside the dashboard grid.

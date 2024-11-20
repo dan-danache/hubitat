@@ -23,7 +23,7 @@ export class ColorHelper {
         // These are fixed and don't depend on the current theme
         const css = getComputedStyle(document.documentElement)
         ColorHelper.chartColors = [
-            css.getPropertyValue('--Red'),
+            css.getPropertyValue('--Magenta'),
             css.getPropertyValue('--Blue'),
             //css.getPropertyValue('--Cyan'),
             //css.getPropertyValue('--Yellow'),

@@ -187,7 +187,7 @@ When you load a dashboard in a new tab for the first time (by clicking the dashb
 
 ### Dashboard Menu
 
-The dashboard menu is not displayed by default and will only appear when the dashboard has no tiles. To toggle the dashboard menu, press the **ESC** (Escape) key on your keyboard. On mobile devices, you can bring up the menu by swiping from the left margin of the screen.
+The dashboard menu is not displayed by default and will only appear when the dashboard has no tiles. To toggle the dashboard menu, press the **ESC** (Escape) key on your keyboard. On touchscreen devices, you can bring up the menu by swiping from the left margin of the screen.
 
 ![Dashboard menu](img/dashboard-menu.png)
 
@@ -251,7 +251,9 @@ Changing the time resolution updates the source of the graph data points. For ex
 
 The zoom functionality allows you to interact with charts displaying multiple data points over time. To zoom in on a specific chart area, simply select it using your mouse. To return to the full dataset view, click the **Reset Zoom** button (◀•••▶) in the top right corner.
 
-On mobile devices, start by tapping the chart briefly, then immediately drag the desired chart area to zoom in.
+If the `CTRL` key is pressed during selection or while clicking the **Reset Zoom** button (◀•••▶), then the zoom/reset zoom will be synced between all dashboard charts.
+
+On touchscreen devices, start by tapping the chart briefly, then immediately drag the desired chart area to zoom in. The sync functionality is not available on touchscreen devices.
 
 ![Chart Zoom](img/zoom.png)
 
