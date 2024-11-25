@@ -9,4 +9,4 @@ del watchtower.html
 del watchtower.js
 
 copy src\watchtower.html .
-tools\esbuild.exe src\watchtower.js --bundle --minify --tree-shaking=true --legal-comments=none --outdir=. "--external:chart.js"
+tools\esbuild.exe src\watchtower.js --bundle --minify --tree-shaking=true --legal-comments=none "--reserve-props=^\$config.*$" --outdir=. "--external:chart.js"

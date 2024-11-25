@@ -110,7 +110,7 @@ export class AttributePanel extends LitElement {
         const data = await DatastoreHelper.fetchAttributeData(this.config)
         //this.nodata = data.attr1.length == 0
 
-        const chartConfig = ChartHelper.lineConfig()
+        const $config = ChartHelper.lineConfig()
         const datasets = []
         for (const deviceId of this.config.devs) {
             datasets.push({
@@ -134,7 +134,7 @@ export class AttributePanel extends LitElement {
         }
 
         const attrLabel = ChartHelper.prettyName(this.config.attr)
-        chartConfig.options.scales.y = {
+        $config.options.scales.y = {
             position: 'left',
             display: true,
             title: {
@@ -148,14 +148,17 @@ export class AttributePanel extends LitElement {
         this.attrMin = supportedAttributes[this.config.attr].min
         this.attrMax = supportedAttributes[this.config.attr].max
         if (this.yScale === 'fixed') {
-            if (this.attrMin !== undefined) chartConfig.options.scales.y.suggestedMin = this.attrMin
-            if (this.attrMax !== undefined) chartConfig.options.scales.y.suggestedMax = this.attrMax
+            if (this.attrMin !== undefined) $config.options.scales.y.suggestedMin = this.attrMin
+            if (this.attrMax !== undefined) $config.options.scales.y.suggestedMax = this.attrMax
         }
 
-        chartConfig.data = { datasets }
+        $config.data = { datasets }
+
+        // Apply user script
+        ChartHelper.executeUserScript(this.config.uscript, $config)
 
         if (this.chart !== undefined) this.chart.destroy()
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), chartConfig)
+        this.chart = new Chart(this.renderRoot.querySelector('canvas'), $config)
         this.chart.precision = this.config.precision
         ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)

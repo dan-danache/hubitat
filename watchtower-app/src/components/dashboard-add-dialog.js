@@ -93,6 +93,9 @@ export class DashboardAddDialog extends LitElement {
             padding: 1em;
             text-align: right;
         }
+        footer button[type="button"] {
+            float: left;
+        }
         button {
             padding: .5em 1em;
             cursor: pointer;
@@ -111,7 +114,7 @@ export class DashboardAddDialog extends LitElement {
         }
         label { display: block; user-select: none; margin-bottom: 5px }
         select { display: block; line-height: 32px }
-        input, select {
+        input, select, textarea {
             box-sizing: border-box;
             display: block;
             width: 100%;
@@ -123,6 +126,7 @@ export class DashboardAddDialog extends LitElement {
             padding: 6px;
             margin: 0;
         }
+        textarea { width:100%; min-height: 200px }
         .checkbox:not(:last-child) { margin-bottom: 9px }
         .checkbox input { display: none }
         .checkbox label {
@@ -155,11 +159,11 @@ export class DashboardAddDialog extends LitElement {
         }
         .checkbox input:checked + label::before { background-color: var(--Blue) }
         .checkbox input:checked + label::after { transform: translate3d(10px, 0, 0) }
-        input:focus, select:focus, button:focus {
+        input:focus, select:focus, textarea:focus, button:focus {
             outline: 1px var(--Blue) solid;
             border-color: var(--Blue)
         }
-        input:user-invalid, select:user-invalid {
+        input:user-invalid, select:user-invalid, textarea:user-invalid {
             border-color: var(--Red) !important;
         }
         aside {
@@ -173,22 +177,24 @@ export class DashboardAddDialog extends LitElement {
     `;
 
     static panels = {
-        'device-panel': 'Device',
-        'attribute-panel': 'Attribute',
-        'statusmap-panel': 'Status Map',
-        'text-panel': 'Text',
-        'iframe-panel': 'Iframe',
-        'hub-info-panel': 'Hub Info',
+        'device-panel': { label: 'Device', hasUserScript: true },
+        'attribute-panel': { label: 'Attribute', hasUserScript: true },
+        'statusmap-panel': { label: 'Status Map', hasUserScript: true },
+        'text-panel': { label: 'Text', hasUserScript: false },
+        'iframe-panel': { label: 'Iframe', hasUserScript: false },
+        'hub-info-panel': { label: 'Hub Info', hasUserScript: false },
     }
 
     static properties = {
         open: { type: Boolean, reflect: true },
+        showUserScript: { type: Boolean, state: true },
         config: { type: Object, state: true },
     }
 
     constructor() {
         super()
         this.open = false
+        this.showUserScript = false
         this.resetForm()
     }
 
@@ -196,34 +202,65 @@ export class DashboardAddDialog extends LitElement {
         setTimeout(() => this.renderRoot.querySelector('.panel-config')?.addEventListener('suggestTitle', event => this.suggestTitle(event)), 0)
         return this.open ? html`
             <article role="dialog" aria-modal="true" aria-labelledby="d-title">
-                <form @submit=${this.submit}>
-                    <header id="d-title">${this.config.id ? 'Edit': 'Add'} Dashboard Tile</header>
-                    <section class="modal-body">
-                        <fieldset>
-                            <section>
-                                <label for="title">Tile name:</label>
-                                <input type="text" id="title" .value=${this.config.title} autocomplete="off" @change=${event => this.config.title = event.target.value} placeholder="[optional]">
-                            </section>
-                            <section>
-                                <label for="type">Tile type:</label>
-                                <select id="type" .value=${this.config.type} @change=${this.onTileTypeChange} required="true">
-                                    <option value=""></option>
-                                    ${Object.entries(DashboardAddDialog.panels).map(([key, val]) => html`
-                                        <option value="${key}" .selected=${this.config.type === key}>${val}</option>
-                                    `
-                                    )}
-                                </select>
-                            </section>
-                        </fieldset>
-                        ${this.config.type ? this.renderPanelConfig() : nothing}
-                    </section>
-                    <footer>
-                        <button type="reset" @click=${this.close}>Cancel</button>
-                        <button type="submit">${this.config.id ? 'Update': 'Add'} tile</button>
-                    </footer>
-                </form>
+                ${this.showUserScript ? this.renderUserScriptForm() : this.renderPanelForm()}
             </article>
         ` : nothing;
+    }
+
+    renderPanelForm() {
+        return html`
+            <form @submit=${this.submit}>
+                <header id="d-title">${this.config.id ? 'Edit': 'Add'} Dashboard Tile</header>
+                <section class="modal-body">
+                    <fieldset>
+                        <section>
+                            <label for="title">Tile name:</label>
+                            <input type="text" id="title" .value=${this.config.title} autocomplete="off" @change=${event => this.config.title = event.target.value} placeholder="[optional]">
+                        </section>
+                        <section>
+                            <label for="type">Tile type:</label>
+                            <select id="type" .value=${this.config.type} @change=${this.onTileTypeChange} required="true">
+                                <option value=""></option>
+                                ${Object.entries(DashboardAddDialog.panels).map(([key, val]) => html`
+                                    <option value="${key}" .selected=${this.config.type === key}>${val.label}</option>
+                                `
+                                )}
+                            </select>
+                        </section>
+                    </fieldset>
+                    ${this.config.type ? this.renderPanelConfig() : nothing}
+                </section>
+                <footer>
+                        ${this.config.type && DashboardAddDialog.panels[this.config.type]?.hasUserScript == true ? html`
+                        <button type="button" @click=${() => this.showUserScript = true} title="Beware: Here be dragons!">&lt;/&gt;</button>
+                    ` : nothing}
+                    <button type="reset" @click=${this.close}>Cancel</button>
+                    <button type="submit">${this.config.id ? 'Update': 'Add'} tile</button>
+                </footer>
+            </form>
+        `
+    }
+
+    renderUserScriptForm() {
+        setTimeout(() => this.renderRoot.querySelector('#uscript').focus(), 0)
+        return html`
+            <form @submit=${this.submitUserScript}>
+                <header id="d-title">Beware: Here be dragons!</header>
+                <section class="modal-body">
+                    <section>
+                        <label for="title">User Script (JS code):</label>
+                        <textarea id="uscript" name="uscript"
+                            .value=${this.config.uscript || ''}
+                            @change=${this.onUserScriptChange}
+                        ></textarea>
+                    </section>
+                </section>
+                <footer>
+                    <button type="reset" @click=${() => this.showUserScript = false}>Get me outta here!</button>
+                    <button type="submit">Set User Script</button>
+                </footer>
+            </form>
+        `
     }
 
     renderPanelConfig() {
@@ -257,6 +294,7 @@ export class DashboardAddDialog extends LitElement {
     }
 
     resetForm() {
+        this.showUserScript = false
         this.config = {
             title: ''
         }
@@ -265,6 +303,7 @@ export class DashboardAddDialog extends LitElement {
     close() {
         this.resetForm()
         this.open = false
+        this.showUserScript = false
     }
 
     submit(event) {
@@ -272,7 +311,8 @@ export class DashboardAddDialog extends LitElement {
         const config = this.renderRoot.querySelector('.panel-config').decorateConfig({
             id: this.config.id,
             title: this.config.title,
-            type: this.config.type
+            type: this.config.type,
+            uscript: this.config.uscript,
         })
         Object.keys(config).forEach(key => config[key] === undefined && delete config[key])
         console.info('**** Adding panel with config', config)
@@ -280,5 +320,12 @@ export class DashboardAddDialog extends LitElement {
         this.close()
         this.resetForm()
         this.dispatchEvent(new CustomEvent('done', {detail: config}))
+    }
+
+    submitUserScript(event) {
+        event.preventDefault()
+        const uscript = new FormData(event.target).get('uscript').trim() || undefined
+        this.config = { ...this.config, uscript }
+        this.showUserScript = false
     }
 }

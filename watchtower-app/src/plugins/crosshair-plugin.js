@@ -112,7 +112,7 @@ export default {
 
         const e = args.event
         e.x = Math.round(Math.min(Math.max(e.x, minX), maxX))
-        const time = Math.round(xScale.getValueForPixel(e.x))
+        let time = Math.round(xScale.getValueForPixel(e.x))
 
         // Enable drag on mobile phones on second quick touch
         if (e.type === 'click') {
@@ -134,16 +134,6 @@ export default {
             return
         }
 
-        // Remove drag box and trace line if out of bounds
-        if (e.type === 'mouseout') {
-            chart.crosshair.x = null
-            chart.crosshair.canStartDrag = false
-            chart.crosshair.dragStarted = false
-            chart.draw()
-            window.dispatchEvent(new CustomEvent('crosshair', { detail: {id: chart.id, time: null }}))
-            return
-        }
-
         // Stop drag
         if (chart.crosshair.dragStarted && e.type === 'mouseup') {
             chart.crosshair.dragStarted = false
@@ -154,14 +144,30 @@ export default {
                 return false
             }
 
+            // Fix touch event
+            if (isNaN(e.x) && e.native.type === 'touchend') {
+                e.x = e.native?.changedTouches[0]?.clientX
+                time = Math.round(xScale.getValueForPixel(e.x))
+            }
+
             var start = xScale.getValueForPixel(chart.crosshair.dragStartX)
             this.doZoom(chart, start, time)
 
             // Sync zoom
-            if (e.native.ctrlKey) Chart.helpers.each(Chart.instances, instance => {
+            if (e.native.ctrlKey) setTimeout(() => Chart.helpers.each(Chart.instances, instance => {
                 if (instance.id == chart.id) return
                 this.doZoom(instance, start, time)
-            })
+            }), 0)
+            return
+        }
+
+        // Remove drag box and trace line if out of bounds
+        if (e.type === 'mouseout') {
+            chart.crosshair.x = null
+            chart.crosshair.canStartDrag = false
+            chart.crosshair.dragStarted = false
+            chart.draw()
+            window.dispatchEvent(new CustomEvent('crosshair', { detail: {id: chart.id, time: null }}))
             return
         }
 
@@ -198,10 +204,9 @@ export default {
         this.getOption(chart, 'callbacks', 'afterZoom')({chart})
 
         // Sync other charts
-        if (sync) Chart.helpers.each(Chart.instances, instance => {
-            if (instance.id == chart.id) return
-            this.resetZoom(instance)
-        })
+        if (sync) setTimeout(() => Chart.helpers.each(Chart.instances, instance => {
+            if (instance.id != chart.id) this.resetZoom(instance)
+        }), 0)
     },
 
     doZoom: function(chart, start, end) {

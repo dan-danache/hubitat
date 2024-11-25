@@ -291,5 +291,47 @@ GET /apps/api/${app_id}/collect-device-metrics?access_token=${access_token}&look
 | access_token    | string, required | Watchtower app Access Token. Get this from the URL when you load a Watchtower dashboard.                           |
 | lookbackMinutes | number, optional | How far back in time to look for device events when calculating the current data point (min=0, max=30, default=0). |
 
+### Chart User Script
+
+For tiles that render a chart, the User Script feature allows you to interact directly with the Chart.js configuration object. First click the `</>` button:
+
+![Open User Script](img/user-script-button.png)
+
+Then you can modify the Chart.js configuration object (`$config`) using JavaScript code:
+
+![User Script Form](img/user-script-form.png)
+
+Check out the [Chart.js documentation](https://www.chartjs.org/docs/latest/configuration/) to find more about the configuration object structure.
+
+#### User Script Examples
+
+Add left padding for the chart:
+```js
+$config.options.layout.padding.left = 150;
+```
+
+Display the chart legend:
+```js
+$config.options.plugins.legend.display = true;
+```
+
+Change the scale label for the first device attribute:
+```js
+$config.options.scales.attr1.title.text = 'Rain Rate mm/h';
+```
+
+Add a chart title:
+```js
+$config.options.plugins.title = {display:true, text:'Heating'};
+```
+
+Inspect the current chart configuration (output is found in the browser web console):
+```js
+console.log($config);
+```
+
+
+
+
 ---
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)

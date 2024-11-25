@@ -97,7 +97,7 @@ export class DevicePanel extends LitElement {
     }
 
     async initChart() {
-        const chartConfig = ChartHelper.lineConfig()
+        const $config = ChartHelper.lineConfig()
 
         this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
@@ -150,7 +150,7 @@ export class DevicePanel extends LitElement {
             })
         }
 
-        chartConfig.options.scales.attr1 = {
+        $config.options.scales.attr1 = {
             position: 'left',
             display: true,
             title: {
@@ -160,15 +160,22 @@ export class DevicePanel extends LitElement {
             },
             ticks: { color: colors.TextColorDarker, precision: 0 },
             grid: { color: colors.TextColorDarker + '33' },
+            // afterFit: function(scaleInstance) {
+            //     scaleInstance.width = 198; // sets the width to 100px
+            // },
         }
         this.attr1Min = supportedAttributes[this.config.attr1].min
         this.attr1Max = supportedAttributes[this.config.attr1].max
         if (this.yScale === 'fixed') {
-            if (this.attr1Min !== undefined) chartConfig.options.scales.attr1.suggestedMin = this.attr1Min
-            if (this.attr1Max !== undefined) chartConfig.options.scales.attr1.suggestedMax = this.attr1Max
+            if (this.attr1Min !== undefined) $config.options.scales.attr1.suggestedMin = this.attr1Min
+            if (this.attr1Max !== undefined) $config.options.scales.attr1.suggestedMax = this.attr1Max
         }
 
         if (this.config.attr2 !== undefined) {
+
+            // Remove right padding since second scale will be there
+            $config.options.layout.padding.right = 0
+
             const attr2Label = ChartHelper.prettyName(this.config.attr2)
             const attr2Unit = supportedAttributes[this.config.attr2].unit
             datasets.push({
@@ -212,7 +219,7 @@ export class DevicePanel extends LitElement {
                 })
             }
 
-            chartConfig.options.scales.attr2 = {
+            $config.options.scales.attr2 = {
                 position: 'right',
                 display: true,
                 title: {
@@ -226,15 +233,18 @@ export class DevicePanel extends LitElement {
             this.attr2Min = supportedAttributes[this.config.attr2].min
             this.attr2Max = supportedAttributes[this.config.attr2].max
             if (this.yScale === 'fixed') {
-                if (this.attr2Min !== undefined) chartConfig.options.scales.attr2.suggestedMin = this.attr2Min
-                if (this.attr2Max !== undefined) chartConfig.options.scales.attr2.suggestedMax = this.attr2Max
+                if (this.attr2Min !== undefined) $config.options.scales.attr2.suggestedMin = this.attr2Min
+                if (this.attr2Max !== undefined) $config.options.scales.attr2.suggestedMax = this.attr2Max
             }
         }
 
-        chartConfig.data = { datasets }
+        $config.data = { datasets }
+
+        // Apply user script
+        ChartHelper.executeUserScript(this.config.uscript, $config)
 
         if (this.chart !== undefined) this.chart.destroy()
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), chartConfig)
+        this.chart = new Chart(this.renderRoot.querySelector('canvas'), $config)
         this.chart.precision = this.config.precision
         ChartHelper.updateChartType(this.chart)
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
@@ -303,7 +313,7 @@ export class DevicePanelConfig extends LitElement {
                     ${this.attributes ? this.renderAttributesSelect() : '' }
                 </section>
             </fieldset>
-            ${ this.config.attr1 !== undefined && this.attributes.length > 1 ? this.renderOptionalAttributesSelect() : '' }
+            ${ this.config.attr1 !== undefined && this.attributes?.length > 1 ? this.renderOptionalAttributesSelect() : '' }
         `
     }
 

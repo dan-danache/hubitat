@@ -45,7 +45,7 @@ export class ChartHelper {
                 maintainAspectRatio: false,
                 onResize: chart => ChartHelper.updateChartType(chart),
                 animation: { duration: 500, onComplete: ({ initial, chart }) => (initial ? ChartHelper.updateChartType(chart) : undefined) },
-                layout: { padding: { top: 25, bottom: 4 }},
+                layout: { padding: { top: 25, bottom: 4, right: 10 }},
                 stacked: false,
                 pointStyle: false,
                 scales: {
@@ -160,6 +160,13 @@ export class ChartHelper {
                     },
                 }
             }
+        }
+    }
+
+    static executeUserScript(uscript, $config){
+        if (!uscript) return 
+        try { eval(uscript) } catch (ex) {
+            alert(`User Script:\n---------------\n${uscript}\n---------------\n${ex}`)
         }
     }
 

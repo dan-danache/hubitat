@@ -109,7 +109,7 @@ export class StatusmapPanel extends LitElement {
             return
         }
 
-        const chartConfig = ChartHelper.statusmapConfig()
+        const $config = ChartHelper.statusmapConfig()
         const labels = []
         const datasets = []
         let minDate = Infinity, maxDate = 0
@@ -132,12 +132,15 @@ export class StatusmapPanel extends LitElement {
             maxDate = Math.max(maxDate, data.pop().x[1])
         })
 
-        chartConfig.data = { labels, datasets }
-        chartConfig.options.scales.x.min = minDate
-        chartConfig.options.scales.x.max = maxDate
+        $config.data = { labels, datasets }
+        $config.options.scales.x.min = minDate
+        $config.options.scales.x.max = maxDate
+
+        // Apply user script
+        ChartHelper.executeUserScript(this.config.uscript, $config)
 
         if (this.chart !== undefined) this.chart.destroy()
-        this.chart = new Chart(this.renderRoot.querySelector('canvas'), chartConfig)
+        this.chart = new Chart(this.renderRoot.querySelector('canvas'), $config)
         this.chart.precision = this.config.precision
         setTimeout(() => this.classList.remove('empty', 'spinner'), 200)
     }
