@@ -138,7 +138,53 @@ export class DatastoreHelper {
         return data
     }
 
-    static async fetchStatusmapData({ ds, precision }) {
+    static async fetchCustomData({ds, precision}) {
+        const requests = {}
+        const retVal = {}
+        ds.forEach(dsr => {
+            if (requests[dsr.dev] === undefined) requests[dsr.dev] = new Set()
+            requests[dsr.dev].add(dsr.attr)
+            retVal[`${dsr.dev}_${dsr.attr}`] = []
+        })
+        Object.keys(requests).forEach(dev => requests[dev] = Array.from(requests[dev]))
+
+        const parseVal = val => val === '' || val === '-' ? 0 : parseFloat(val)
+        for (const [dev, attrs] of Object.entries(requests)) {
+            const attrsLen = attrs.length
+            try {
+                const response = await fetch(new Request(this.buildCsvUrl(dev, precision)), { cache: 'no-store' })
+    
+                // Data not available yet
+                if (response.status == 404) continue
+    
+                // Data transfer failed
+                if (!response.ok) {
+                    throw new Error(`DatastoreHelper.fetchStatusmapData() - HTTP error, status = ${response.status}`)
+                }
+                const lines = (await response.text()).split("\n")
+                const header = lines.shift().split(',')
+                const attrsIdx = attrs.map(attr => header.indexOf(attr))
+
+                // Process all lines
+                lines.forEach(line => {
+                    const vals = line.split(',')
+                    const x = parseInt(vals[0]) * 1000
+
+                    for (let idx = 0; idx < attrsLen; idx++) {
+                        const attr = attrs[idx]
+                        const attrIdx = attrsIdx[idx]
+                        retVal[`${dev}_${attr}`].push({x, y: parseVal(vals[attrIdx])})
+                    }
+                })
+            } catch (ex) {
+                console.error(ex)
+                alert(ex.message)
+            }
+        }
+        return retVal
+    }
+
+    static async fetchStatusmapData({ds, precision}) {
         const requests = {}
         const retVal = {}
         ds.forEach(dsr => {

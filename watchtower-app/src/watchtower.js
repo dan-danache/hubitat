@@ -6,6 +6,7 @@ import { PrecisionSelector } from './panels/precision-selector.js';
 
 import { DevicePanel, DevicePanelConfig } from './panels/device-panel.js';
 import { AttributePanel, AttributePanelConfig } from './panels/attribute-panel.js';
+import { CustomPanel, CustomPanelConfig } from './panels/custom-panel.js';
 import { StatusmapPanel, StatusmapPanelConfig } from './panels/statusmap-panel.js';
 import { TextPanel, TextPanelConfig } from './panels/text-panel.js';
 import { IframePanel, IframePanelConfig } from './panels/iframe-panel.js';
@@ -25,6 +26,9 @@ customElements.define('attribute-panel-config', AttributePanelConfig)
 
 customElements.define('statusmap-panel', StatusmapPanel)
 customElements.define('statusmap-panel-config', StatusmapPanelConfig)
+
+customElements.define('custom-panel', CustomPanel)
+customElements.define('custom-panel-config', CustomPanelConfig)
 
 customElements.define('text-panel', TextPanel)
 customElements.define('text-panel-config', TextPanelConfig)

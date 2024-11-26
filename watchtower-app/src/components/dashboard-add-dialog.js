@@ -177,8 +177,9 @@ export class DashboardAddDialog extends LitElement {
     `;
 
     static panels = {
-        'device-panel': { label: 'Device', hasUserScript: true },
-        'attribute-panel': { label: 'Attribute', hasUserScript: true },
+        'device-panel': { label: 'Single Device', hasUserScript: true },
+        'attribute-panel': { label: 'Single Attribute', hasUserScript: true },
+        'custom-panel': { label: 'Multi Device/Attribute', hasUserScript: true },
         'statusmap-panel': { label: 'Status Map', hasUserScript: true },
         'text-panel': { label: 'Text', hasUserScript: false },
         'iframe-panel': { label: 'Iframe', hasUserScript: false },

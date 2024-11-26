@@ -4,7 +4,7 @@ import { DatastoreHelper } from '../helpers/datastore-helper.js';
 import { ColorHelper } from '../helpers/color-helper.js'
 import { ChartHelper } from '../helpers/chart-helper.js'
 
-export class StatusmapPanel extends LitElement {
+export class CustomPanel extends LitElement {
     static styles = css`
         :host {
             display: block;
@@ -101,7 +101,7 @@ export class StatusmapPanel extends LitElement {
         const monitoredDevices = await DatastoreHelper.fetchMonitoredDevices()
         const colors = ColorHelper.colors()
 
-        const dbResult = await DatastoreHelper.fetchStatusmapData(this.config)
+        const dbResult = await DatastoreHelper.fetchCustomData(this.config)
         this.nodata = Object.entries(dbResult).find(entry => entry[1]?.length > 0) === undefined
         if (this.nodata) {
             if (this.chart !== undefined) this.chart.destroy()
@@ -109,32 +109,45 @@ export class StatusmapPanel extends LitElement {
             return
         }
 
-        const $config = ChartHelper.statusmapConfig()
-        const labels = []
+        const $config = ChartHelper.lineConfig()
         const datasets = []
-        let minDate = Infinity, maxDate = 0
+        const len = this.config.ds.length
+        let idx = 1
         this.config.ds.forEach(({dev, attr}) => {
             const devName = monitoredDevices.find(monitoredDevice => monitoredDevice.id == dev).name
-            const attrUnit = supportedAttributes[attr].unit
+            const {unit, min, max} = supportedAttributes[attr]
             const attrName = ChartHelper.prettyName(attr)
-            const label = `${devName} ${attrName}`
-            labels.push(label)
+            const attrLabel = `${devName} ${attrName}`
 
-            const data = dbResult[`${dev}_${attr}`].map(record => {return { ...record, y: label}})
             datasets.push({
-                label: attrName,
-                unit: attrUnit,
-                backgroundColor: record => `rgba(133, 153, 0, ${Math.round(Math.min(100, Math.max(0, record.raw?.v || 0)) * 9) / 1000 + 0.1})`,
-                borderColor: colors.Green,
-                data: [...data],
+                label: attrLabel,
+                data: dbResult[`${dev}_${attr}`],
+                pointStyle: false,
+                borderWidth: 1.2,
+                tension: 0.5,
+                fill: len < 3,
+                yAxisID: `y${idx}`,
+                unit,
             })
-            minDate = Math.min(minDate, data[0].x[0])
-            maxDate = Math.max(maxDate, data.pop().x[1])
+
+            $config.options.scales[`y${idx}`] = {
+                position: idx - 1 < len / 2 ? 'left' : 'right',
+                display: true,
+                title: {
+                    display: true,
+                    text: `${attrLabel} ${unit}`,
+                },
+                ticks: { color: colors.TextColorDarker, precision: 0 },
+                grid: { color: colors.TextColorDarker + '33' },
+            }
+            if (this.yScale === 'fixed') {
+                if (min !== undefined) $config.options.scales[`y${idx}`].suggestedMin = min
+                if (max !== undefined) $config.options.scales[`y${idx}`].suggestedMax = max
+            }
+            idx++
         })
 
-        $config.data = { labels, datasets }
-        $config.options.scales.x.min = minDate
-        $config.options.scales.x.max = maxDate
+        $config.data = { datasets }
 
         // Apply user script
         ChartHelper.executeUserScript(this.config.uscript, $config)
@@ -164,7 +177,7 @@ export class StatusmapPanel extends LitElement {
     }
 }
 
-export class StatusmapPanelConfig extends LitElement {
+export class CustomPanelConfig extends LitElement {
     static properties = {
         config: { type: Object, reflect: true },
         devices: { type: Object, state: true },
@@ -218,7 +231,7 @@ export class StatusmapPanelConfig extends LitElement {
         return this.config.ds.map((dataset, idx) => html`
             <fieldset>
                 <section>
-                    ${this.devices.find(device => device.id == dataset.dev).name}: ${dataset.attr}
+                    ${this.devices.find(it => it.id == dataset.dev).name}: ${dataset.attr}
                     <nav>
                         ${idx > 0 ? html`<a href="javascript:" @click=${() => this.moveUp(idx)} title="Move up">▲</a> | ` : ''}
                         ${idx < this.config.ds.length - 1 ? html`<a href="javascript:" @click=${() => this.moveDown(idx)} title="Move down">▼</a> | ` : ''}
@@ -249,7 +262,7 @@ export class StatusmapPanelConfig extends LitElement {
                 <label for="attr">Select attribute to chart:</label>
                 <select id="attr" @change=${this.onAttributeSelect} .required=${!this.config.ds?.length}>
                     <option value=""></option>
-                    ${this.attributes.map(attr => html`<option value="${attr}" .disabled=${this.selectable(attr)}>${attr}</option>`)}
+                    ${this.attributes.map(attr => html`<option value="${attr}" .disabled=${this.isDisabled(attr)}>${attr}</option>`)}
                 </select>
             </section>
         `
@@ -264,8 +277,8 @@ export class StatusmapPanelConfig extends LitElement {
         }, 0)
     }
 
-    selectable(attr) {
-        return !this.supportedAttributes[attr].unit.startsWith('% ')
+    isDisabled(attr) {
+        return this.config.ds.find(it => it.dev == this.dev && it.attr == attr) !== undefined
     }
 
     moveUp(idx) {

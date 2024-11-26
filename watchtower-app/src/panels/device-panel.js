@@ -160,9 +160,6 @@ export class DevicePanel extends LitElement {
             },
             ticks: { color: colors.TextColorDarker, precision: 0 },
             grid: { color: colors.TextColorDarker + '33' },
-            // afterFit: function(scaleInstance) {
-            //     scaleInstance.width = 198; // sets the width to 100px
-            // },
         }
         this.attr1Min = supportedAttributes[this.config.attr1].min
         this.attr1Max = supportedAttributes[this.config.attr1].max

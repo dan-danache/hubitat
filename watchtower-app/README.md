@@ -199,17 +199,23 @@ From the dashboard menu on the left, you can add a new dashboard tile, save the 
 
 The following dashboard tile types are currently supported:
 
-- **Device** - Renders a chart with one or two attributes for a selected device. If you select a second attribute, its scale is shown on the right side of the chart.
+- **Singe Device** - Renders a chart with one or two attributes for the selected device. If you select a second attribute, its scale is shown on the right side of the chart.
 
    Example usage: chart temperature and humidity for a specific device.
 
-   ![Device tile](img/tile-device.png)
+   ![Singe Device tile](img/tile-device.png)
 
-- **Attribute** - Renders a chart with the selected attribute, from multiple devices.
+- **Singe Attribute** - Renders a chart with the selected attribute, from multiple devices.
 
    Example usage: chart temperature for 2 devices (inside vs. outside).
 
-   ![Attribute tile](img/tile-attribute.png)
+   ![Singe Attribute tile](img/tile-attribute.png)
+
+- **Multi Device/Attribute** - Renders a chart with multiple attributes from multiple devices.
+
+   Example usage: chart temperature for one device and switch status from another device.
+
+   ![Multi Device/Attribute tile](img/tile-custom.png)
 
 - **Status Map** - Renders a status/heatmap chart with multiple attribute from multiple devices.
 
