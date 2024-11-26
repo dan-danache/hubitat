@@ -320,6 +320,12 @@ Change the scale label for the first device attribute:
 $config.options.scales.attr1.title.text = 'Rain Rate mm/h';
 ```
 
+Change the line and area color of the first dataset to red (`#FF0000`):
+```js
+$config.data.datasets[0].borderColor = '#FF0000';
+$config.data.datasets[0].backgroundColor = '#FF000022';
+```
+
 Add a chart title:
 ```js
 $config.options.plugins.title = {display:true, text:'Heating'};
