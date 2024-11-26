@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.7.0] - 2024-11-26
 ### Added
-- Add Custom chart type - `@user3666`
+- Add Multi Device/Attribute chart type - `@user3666`
 
 ## [2.6.0] - 2024-11-25
 ### Added

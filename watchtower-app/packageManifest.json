@@ -1,7 +1,7 @@
 {
     "packageName": "Watchtower",
     "version": "2.7.0",
-    "releaseNotes": "v2.7.0\n - Add Custom chart type - @user3666",
+    "releaseNotes": "v2.7.0\n - Add Multi Device/Attribute chart type - @user3666",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
     "dateReleased": "2024-11-26",
