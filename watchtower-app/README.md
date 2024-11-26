@@ -331,6 +331,16 @@ Add a chart title:
 $config.options.plugins.title = {display:true, text:'Heating'};
 ```
 
+Stack the charts of a device type tile with 2 attributes selected:
+```js
+$config.options.scales.attr1.stack = 'stack';
+$config.options.scales.attr1.stackWeight = 2;
+$config.options.scales.attr2.stack = 'stack';
+$config.options.scales.attr2.stackWeight = 1;
+$config.options.scales.attr2.offset = true;
+$config.options.scales.attr2.position = 'left';
+```
+
 Inspect the current chart configuration (output is found in the browser web console):
 ```js
 console.log($config);
