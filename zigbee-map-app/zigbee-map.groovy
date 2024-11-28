@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.app.ChildDeviceWrapper
 
 @Field static final String APP_NAME = 'Zigbee Map'
-@Field static final String APP_VERSION = '2.2.0'
+@Field static final String APP_VERSION = '2.2.1'
 @Field static final String NEIGHBORS_FILE_NAME = 'zigbee-neighbors.html'
 @Field static final String ROUTES_FILE_NAME = 'zigbee-routes.html'
 @Field static final String MEMCPU_FILE_NAME = 'mem-cpu-history.html'
@@ -22,7 +22,7 @@ definition(
     author: 'Dan Danache',
     description: 'Visualize the topology and connectivity of your Zigbee network.',
     documentationLink: 'https://community.hubitat.com/t/release-zigbee-map-app/133888',
-    importUrl: 'https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/zigbee-map.groovy',
+    importUrl: 'https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.1/zigbee-map-app/zigbee-map.groovy',
     category: 'Utility',
     singleInstance: true,
     installOnOpen: true,
@@ -73,7 +73,6 @@ private void debug(message) {
 
 preferences {
     page name: 'main'
-    page name: 'changelog'
     page name: 'pairing'
     page name: 'selectRepeater'
     page name: 'instructions'
@@ -125,13 +124,7 @@ Map main() {
                     page: 'pairing',
                     required: false,
                 )
-                href (
-                    name: 'changelogLink',
-                    title: 'View change log',
-                    description: 'See latest application changes',
-                    page: 'changelog',
-                    required: false,
-                )
+                href(name:'changelogLink', title:'Change log', description:'See latest application changes', url:'https://dan-danache.github.io/hubitat/zigbee-map-app/CHANGELOG', style:'embedded', state:'complete', required:false)
 
                 // Preferences
                 input(
@@ -204,7 +197,7 @@ Map selectRepeater() {
     dynamicPage (title:'<b>Advanced Zigbee Pairing</b> - Select repeater device', name:'select-repeater', install:false, uninstall:false, nextPage:'instructions') {
         section {
             paragraph '<b>Important</b>: Make sure that the device you select below is a Zigbee repeater. Usually all mains-powered devices act as Zigbee repeaters.'
-            input 'repeater', 'capability.switch', title:'Select repeater device:', multiple:false, required:true, showFilter:true
+            input 'repeater', 'capability.*', title:'Select repeater device:', multiple:false, required:true, showFilter:true
         }
     }
 }
@@ -332,78 +325,6 @@ Map start() {
                 </style>
             </div>
             """.trim();
-        }
-    }
-}
-
-Map changelog() {
-    dynamicPage (
-        name: 'changelog',
-        title: "<b>Change Log</b>",
-        install: false,
-        uninstall: false
-    ) {
-
-        section ('v2.2.0 - 2024-07-01', hideable: true, hidden: false) {
-            paragraph '<li>Add "Advanced Zigbee pairing" functionality</li>';
-        }
-
-        section ('v2.1.0 - 2024-05-16', hideable: true, hidden: true) {
-            paragraph """
-                <li>Change "poor" link quality color from yellow to violet - @Horseflesh</li>
-                <li>Change "good" link quality LQI interval from [150 - 200) to [130 - 200)</li>
-                <li>Scrollbars on tab contents appear only when ncesessary</li>
-            """.replaceAll(/\n\s*/, '');
-        }
-
-        section ('v2.0.0 - 2024-03-09', hideable: true, hidden: true) {
-            paragraph """
-                <li><b>Breaking change</b>: Some files were renamed therefore your bookmarks or PWA installs might be broken</li>
-                <li>Add Zigbee routes map - @Tony</li>
-                <li>Fade-out the nodes tooltip to see better how things are connected - @danabw</li>
-            """.replaceAll(/\n\s*/, '');
-        }
-
-        section ('v1.5.0 - 2024-02-23', hideable: true, hidden: true) {
-            paragraph """
-                <li>Add config option to show/hide link colors
-                <li>Make node hover effect (see neighbors) more visible - @WarlockWeary</li>
-            """.replaceAll(/\n\s*/, '');
-        }
-
-        section ('v1.4.0 - 2024-02-23', hideable: true, hidden: true) {
-            paragraph """
-                <li>Color links based on LQI/LQA value - @Horseflesh</li>
-                <li>Hide back <b>duplex</b> links by default to better see the link colors</li>
-                <li>Use <b>Esc</b> keyboard key to toggle the controls - @jshimota</li>
-            """.replaceAll(/\n\s*/, '');
-        }
-
-        section ('v1.3.0 - 2024-02-21', hideable: true, hidden: true) {
-            paragraph """
-                <li>Add option to show/hide <b>Unknown</b> devices - @Tony</li>
-                <li>Remove the Hub device from the <b>Devices</b> tab - @jimhim</li>
-                <li>Add PWA manifest</li>
-            """.replaceAll(/\n\s*/, '');
-        }
-
-        section ('v1.2.0 - 2024-02-20', hideable: true, hidden: true) {
-            paragraph '<li>Add option to use an image as map background (e.g.: home layout)</li>'
-        }
-
-        section ('v1.1.0 - 2024-02-19', hideable: true, hidden: true) {
-            paragraph """
-                <li>Add <b>Done</b> button in the Hubitat app - @dnickel</li>
-                <li>Click the address of any device in the <b>Devices</b> tab to add it to the Interview Queue - @hubitrep</li>
-                <li>Use relative URL when opening the HTML app - @jlv</li>
-                <li>Mark devices that failed the Interview  - @kahn-hubitat</li>
-                <li>Show Interview Queue size</li>
-                <li>Show <b>duplex</b> links by default</li>
-            """.replaceAll(/\n\s*/, '');
-        }
-
-        section ('v1.0.0 - 2024-02-16', hideable: true, hidden: true) {
-            paragraph '<li>Initial release</li>'
         }
     }
 }

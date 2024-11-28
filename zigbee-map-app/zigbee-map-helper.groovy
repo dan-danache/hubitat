@@ -7,14 +7,14 @@ import groovy.transform.Field
 import hubitat.helper.HexUtils
 
 @Field static final String DRIVER_NAME = "Zigbee Map Helper"
-@Field static final String DRIVER_VERSION = "2.2.0"
+@Field static final String DRIVER_VERSION = "2.2.1"
 
 metadata {
     definition(
         name: DRIVER_NAME,
         namespace: "dandanache",
         author: "Dan Danache",
-        importUrl: "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.1.0/zigbee-map-app/zigbee-map-helper.groovy"
+        importUrl: "https://raw.githubusercontent.com/dan-danache/hubitat/zigbee-map_2.2.1/zigbee-map-app/zigbee-map-helper.groovy"
     ) {
         capability "Actuator"
         attribute "poked", "string"
