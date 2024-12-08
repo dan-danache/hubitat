@@ -1,76 +1,19 @@
-import { html, css, LitElement } from '../vendor/vendor.min.js';
+import { html, LitElement } from '../vendor/vendor.min.js';
 
 import { DatastoreHelper } from '../helpers/datastore-helper.js';
-import { ColorHelper } from '../helpers/color-helper.js'
+import { UiHelper } from '../helpers/ui-helper.js'
 import { ChartHelper } from '../helpers/chart-helper.js'
 
 export class AttributePanel extends LitElement {
-    static styles = css`
-       :host {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            touch-action: pan-y;
-        }
-        :host(.empty) canvas { visibility: hidden }
-        precision-selector {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translate(-50%, 0);
-            visibility: hidden;
-        }
-        :host(:hover) precision-selector,
-        :host(:hover) nav {
-            visibility: visible;
-        }
-        aside {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translate(0, -50%);
-            display: block;
-            color: var(--text-color-darker);
-            width: 100%;
-            text-align: center;
-        }
-        .reset-zoom {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            border: none;
-            background-color: var(--Blue);
-            color: var(--Base3);
-            border-radius: 0 0 0 5px;
-            padding: 5px 10px;
-            line-height: 1rem;
-            z-index: 100;
-            cursor: pointer;
-            letter-spacing: 1px;
-        }
-        aside {
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-        nav {
-            position: absolute;
-            top: 0px; left: 2px;
-            cursor: pointer;
-            visibility: hidden;
-        }
-    `
-
     static properties = {
         config: { type: Object, reflect: true },
         yScale: { type: String, reflect: true },
-        mobileView: { type: Boolean, state: true },
         chart: { type: Object, state: true },
         nodata: { type: Boolean, state: true }
+    }
+
+    createRenderRoot() {
+        return this
     }
 
     render() {
@@ -80,10 +23,6 @@ export class AttributePanel extends LitElement {
             <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
             ${ this.nodata === true ? html`<aside>No data yet</aside>` : '' }
         `;
-    }
-
-    updated(changedProperties) {
-        if (changedProperties.mobileView == this.mobileView) return
     }
 
     async connectedCallback() {
@@ -105,7 +44,7 @@ export class AttributePanel extends LitElement {
         this.classList.add('spinner')
         const supportedAttributes = await DatastoreHelper.fetchSupportedAttributes()
         const monitoredDevices = await DatastoreHelper.fetchMonitoredDevices()
-        const colors = ColorHelper.colors()
+        const colors = UiHelper.colors()
 
         const data = await DatastoreHelper.fetchAttributeData(this.config)
         //this.nodata = data.attr1.length == 0
@@ -126,14 +65,14 @@ export class AttributePanel extends LitElement {
 
         if (this.config.devs.length <= 2) {
             for (let idx = 0; idx < this.config.devs.length; idx++) {
-                const color = ColorHelper.chartColors[idx]
+                const color = UiHelper.chartColors[idx]
                 datasets[idx].fill = 'start'
                 datasets[idx].borderColor = color
                 datasets[idx].backgroundColor = `${color}44`
             }
         }
 
-        const attrLabel = ChartHelper.prettyName(this.config.attr)
+        const attrLabel = UiHelper.prettyName(this.config.attr)
         $config.options.scales.y = {
             position: 'left',
             display: true,
@@ -213,6 +152,10 @@ export class AttributePanelConfig extends LitElement {
         this.attributes = undefined
     }
 
+    createRenderRoot() {
+        return this
+    }
+
     render() {
         return html`
             <fieldset>
@@ -231,10 +174,6 @@ export class AttributePanelConfig extends LitElement {
         const attrs = new Set()
         this.devices.forEach(device => device.attrs.forEach(attr => attrs.add(attr)))
         this.attributes = [...attrs].sort()
-    }
-
-    createRenderRoot() {
-        return this
     }
 
     renderAttributesSelect() {
@@ -292,7 +231,7 @@ export class AttributePanelConfig extends LitElement {
             z: false,
             devs: [],
         }
-        if (attr) this.dispatchEvent(new CustomEvent('suggestTitle', { detail: ChartHelper.prettyName(attr) }))
+        if (attr) this.dispatchEvent(new CustomEvent('suggestTitle', { detail: UiHelper.prettyName(attr) }))
     }
 
     onDeviceSelect() {

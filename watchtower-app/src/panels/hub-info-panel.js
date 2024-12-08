@@ -63,7 +63,6 @@ export class HubInfoPanel extends LitElement {
         config: { type: Object, reflect: true },
         hubInfo: { type: Object, state: true },
         hubData: { type: Object, state: true },
-        mobileView: { type: Boolean, state: true },
     }
 
     render() {
@@ -115,6 +114,10 @@ export class HubInfoPanelConfig extends LitElement {
         this.config = { info: [] }
     }
 
+    createRenderRoot() {
+        return this
+    }
+
     render() {
         return html`
             <fieldset>
@@ -149,10 +152,6 @@ export class HubInfoPanelConfig extends LitElement {
                 info: [],
             }
         }
-    }
-
-    createRenderRoot() {
-        return this
     }
 
     firstUpdated() {

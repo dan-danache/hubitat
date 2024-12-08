@@ -138,7 +138,7 @@ export class DatastoreHelper {
         return data
     }
 
-    static async fetchCustomData({ds, precision}) {
+    static async fetchCustomData({ds, precision}, last24Hours = false) {
         const requests = {}
         const retVal = {}
         ds.forEach(dsr => {
@@ -147,6 +147,9 @@ export class DatastoreHelper {
             retVal[`${dsr.dev}_${dsr.attr}`] = []
         })
         Object.keys(requests).forEach(dev => requests[dev] = Array.from(requests[dev]))
+
+        // Retrieve only records in the last 24 hours
+        const minTime = last24Hours ? new Date().getTime() - 86400000 : 0
 
         const parseVal = val => val === '' || val === '-' ? 0 : parseFloat(val)
         for (const [dev, attrs] of Object.entries(requests)) {
@@ -169,6 +172,7 @@ export class DatastoreHelper {
                 lines.forEach(line => {
                     const vals = line.split(',')
                     const x = parseInt(vals[0]) * 1000
+                    if (x < minTime) return
 
                     for (let idx = 0; idx < attrsLen; idx++) {
                         const attr = attrs[idx]

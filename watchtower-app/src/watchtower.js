@@ -8,6 +8,7 @@ import { DevicePanel, DevicePanelConfig } from './panels/device-panel.js';
 import { AttributePanel, AttributePanelConfig } from './panels/attribute-panel.js';
 import { CustomPanel, CustomPanelConfig } from './panels/custom-panel.js';
 import { StatusmapPanel, StatusmapPanelConfig } from './panels/statusmap-panel.js';
+import { StatsPanel, StatsPanelConfig } from './panels/stats-panel.js';
 import { TextPanel, TextPanelConfig } from './panels/text-panel.js';
 import { IframePanel, IframePanelConfig } from './panels/iframe-panel.js';
 import { HubInfoPanel, HubInfoPanelConfig } from './panels/hub-info-panel.js';
@@ -26,6 +27,9 @@ customElements.define('attribute-panel-config', AttributePanelConfig)
 
 customElements.define('statusmap-panel', StatusmapPanel)
 customElements.define('statusmap-panel-config', StatusmapPanelConfig)
+
+customElements.define('stats-panel', StatsPanel)
+customElements.define('stats-panel-config', StatsPanelConfig)
 
 customElements.define('custom-panel', CustomPanel)
 customElements.define('custom-panel-config', CustomPanelConfig)

@@ -1,142 +1,12 @@
-import { html, css, LitElement } from '../vendor/vendor.min.js';
+import { html, LitElement } from '../vendor/vendor.min.js';
 
 export class DashboardMenu extends LitElement {
-    static styles = css`
-        :host {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-        }
-        nav {
-            box-sizing: border-box;
-            position: absolute;
-            top: 0;
-            left: -15em;
-            width: 15em;
-            height: 100%;
-            padding: 1em;
-            background-color: var(--bg-color-darker);
-            color: var(--text-color);
-            border-right: 1px var(--border-color) solid;
-            animation: hideme .3s;
-        }
-        :host([open]) nav {
-            box-shadow: 0 0 1em var(--shadow-color);
-            left: 0;
-            animation: showme .3s;
-        }
-        @keyframes hideme {
-            from { left: 0 }
-            to { left: -15em }
-        }
-        @keyframes showme {
-            from { left: -15em }
-            to { left: 0px }
-        }
-        hr {
-            border: 0;
-            border-top: 1px var(--separator-color) solid;
-            margin: 1em 0;
-        }
-        button {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px var(--border-color) solid;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            padding: .5em 1em;
-            cursor: pointer;
-            display: block;
-            width: 100%;
-            text-align: left;
-            box-shadow: 0 0 0.3em var(--shadow-color);
-        }
-        button:hover {
-            background-color: var(--Blue);
-            color: var(--Base3);
-        }
-        label {
-            display: block;
-            margin: 1em 0 .5em 0;
-            font-size: .85rem;
-        }
-        select {
-            display: block;
-            width: 100%;
-            margin-bottom: 5px;
-            height: 30px;
-            background-color: var(--bg-color-darker);
-            color: var(--text-color);
-            border: 1px var(--border-color) solid;
-            border-radius: 5px;
-        }
-        select:focus, button:focus {
-            outline: 1px var(--Blue) solid;
-            border-color: var(--Blue);
-        }
-        aside {
-            color: var(--text-color-darker);
-            position: absolute;
-            bottom: .5em;
-            left: 50%;
-            transform: translateX(-50%);
-            user-select: none;
-            font-size: .75rem;
-        }
-        form {
-            border: 1px solid grey;
-            padding: 0;
-            background-color: var(--bg-color-darker);
-            color: var(--text-color);
-            border: 1px var(--border-color) solid;
-            border-radius: 5px;
-            position: relative;
-            display: block;
-            width: 100%;
-        }
-        form input[type="text"] {
-            box-sizing: border-box;
-            border: none;
-            color: var(--text-color);
-            background-color: transparent;
-            padding-right: 30px;
-            padding-left: 5px;
-            width: 100%;
-            height: 28px;
-        }
-        form input:focus {
-            outline: none;
-        }
-        form:focus-within {
-            border-color: var(--Blue);
-            outline: 1px solid var(--Blue); 
-        }
-        form:invalid {
-            border-color: var(--Red);
-            outline: 1px solid var(--Red);
-        }
-        form input[type="submit"] {
-            border: none;
-            color: var(--text-color-darker);
-            background-color: transparent;
-            position: absolute;
-            top: 50%;
-            right: 0px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            width: 30px;
-        }
-    `;
-
     static properties = {
         open: { type: Boolean, reflect: true },
         refreshInterval: { type: String, state: true },
         theme: { type: String, state: true },
         yScale: { type: String, state: true },
         cellHeight: { type: Number, state: true },
-        mobileView: { type: Boolean, state: true }
     }
 
     constructor() {
@@ -146,6 +16,10 @@ export class DashboardMenu extends LitElement {
         this.theme = 'light'
         this.yScale = 'auto'
         this.cellHeight = 206
+    }
+
+    createRenderRoot() {
+        return this
     }
 
     render() {
@@ -182,7 +56,7 @@ export class DashboardMenu extends LitElement {
                 </form>
                 <hr>
                 <button @click=${this.saveDashboard} title="Save current dashboard layout">✓ Save dashboard</button>
-                <aside>v2.7.0</aside>
+                <aside>v2.8.0</aside>
             </nav>
         `;
     }
@@ -191,10 +65,6 @@ export class DashboardMenu extends LitElement {
         super.connectedCallback();
         window.addEventListener('touchstart', event => this.touchStart(event));
         window.addEventListener('touchend', event => this.touchEnd(event));
-    }
-
-    applyMobileView(mobileView) {
-        this.mobileView = mobileView
     }
 
     addTile() {

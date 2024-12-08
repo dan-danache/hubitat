@@ -99,6 +99,10 @@ export class IframePanelConfig extends LitElement {
         `
     }
 
+    createRenderRoot() {
+        return this
+    }
+
     connectedCallback() {
         super.connectedCallback()
         if (this.config?.url === undefined) {
@@ -106,10 +110,6 @@ export class IframePanelConfig extends LitElement {
                 url: '',
             }
         }
-    }
-
-    createRenderRoot() {
-        return this
     }
 
     firstUpdated() {

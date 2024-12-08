@@ -8,5 +8,5 @@ ECHO ===========================================================================
 del watchtower.html
 del watchtower.js
 
-copy src\watchtower.html .
-tools\esbuild.exe src\watchtower.js --bundle --minify --tree-shaking=true --legal-comments=none "--reserve-props=^\$config.*$" --outdir=. "--external:chart.js"
+tools\esbuild-0.23.0.exe src\watchtower.js --bundle --minify --tree-shaking=true --legal-comments=none "--reserve-props=^\$config.*$" --outdir=. "--external:chart.js"
+tools\minhtml-0.15.0.exe --minify-css --do-not-minify-doctype --ensure-spec-compliant-unquoted-attribute-values --keep-closing-tags .\src\watchtower.html -o .\watchtower.html

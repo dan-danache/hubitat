@@ -1,5 +1,5 @@
 import '../vendor/vendor.min.js'
-import { ColorHelper } from './color-helper.js'
+import { UiHelper } from './ui-helper.js'
 import CrosshairPlugin from '../plugins/crosshair-plugin.js'
 import { precisions } from '../panels/precision-selector.js'
 
@@ -34,7 +34,7 @@ function statusmapTooltipTitle(times, precision, formats) {
 }
 export class ChartHelper {
     static lineConfig() {
-        const colors = ColorHelper.colors()
+        const colors = UiHelper.colors()
         return {
             type: 'line',
             options: {
@@ -103,8 +103,39 @@ export class ChartHelper {
         }
     }
 
+    static sparklineConfig() {
+        const colors = UiHelper.colors()
+        return {
+            type: 'line',
+            options: {
+                normalized: true,
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: { top: 2 }, autoPadding: false},
+                stacked: false,
+                pointStyle: false,
+                scales: {
+                    x: {
+                        type: 'time',
+                        display: false,
+                        ticks: { padding: 0, backdropPadding: 0 },
+                    },
+                    y: {
+                        position: 'left',
+                        display: false,
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false },
+                    crosshair: { enabled: false },
+                }
+            }
+        }
+    }
+
     static statusmapConfig() {
-        const colors = ColorHelper.colors()
+        const colors = UiHelper.colors()
         return {
             type: 'bar',
             options: {
@@ -186,11 +217,5 @@ export class ChartHelper {
             chart.data.datasets.forEach(dataset => dataset.pointStyle = pointStyle)
             chart.update()
         }
-    }
-
-    static prettyName(camelCase) {
-        return (camelCase[0].toUpperCase() + camelCase.slice(1))
-            .replace(/([A-Z])(?=[A-Z][a-z])|([a-z])(?=[A-Z])/g, '$& ')
-            .replace('Hub ', '')
     }
 }

@@ -15,6 +15,7 @@ export default {
         if (chart.options.plugins.crosshair === undefined) chart.options.plugins.crosshair = defaultOptions
 
         chart.crosshair = {
+            enabled: chart.options.plugins.crosshair?.enabled !== false,
             x: null,
             originalXRange: null,
             button: null,
@@ -27,6 +28,8 @@ export default {
             resetZoom: () => this.resetZoom(chart),
             panZoom: direction => this.panZoom(chart, direction)
         }
+
+        if (!chart.crosshair.enabled) return
 
         // Listen to incoming sync messages
         window.addEventListener('crosshair', event => this.syncCrosshair(chart, event.detail))
@@ -94,7 +97,7 @@ export default {
     },
 
     afterEvent: function(chart, args) {
-        if (chart.config.options.scales.x.length == 0) return false
+        if (!chart.crosshair.enabled || chart.config.options.scales.x.length == 0) return false
 
         // var xScaleType = chart.config.options.scales.x.type
         // if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic') return false
@@ -181,7 +184,7 @@ export default {
     },
 
     afterDraw: function(chart) {
-        if (chart.crosshair.x === null) return false
+        if (!chart.crosshair?.enabled || chart.crosshair.x === null) return false
 
         if (chart.crosshair.dragStarted) this.drawZoombox(chart)
         else this.drawTraceLine(chart)

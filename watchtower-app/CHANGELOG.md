@@ -5,13 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2024-12-08
+### Added
+- Add Stats tile type
+
+### Changed
+- Use drag-and-drop to re-order datasets when configuring "Multi Device/Attribute" and "Status Map" tile types
+- Tech stack: don't use shadow dom anymore; minify HTML/CSS
+
+### Fixed
+- Dashboard tiles can now be resized and moved on touchscreen devices - `@Sebastien`
+
 ## [2.7.0] - 2024-11-26
 ### Added
-- Add Multi Device/Attribute chart type - `@user3666`
+- Add Multi Device/Attribute tile type - `@user3666`
 
 ## [2.6.0] - 2024-11-25
 ### Added
-- Add support for chart User Scripts
+- Add support for chart chart user scripts
 
 ## [2.5.0] - 2024-11-20
 ### Added
@@ -27,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.3.0] - 2024-11-16
 ### Added
-- Add Status Map chart type - `@briguy`
+- Add Status Map tile type - `@briguy`
 
 ## [2.2.0] - 2024-11-02
 ### Added

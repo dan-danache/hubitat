@@ -1,14 +1,7 @@
-import { html, css, LitElement } from '../vendor/vendor.min.js';
+import { html, LitElement } from '../vendor/vendor.min.js';
 import { DatastoreHelper } from '../helpers/datastore-helper.js'
 
 export class WatchtowerApp extends LitElement {
-    static styles = css`
-        :host {
-            display: block;
-            height: calc(100vh - 10px);
-        }
-    `
-
     static properties = {
         halt: { type: Boolean, state: true },
         embedded: { type: Boolean, state: true },
@@ -33,14 +26,6 @@ export class WatchtowerApp extends LitElement {
             throw new Error('Query parameter [access_token] is missing!')
         }
 
-        this.mobileView = window.innerWidth < 768
-        window.addEventListener('resize', () => {
-            const newState = window.innerWidth < 768
-            if (this.mobileView == newState) return
-            this.mobileView = newState
-            this.applyMobileView()
-        })
-
         // Embeddable
         window.addEventListener('load', () => {
             if (window.top === window.self) return
@@ -51,15 +36,18 @@ export class WatchtowerApp extends LitElement {
         this.halt = false
     }
 
+    createRenderRoot() {
+        return this
+    }
+
     render() {
         return this.halt !== false ? '' : html`
-            <dashboard-grid
-                name=${this.name}
+            <dashboard-grid id="grid" name=${this.name}
                 class="${this.embedded ? 'embedded' : ''}"
                 @edit=${this.editPanel}
             ></dashboard-grid>
             ${this.embedded === true ? '' : html`
-                <dashboard-menu
+                <dashboard-menu id="menu"
                     @add=${this.showAddDialog}
                     @compact=${this.compactPanels}
                     @changeRefreshInterval=${this.applyRefreshInterval}
@@ -67,7 +55,9 @@ export class WatchtowerApp extends LitElement {
                     @changeCellHeight=${this.applyCellHeight}
                     @save=${this.saveDashboard}
                 ></dashboard-menu>
-                <dashboard-add-dialog @done=${this.addDashboardPanel}></dashboard-add-dialog>
+                <dashboard-add-dialog id="add-dialog"
+                    @done=${this.addDashboardPanel}
+                ></dashboard-add-dialog>
             `}
         `
     }
@@ -104,9 +94,6 @@ export class WatchtowerApp extends LitElement {
         this.menuElm.yScale = yScale
         this.menuElm.cellHeight = cellHeight
         this.menuElm.setTheme(theme)
-
-        // Apply mobile view
-        this.applyMobileView()
     }
 
     onKeyDown(event) {
@@ -127,11 +114,6 @@ export class WatchtowerApp extends LitElement {
 
             Error Code: #${errCode}
         `)
-    }
-
-    applyMobileView() {
-        this.gridElm.applyMobileView(this.mobileView)
-        this.menuElm.applyMobileView(this.mobileView)
     }
 
     async saveDashboard(event) {
