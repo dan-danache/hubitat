@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2024-12-10
+### Added
+- Add precision selector for the Stats tile - `@Ranchitat`
+
+### Changed
+- The Stat tile sparkline renders only the last 10 values for the selected precision
+
+### Fixed
+- Disable dashboard scroll when either the left menu or the add tile dialog is opened
+- Hide the left menu when the add tile dialog is opened
+
 ## [2.8.0] - 2024-12-08
 ### Added
 - Add Stats tile type

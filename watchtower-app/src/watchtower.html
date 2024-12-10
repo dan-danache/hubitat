@@ -90,6 +90,7 @@
                 width: calc(100vw + 9px);
                 overflow: hidden;
             }
+            body:has(#menu[open]), body:has(#add-dialog[open]) { overflow-y: hidden; }
             a { text-decoration: none; color: var(--Blue) }
 
             /* CSS spinner */
@@ -352,6 +353,7 @@
                 top: 0;
                 left: 0;
                 height: 100%;
+                
             }
             #menu nav {
                 box-sizing: border-box;
@@ -365,6 +367,8 @@
                 color: var(--text-color);
                 border-right: 1px var(--border-color) solid;
                 animation: hidemenu .3s;
+                height: 100%;
+                overflow-y: auto;
             }
             #menu[open] nav {
                 box-shadow: 0 0 1em var(--shadow-color);

@@ -138,7 +138,7 @@ export class DatastoreHelper {
         return data
     }
 
-    static async fetchCustomData({ds, precision}, last24Hours = false) {
+    static async fetchCustomData({ds, precision}, sparkline = false) {
         const requests = {}
         const retVal = {}
         ds.forEach(dsr => {
@@ -148,8 +148,16 @@ export class DatastoreHelper {
         })
         Object.keys(requests).forEach(dev => requests[dev] = Array.from(requests[dev]))
 
-        // Retrieve only records in the last 24 hours
-        const minTime = last24Hours ? new Date().getTime() - 86400000 : 0
+        // Retrieve only records needed to render the sparkline
+        let minTime = 0
+        if (sparkline) {
+            switch (precision) {
+                case '5m': minTime = new Date().getTime() - 3600 * 1000; break;                // Last 1 hour
+                case '1h': minTime = new Date().getTime() - 10 * 3600 * 1000; break;           // Last 10 hours
+                case '1d': minTime = new Date().getTime() - 10 * 24 * 3600 * 1000; break;      // Last 10 days
+                case '1w': minTime = new Date().getTime() - 10 * 7 * 24 * 3600 * 1000; break;  // Last 10 weeks
+            }
+        }
 
         const parseVal = val => val === '' || val === '-' ? 0 : parseFloat(val)
         for (const [dev, attrs] of Object.entries(requests)) {

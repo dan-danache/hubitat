@@ -128,6 +128,7 @@ export class WatchtowerApp extends LitElement {
     showAddDialog() {
         this.dialogElm.resetForm()
         this.dialogElm.setAttribute('open', true)
+        this.menuElm.open = false
     }
 
     editPanel(event) {

@@ -45,6 +45,7 @@ export class StatsPanel extends LitElement {
                     </li>
                 `)}
             </ul>
+            <precision-selector @change=${this.changePrecision} .precision=${this.config.precision}></precision-selector>
             <nav title="Edit tile" @click=${this.editPanel}>⚙️</nav>
         `;
     }
@@ -94,7 +95,11 @@ export class StatsPanel extends LitElement {
 
         if (this.charts[`${dev}_${attr}`] !== undefined) this.charts[`${dev}_${attr}`].destroy()
         this.charts[`${dev}_${attr}`] = new Chart(this.renderRoot.querySelector(`#c${dev}_${attr}`), $config)
-        ChartHelper.updateChartType(this.charts[`${dev}_${attr}`])
+    }
+
+    async changePrecision(event) {
+        this.config.precision = event.detail
+        await this.refresh()
     }
 
     async refresh() {
@@ -173,7 +178,7 @@ export class StatsPanelConfig extends AttributeListMixin(LitElement) {
                             .checked="${this.config.rk}"
                             @change=${this.onSetSparkline}
                         >
-                        <label for="rk">Render sparkline (last 24h)</label>
+                        <label for="rk">Render sparkline (last 10 values)</label>
                     </div>
                 </section>
 
