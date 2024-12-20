@@ -223,6 +223,10 @@ The following dashboard tile types are currently supported:
 
    ![Attribute tile](img/tile-statusmap.png)
 
+- **Bring Your Own Data** - Renders a chart with data from a CSV or JSON file (hosted in the Hubitat File Manager) that is not managed by the Watchtower app.
+
+   ![Attribute tile](img/tile-byod.png)
+
 - **Text** - This tile type renders plain or HTML text.
 
    Example usage: add a navigation tile with links to other dashboards (using HTML code).

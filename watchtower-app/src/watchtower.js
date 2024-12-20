@@ -9,6 +9,7 @@ import { AttributePanel, AttributePanelConfig } from './panels/attribute-panel.j
 import { CustomPanel, CustomPanelConfig } from './panels/custom-panel.js';
 import { StatusmapPanel, StatusmapPanelConfig } from './panels/statusmap-panel.js';
 import { StatsPanel, StatsPanelConfig } from './panels/stats-panel.js';
+import { ByodPanel, ByodPanelConfig } from './panels/byod-panel.js';
 import { TextPanel, TextPanelConfig } from './panels/text-panel.js';
 import { IframePanel, IframePanelConfig } from './panels/iframe-panel.js';
 import { HubInfoPanel, HubInfoPanelConfig } from './panels/hub-info-panel.js';
@@ -33,6 +34,9 @@ customElements.define('stats-panel-config', StatsPanelConfig)
 
 customElements.define('custom-panel', CustomPanel)
 customElements.define('custom-panel-config', CustomPanelConfig)
+
+customElements.define('byod-panel', ByodPanel)
+customElements.define('byod-panel-config', ByodPanelConfig)
 
 customElements.define('text-panel', TextPanel)
 customElements.define('text-panel-config', TextPanelConfig)

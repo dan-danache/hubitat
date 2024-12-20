@@ -27,6 +27,7 @@ positioners.mouse = function (elements, eventPosition) {
 
 const adapter = Chart._adapters._date.prototype
 function lineTooltipTitle(time, precision, formats) {
+    if (precision === undefined) return adapter.format(time, 'd LLL HH:mm')
     return `${adapter.format(adapter.add(time, 0 - precision.amount, precision.unit), formats[precision.unit])} - ${adapter.format(time, formats[precision.unit])}`
 }
 function statusmapTooltipTitle(times, precision, formats) {

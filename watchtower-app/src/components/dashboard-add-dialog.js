@@ -7,6 +7,7 @@ export class DashboardAddDialog extends LitElement {
         'custom-panel': { label: 'Multi Device/Attribute', hasUserScript: true },
         'statusmap-panel': { label: 'Status Map', hasUserScript: true },
         'stats-panel': { label: 'Stats', hasUserScript: false },
+        'byod-panel': { label: 'Bring Your Own Data', hasUserScript: true },
         'text-panel': { label: 'Text', hasUserScript: false },
         'iframe-panel': { label: 'Iframe', hasUserScript: false },
         'hub-info-panel': { label: 'Hub Info', hasUserScript: false },
