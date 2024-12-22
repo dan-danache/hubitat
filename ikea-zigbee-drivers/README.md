@@ -41,6 +41,7 @@ Appliances:
 Devices from other vendors (not in HPM):
 * [Aqara Dual Relay Module T2 (DCM-K01)](#aqara-dual-relay-module-t2-dcm-k01)
 * [Gewiss 2-channel Contact Interface (GWA1501)](#gewiss-2-channel-contact-interface-gwa1501)
+* [Gewiss 2-channel Contact Interface 230V (GWA1502)](#gewiss-2-channel-contact-interface-230v-gwa1502)
 * [Legrand Connected Outlet (741811)](#legrand-connected-outlet-741811)
 * [Philips Hue Wall Switch Module (RDM001)](#philips-hue-wall-switch-module-rdm001)
 * [Philips Hue Dimmer Switch (RWL022)](#philips-hue-dimmer-switch-rwl022)
@@ -900,7 +901,7 @@ Below you can find the details of each device, including the features and pairin
 | Since version | `5.1.0` |
 
 #### Features
-* **Switch Style Configuration**: This feature allows users to configure the physical switch style, with options including rocker / toggle, and push button.
+* **Button Type Configuration**: This feature allows users to configure the physical button type, with options including rocker/toggle and push button.
 * **Button Events**: Supports "Push" events for both buttons.
 * **Battery Report**: Provides a percentage-based report on the current battery level.
 * **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
@@ -915,6 +916,39 @@ Below you can find the details of each device, including the features and pairin
 1. Remove the battery.
 1. Set jumpers in position `1011` (▀ ▄ ▀ ▀) = Pairing configuration.
 1. Re-insert the battery.
+1. Device is now in pairing mode for 5 minutes. LED light should stay red.
+1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
+1. LED should start to slowly blink green for a few seconds, then bink orange while driver is configuring the device.
+1. After pairing is complete, the LED will continue to slowly blink green for a few minutes.
+1. Provide a name for your device, and assign it to a room.
+1. Set jumpers in position `0011` (▄ ▄ ▀ ▀) = One-way switch (on/off) configuration.
+1. Flip switches on and off.
+1. You're all set! Enjoy using your Gewiss 2-channel Contact Interface.
+
+### Gewiss 2-channel Contact Interface 230V (GWA1502)
+
+| Parameter | Details |
+|-----------|---------|
+| Product Image | <img src="img/Gewiss_GWA1502.webp" style="width: 200px"> |
+| Manual install file | `https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Gewiss_GWA1502.groovy` |
+| Tested firmwares | `1994-0001-00000200` |
+| Since version | `5.3.0` |
+
+#### Features
+* **Button Type Configuration**: This feature allows users to configure the physical button type, with options including rocker/toggle and push button.
+* **Button Events**: Supports "Push" events for both buttons.
+* **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
+* **Contact Sensor**: If enabled in Preferences panel, track open/closed state using two Contact Sensor child devices (button pushed events are not published anymore).
+
+#### Pairing Instructions
+1. Power off the device.
+1. Flip the switches in the off position (contacts I1/C1 and I2/C2 are open).
+1. Set jumpers in position `0000` (▄ ▄ ▄ ▄) = Factory default.
+1. Power on the device.
+1. Push and hold the small pairing button (A2 in manual) for at least 10 seconds. The status LED will flash red and green alternately for 3 seconds, then become red fixed. Device is now factory reset.
+1. Power off the device.
+1. Set jumpers in position `1011` (▀ ▄ ▀ ▀) = Pairing configuration.
+1. Power on the device.
 1. Device is now in pairing mode for 5 minutes. LED light should stay red.
 1. In the Hubitat interface, navigate to **Devices**, click **Add Device** in the top right corner, select **Zigbee**, and then click **Start Zigbee Pairing**.
 1. LED should start to slowly blink green for a few seconds, then bink orange while driver is configuring the device.

@@ -1,5 +1,5 @@
 /**
- * Gewiss 2-channel Contact Interface (GWA1501)
+ * Gewiss 2-channel Contact Interface 230V (GWA1502)
  *
  * @see https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/
  */
@@ -8,14 +8,18 @@ import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
-@Field static final String DRIVER_NAME = 'Gewiss 2-channel Contact Interface (GWA1501)'
+@Field static final String DRIVER_NAME = 'Gewiss 2-channel Contact Interface 230V (GWA1502)'
 @Field static final String DRIVER_VERSION = '5.2.0'
 
-// Fields for devices.Gewiss_GWA1501
+// Fields for devices.Gewiss_GWA1502
 import com.hubitat.app.ChildDeviceWrapper
 import com.hubitat.app.DeviceWrapper
 
-@Field static final Map<String, String> GWA1501_BUTTON_TYPE = [
+@Field static final Map<String, String> GWA1502_WORK_MODE = [
+    'button': 'Button - Track button events',
+    'sensor': 'Sensor - Track open/closed state using two Contact Sensor child devices',
+]
+@Field static final Map<String, String> GWA1502_BUTTON_TYPE = [
     'toggle': 'Rocker / Toggle',
     'push': 'Push Button',
 ]
@@ -25,7 +29,7 @@ import groovy.time.TimeCategory
 
 @Field static final Map<String, String> HEALTH_CHECK = [
     'schedule': '0 0 0/1 ? * * *', // Health will be checked using this cron schedule
-    'thereshold': '43200' // When checking, mark the device as offline if no Zigbee message was received in the last 43200 seconds
+    'thereshold': '3600' // When checking, mark the device as offline if no Zigbee message was received in the last 3600 seconds
 ]
 
 // Fields for capability.PushableButton
@@ -35,18 +39,14 @@ import groovy.time.TimeCategory
 ]
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Gewiss_GWA1501.groovy') {
+    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/ikea-zigbee-drivers/Gewiss_GWA1502.groovy') {
         capability 'Configuration'
         capability 'Refresh'
         capability 'Sensor'
-        capability 'Battery'
         capability 'HealthCheck'
         capability 'PushableButton'
 
-        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,000F,0020,0406,FD75', outClusters:'0003,0004,0005,0006,0008,0019,0102,FD70,FD71,FD72,FD73', model:'GWA1501_BinaryInput_FC', manufacturer:'Gewiss', controllerType:'ZGB' // Firmware: 1994-0002-00000400
-        
-        // Attributes for capability.Battery
-        attribute 'lastBattery', 'date'
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,000F,0406,FD75', outClusters:'0003,0004,0005,0006,0008,0019,0102,FD70,FD71,FD72,FD73', model:'GWA1502_BinaryInput230V', manufacturer:'Gewiss', controllerType:'ZGB' // Firmware: 1994-0001-00000200
         
         // Attributes for capability.HealthCheck
         attribute 'healthStatus', 'enum', ['offline', 'online', 'unknown']
@@ -59,10 +59,10 @@ metadata {
         input(
             name:'helpInfo', type:'hidden',
             title:'''
-            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Gewiss_GWA1501.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Gewiss 2-channel Contact Interface (GWA1501) <small>v5.2.0</small><br>
+            <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Gewiss_GWA1502.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
+                Gewiss 2-channel Contact Interface 230V (GWA1502) <small>v5.2.0</small><br>
                 <small><div>
-                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#gewiss-2-channel-contact-interface-gwa1501" target="_blank">device details</a><br>
+                • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#gewiss-2-channel-contact-interface-230v-gwa1502" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
                 </div></small>
             </div>
@@ -75,19 +75,21 @@ metadata {
             defaultValue:'1'
         )
         
-        // Inputs for devices.Gewiss_GWA1501
+        // Inputs for devices.Gewiss_GWA1502
         input(
-            name:'buttonType', type:'enum', title:'Button type', required:true,
-            description:'<small>Select wired buttons type.</small>',
-            options:GWA1501_BUTTON_TYPE,
-            defaultValue:'toggle'
+            name:'workMode', type:'enum', title:'Device mode', required:true,
+            description:'<small>Select device work mode.</small>',
+            options:GWA1502_WORK_MODE,
+            defaultValue:'button'
         )
-        
-        input(
-            name:'enableContacts', type:'bool', title:'Use as Contact Sensor', required:true,
-            description:'<small>Track open/closed state using two Contact Sensor child devices.</small>',
-            defaultValue:false
-        )
+        if (workMode != 'sensor') {
+            input(
+                name:'buttonType', type:'enum', title:'Button type', required:true,
+                description:'<small>Select wired buttons type.</small>',
+                options:GWA1502_BUTTON_TYPE,
+                defaultValue:'toggle'
+            )
+        }
     }
 }
 
@@ -116,19 +118,13 @@ List<String> updated(boolean auto = false) {
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${['1':'Debug', '2':'Info', '3':'Warning', '4':'Error'].get(logLevel)}"
     
-    // Preferences for devices.Gewiss_GWA1501
-    if (buttonType == null) {
-        buttonType = 'toggle'
-        device.updateSetting 'buttonType', [value:buttonType, type:'enum']
+    // Preferences for devices.Gewiss_GWA1502
+    if (workMode == null) {
+        workMode = 'button'
+        device.updateSetting 'workMode', [value:workMode, type:'enum']
     }
-    log_info "🛠️ buttonType = ${GWA1501_BUTTON_TYPE[buttonType]}"
-    
-    if (enableContacts == null) {
-        enableContacts = false
-        device.updateSetting 'enableContacts', [value:false, type:'bool']
-    }
-    log_info "🛠️ enableContacts = ${enableContacts}"
-    if (enableContacts != true) {
+    log_info "🛠️ workMode = ${GWA1502_WORK_MODE[workMode]}"
+    if (workMode == 'button') {
         ChildDeviceWrapper childDevice = getChildDevice("${device.deviceNetworkId}-1")
         if (childDevice) {
             log_debug "🎬 Removing child device ${childDevice} ..."
@@ -139,6 +135,11 @@ List<String> updated(boolean auto = false) {
             log_debug "🎬 Removing child device ${childDevice} ..."
             deleteChildDevice("${device.deviceNetworkId}-2")
         }
+        if (buttonType == null) {
+            buttonType = 'toggle'
+            device.updateSetting 'buttonType', [value:buttonType, type:'enum']
+        }
+        log_info "🛠️ buttonType = ${GWA1502_BUTTON_TYPE[buttonType]}"
     }
     
     // Preferences for capability.HealthCheck
@@ -204,15 +205,9 @@ void configureApply() {
     // Auto-apply preferences
     cmds += updated true
     
-    // Configuration for devices.Gewiss_GWA1501
+    // Configuration for devices.Gewiss_GWA1502
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster (ep 0x01)
     cmds += "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0406 {${device.zigbeeId}} {}" // Occupancy Sensing cluster (ep 0x02)
-    cmds += "he raw 0x${device.deviceNetworkId} 0x00 0x00 0x0022 {49 ${utils_payload "${device.zigbeeId}"} ${utils_payload '0x01'} ${utils_payload '0x0020'} 03 ${utils_payload "${location.hub.zigbeeEui}"} 01} {0x0000}" // Unbind Poll Control cluster
-    cmds += zigbee.writeAttribute(0x0020, 0x0000, 0x23, 0x00) // Disable periodic polling by the device (to conserve battery)
-    
-    // Configuration for capability.Battery
-    cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0001 {${device.zigbeeId}} {}" // Power Configuration cluster
-    cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0001 0x0021 0x20 0x0000 0x4650 {02} {}" // Report BatteryPercentage (uint8) at least every 5 hours (Δ = 1%)
     
     // Configuration for capability.HealthCheck
     sendEvent name:'healthStatus', value:'online', descriptionText:'Health status initialized to online'
@@ -247,21 +242,18 @@ List<String> refresh(boolean auto = false) {
 
     List<String> cmds = []
     
-    // Refresh for devices.Gewiss_GWA1501
+    // Refresh for devices.Gewiss_GWA1502
     cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x01]) // Occupancy (ep 01)
     cmds += zigbee.readAttribute(0x0406, 0x0000, [destEndpoint:0x02]) // Occupancy (ep 02)
-    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x01)
-    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x0000 {01} {}" // Disable periodic reporting for Occupancy (map8) (ep 0x02)
-    
-    // Refresh for capability.Battery
-    cmds += zigbee.readAttribute(0x0001, 0x0021) // BatteryPercentage
+    cmds += "he cr 0x${device.deviceNetworkId} 0x01 0x0406 0x0000 0x18 0x0000 0x0258 {01} {}" // Disable periodic reporting for Occupancy (map8) at least every 10 minutes (ep 0x01)
+    cmds += "he cr 0x${device.deviceNetworkId} 0x02 0x0406 0x0000 0x18 0x0000 0x0258 {01} {}" // Disable periodic reporting for Occupancy (map8) at least every 10 minutes (ep 0x02)
 
     if (auto) return cmds
     utils_sendZigbeeCommands cmds
     return []
 }
 
-// Implementation for devices.Gewiss_GWA1501
+// Implementation for devices.Gewiss_GWA1502
 private ChildDeviceWrapper fetchChildDevice(Integer moduleNumber) {
     ChildDeviceWrapper childDevice = getChildDevice("${device.deviceNetworkId}-${moduleNumber}")
     return childDevice ?: addChildDevice('hubitat', 'Generic Component Contact Sensor', "${device.deviceNetworkId}-${moduleNumber}", [name:"${device.displayName} - Contact ${moduleNumber}", label:"Contact ${moduleNumber}", isComponent:true])
@@ -356,7 +348,7 @@ void parse(String description) {
 
     switch (msg) {
         
-        // Events for devices.Gewiss_GWA1501
+        // Events for devices.Gewiss_GWA1502
         // ===================================================================================================================
         
         // Report/Read Attributes Reponse: Occupancy
@@ -364,65 +356,28 @@ void parse(String description) {
         case { contains it, [clusterInt:0x0406, commandInt:0x01, attrInt:0x0000] }:
             String newState = msg.value == '01' ? 'closed' : 'open'
         
-            // Send button events only when the device reports any change, not on refresh
-            // Ignore open state for push buttons
-            if (msg.commandInt == 0x0A && (buttonType == 'toggle' || newState == 'closed')) {
-                List<String> button = msg.endpointInt == 0x01 ? BUTTONS.ONE : BUTTONS.TWO
-                utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
-            }
-        
             // Send event to module child device (if contacts child devices are enabled)
-            if (enableContacts == true) {
+            if (workMode == 'sensor') {
                 Integer moduleNumber = msg.endpointInt
                 ChildDeviceWrapper childDevice = fetchChildDevice(moduleNumber)
                 if (newState != childDevice.currentValue('contact', true)) {
                     childDevice.parse([[name:'contact', value:newState, descriptionText:"${childDevice.displayName} is ${newState}", type:type]])
                 }
                 utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Contact=${moduleNumber}, State=${newState}"
+                return
+            }
+        
+            // Send button events only when the device reports any change, not on refresh
+            // Ignore open state for push buttons
+            if (msg.commandInt == 0x0A && (buttonType == 'toggle' || newState == 'closed')) {
+                List<String> button = msg.endpointInt == 0x01 ? BUTTONS.ONE : BUTTONS.TWO
+                utils_sendEvent name:'pushed', value:button[0], type:'physical', isStateChange:true, descriptionText:"Button ${button[0]} (${button[1]}) was pushed"
             }
             return
         
         // Other events that we expect but are not usefull
         case { contains it, [clusterInt:0x0406, commandInt:0x07] }:
             utils_processedZclMessage 'Configure Reporting Response', "attribute=Occupancy, data=${msg.data}"
-            return
-        case { contains it, [clusterInt:0x0020, commandInt:0x04] }: // Write Attribute Response
-            return
-        
-        // Events for capability.Battery
-        // ===================================================================================================================
-        
-        // Report/Read Attributes Reponse: BatteryPercentage
-        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0021] }:
-        case { contains it, [clusterInt:0x0001, commandInt:0x01] }:
-        
-            // Hubitat fails to parse some Read Attributes Responses
-            if (msg.value == null && msg.data != null && msg.data[0] == '21' && msg.data[1] == '00') {
-                msg.value = msg.data[2]
-            }
-        
-            // The value 0xff indicates an invalid or unknown reading
-            if (msg.value == 'FF') {
-                log_warn "Ignored invalid remaining battery percentage value: 0x${msg.value}"
-                return
-            }
-        
-            Integer percentage = Integer.parseInt(msg.value, 16) / 2
-            Date lastBattery = new Date()
-            utils_sendEvent name:'battery', value:percentage, unit:'%', descriptionText:"Battery is ${percentage}% full", type:type
-            utils_sendEvent name:'lastBattery', value:lastBattery, descriptionText:"Last battery report time is ${lastBattery}", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "BatteryPercentage=${percentage}%"
-            return
-        
-        // Other events that we expect but are not usefull
-        case { contains it, [clusterInt:0x0001, commandInt:0x07] }:
-            utils_processedZclMessage 'Configure Reporting Response', "attribute=BatteryPercentage, data=${msg.data}"
-            return
-        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x0020] }:
-            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryVoltage, data=${msg.value}"
-            return
-        case { contains it, [clusterInt:0x0001, commandInt:0x0A, attrInt:0x003E] }:
-            utils_processedZclMessage 'Report Attributes Response', "attribute=BatteryAlarmState, data=${msg.value}"
             return
         
         // Events for capability.HealthCheck
