@@ -34,7 +34,13 @@
         "MethodSize": {
             "enabled": false
         },
+        "NestedBlockDepth": {
+            "enabled": false
+        },
         "NoJavaUtilDate": {
+            "enabled": false
+        },
+        "ParameterCount": {
             "enabled": false
         },
         "PublicMethodsBeforeNonPublicMethods": {

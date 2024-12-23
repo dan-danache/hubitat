@@ -197,7 +197,7 @@ void configure(boolean auto = false) {
     runIn(cmds.findAll { !it.startsWith('delay') }.size() + 1, 'configureApply')
 }
 void configureApply() {
-    log_info "⚙️ Finishing device configuration ..."
+    log_info '⚙️ Finishing device configuration ...'
     List<String> cmds = ["he raw 0x${device.deviceNetworkId} 0x01 0x01 0x0003 {014300 3C00}"]
 
     // Auto-apply preferences

@@ -938,7 +938,7 @@ Below you can find the details of each device, including the features and pairin
 * **Button Type Configuration**: This feature allows users to configure the physical button type, with options including rocker/toggle and push button.
 * **Button Events**: Supports "Push" events for both buttons.
 * **Health Status**: Indicates the operational status of the device, showing whether it's "online" or "offline".
-* **Contact Sensor**: If enabled in Preferences panel, track open/closed state using two Contact Sensor child devices (button pushed events are not published anymore).
+* **Contact Sensor**: If enabled in Preferences panel, track open/closed state using two Contact Sensor child devices.
 
 #### Pairing Instructions
 1. Power off the device.
@@ -956,7 +956,7 @@ Below you can find the details of each device, including the features and pairin
 1. Provide a name for your device, and assign it to a room.
 1. Set jumpers in position `0011` (▄ ▄ ▀ ▀) = One-way switch (on/off) configuration.
 1. Flip switches on and off.
-1. You're all set! Enjoy using your Gewiss 2-channel Contact Interface.
+1. You're all set! Enjoy using your Gewiss 2-channel Contact Interface 230V.
 
 ### Legrand Connected Outlet (741811)
 
