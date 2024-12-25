@@ -379,7 +379,7 @@ ${_}`)}}static updateChartType(_){return this.updatePointStyle(_)}static updateP
                             ${l?Z`
                                 <header>${this.monitoredDevices.find(x=>x.id==u.dev).name}</header>
                                 <div>
-                                    <!--small>${Nt.prettyName(u.attr)}</small-->
+                                    <small>${Nt.prettyName(u.attr)}</small>
                                     <b>${this.dbResult[`${u.dev}_${u.attr}`].pop().y}<span>${this.supportedAttributes[u.attr].unit}</span></b>
                                 </div>
                             `:xt}

@@ -34,7 +34,7 @@ export class StatsPanel extends LitElement {
                             ${ready ? html`
                                 <header>${this.monitoredDevices.find(it => it.id == dataset.dev).name}</header>
                                 <div>
-                                    <!--small>${UiHelper.prettyName(dataset.attr)}</small-->
+                                    <small>${UiHelper.prettyName(dataset.attr)}</small>
                                     <b>${this.dbResult[`${dataset.dev}_${dataset.attr}`].pop().y}<span>${this.supportedAttributes[dataset.attr].unit}</span></b>
                                 </div>
                             ` : nothing}

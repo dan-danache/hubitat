@@ -14,13 +14,12 @@ import java.nio.file.NoSuchFileException
 import java.time.DayOfWeek
 import java.time.ZonedDateTime
 import java.time.ZoneId
-import java.util.Collections
 
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.hub.domain.Event
 
 @Field static final String APP_NAME = 'Watchtower'
-@Field static final String APP_VERSION = '2.10.0'
+@Field static final String APP_VERSION = '2.10.1'
 @Field static final def URL_PATTERN = ~/^https?:\/\/[^\/]+(.+)/
 @Field static final String APP_ICON = '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'
 @Field static final String MASKABLE_ICON = 'iVBORw0KGgoAAAANSUhEUgAAAgAAAAIABAMAAAAGVsnJAAAAElBMVEVHcExxpQBxpQBwpQBxpgCAvACY5M8+AAAABXRSTlMAJ7Ti/ZKd2DUAAANgSURBVHja7d1BctowGIZhAxcgkANAwwEo4+wbW75AY93/Kl22ixJJaQnw8zx7zTCadz5WHnUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwB8WT+esuwew6dN5476L7iXN+bw5fe9i26b8sRS7gUXKJWPoIXiecsl87ALrc9nQxbWYctm87sJaVV3ALvAE5BpvXVgHF5AfewVfH/0Cplzj/dEvYFSAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQpQgAIUoAAFKEABClCAAhSgAAUoQAEKUIACFKAABShAAQq42wI2L306ZzztwxewSanwME3sApbFh2l2oQtY9OUD68gFrGoepolcwCGXDdEKaH+YJm4By6oLOMYqINjDNO0FtF/AKVgB7Q/TxC3gUHdncQt4zTXGWAW0X8D86AXMj15AUoANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUIANUMAFFD5m+bYOvwHbNH0gpX3wAjblj1mibUDrxyxD6AK2Uy6Zd5E3oM9lb8EKaP+YJfAGrKouYBe3gOdcYT7G3YBDrvEWq4D2n3aKuwFTrjEEK6D9AsJuwGLKNX6GLWBxSwXMCghwAUE3YFDAl2yAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmyAAmzArReQ7uSdode6aNqPvIe6gKH9RbPxTt4aO1zqyHDrr819/shz5ZErqPtpx/YjP+7kAla5wrz7x0cql5VHbvV/MLUfmdefOXINffs6HS515E7eHe5W7UeWFUeO3c2+PN1+ZFx/5sh1bGvfHv9teaEjV7uBaT4f5pz2fz0yNR7ZFI9cz+alT+eMp6f/dOSpcAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAu/cLBQBL1l75RF4AAAAASUVORK5CYII='
@@ -128,7 +127,6 @@ def refresh() {
     log.info "${app.getLabel()} has been refreshed"
 }
 private void debug(message) { if (logEnable) log.debug "${APP_NAME} ▸ ${message}" }
-private void info(message) { log.info "${APP_NAME} ▸ ${message}" }
 private void warn(message) { log.warn "${APP_NAME} ▸ ${message}" }
 private void error(message) { log.error "${APP_NAME} ▸ ${message}" }
 
@@ -427,10 +425,10 @@ Map settings() {
                 <br>
                 How it works:
                 <ul>
-                    <li><b>Every 5 minutes</b>: The application reads the current value for all configured device attributes and stores this data in the File Manager using CSV files named <code>wt_${device_id}_5m.csv</code>, one file per configured device. Only devices configured in the <b>Devices</b> screen are queried.</li>
-                    <li><b>At the start of every hour</b>: The application reads the data from each device's <code>wt_${device_id}_5m.csv</code> file, selects records from the last hour, calculates the averages, and saves them in CSV files named <code>wt_${device_id}_1h.csv</code>.</li>
-                    <li><b>At midnight daily</b>: The application reads the data from each device's <code>wt_${device_id}_5m.csv</code> file, selects records from the last day (00:00 - 23:59), calculates the averages, and saves them in CSV files named <code>wt_${device_id}_1d.csv</code>.</li>
-                    <li><b>At midnight every Sunday</b>: The application reads the data from each device's <code>wt_${device_id}_1h.csv</code> file, selects records from the last week (Monday 00:00 - Sunday 23:59), calculates the averages, and saves them in CSV files named <code>wt_${device_id}_1w.csv</code>.</li>
+                    <li><b>Every 5 minutes</b>: The application reads the current value for all configured device attributes and stores this data in the File Manager using CSV files named <code>wt_{device_id}_5m.csv</code>, one file per configured device. Only devices configured in the <b>Devices</b> screen are queried.</li>
+                    <li><b>At the start of every hour</b>: The application reads the data from each device's <code>wt_{device_id}_5m.csv</code> file, selects records from the last hour, calculates the averages, and saves them in CSV files named <code>wt_{device_id}_1h.csv</code>.</li>
+                    <li><b>At midnight daily</b>: The application reads the data from each device's <code>wt_{device_id}_5m.csv</code> file, selects records from the last day (00:00 - 23:59), calculates the averages, and saves them in CSV files named <code>wt_{device_id}_1d.csv</code>.</li>
+                    <li><b>At midnight every Sunday</b>: The application reads the data from each device's <code>wt_{device_id}_1h.csv</code> file, selects records from the last week (Monday 00:00 - Sunday 23:59), calculates the averages, and saves them in CSV files named <code>wt_{device_id}_1w.csv</code>.</li>
                 </ul>
                 <br>
                 To maintain a fixed file size, old records are discarded during each save, as specified below.
@@ -483,11 +481,11 @@ Map settings() {
         section('Advanced settings', hideable:true, hidden:false) {
             input(name:'collectDisable', type:'bool', title:'Disable data collection (that runs every 5 minutes)', defaultValue:false, submitOnChange:true)
             if (collectDisable) {
-                paragraph '<aside><b>Caution</b>: Data collection has been disabled, and no new data points will be added to the <code>wt_${device_id}_5m.csv</code> data files. As a result, data aggregation will also be affected, as there won’t be any new data points available for the aggregation process.</aside>'
+                paragraph '<aside><b>Caution</b>: Data collection has been disabled, and no new data points will be added to the <code>wt_{device_id}_5m.csv</code> data files. As a result, data aggregation will also be affected, as there won\'t be any new data points available for the aggregation process.</aside>'
             }
             input(name:'aggregateDisable', type:'bool', title:'Disable data aggregation for 1 hour, 1 day, and 1 week intervals', defaultValue:false, submitOnChange:true)
             if (aggregateDisable) {
-                paragraph '<aside><b>Caution</b>: Data aggregation has been disabled, and no new data points will be added to the <code>wt_${device_id}_1h.csv</code>, <code>wt_${device_id}_1d.csv</code>, and <code>wt_${device_id}_1w.csv</code> data files.</aside>'
+                paragraph '<aside><b>Caution</b>: Data aggregation has been disabled, and no new data points will be added to the <code>wt_{device_id}_1h.csv</code>, <code>wt_{device_id}_1d.csv</code>, and <code>wt_{device_id}_1w.csv</code> data files.</aside>'
             }
         }
     }
@@ -670,7 +668,7 @@ def appButtonHandler(String buttonName) {
 
         // Find next empty position for insertion
         int nextPosition = 1
-        while (app.getSetting("d.${nextPosition}") != null && app.getSetting("a.${nextPosition}") != null) nextPosition++
+        while (app.getSetting("d.${nextPosition}") != null && app.getSetting("a.${nextPosition}") != null) { nextPosition++ }
         state.position = nextPosition
 
         // Clear form
@@ -738,7 +736,7 @@ def appButtonHandler(String buttonName) {
 
 @CompileStatic
 static String calc5minValue(DeviceWrapper device, String attribute, List<String> onValues, List<Event> events, long beginTimestamp, long endTimestamp) {
-    String currentValue = device.currentValue(attribute)?.toString()
+    String currentValue = device.currentValue(attribute)
     if (currentValue == null) return ''
 
     // Short-circuit all the time calculations if nothing happened in the past 5 minutes
@@ -873,7 +871,7 @@ void update1HourData(ZonedDateTime now, String deviceId, List<String> attrs) {
 
         // Create and save a new CSV record
         List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-        for (int i = 0; i < averagesAndMinMax.length; i++) newCsvRecord.add(averagesAndMinMax[i])
+        for (int i = 0; i < averagesAndMinMax.length; i++) { newCsvRecord.add(averagesAndMinMax[i]) }
         appendDataRecord("wt_${deviceId}_1h.csv", newCsvRecord, attrs, conf_1HourMaxLines ?: 744, true)
     } catch (NoSuchFileException ex) {
         warn "update1HourData: File not found: ${lowerFileName}"
@@ -896,7 +894,7 @@ void update1DayData(ZonedDateTime now, String deviceId, List<String> attrs) {
 
         // Create and save a new CSV record
         List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-        for (int i = 0; i < averagesAndMinMax.length; i++) newCsvRecord.add(averagesAndMinMax[i])
+        for (int i = 0; i < averagesAndMinMax.length; i++) { newCsvRecord.add(averagesAndMinMax[i]) }
         appendDataRecord("wt_${deviceId}_1d.csv", newCsvRecord, attrs, conf_1DayMaxLines ?: 732, true)
     } catch (NoSuchFileException ex) {
         warn "update1DayData: File not found: ${lowerFileName}"
@@ -919,7 +917,7 @@ void update1WeekData(ZonedDateTime now, String deviceId, List<String> attrs) {
 
         // Create and save a new CSV record
         List<String> newCsvRecord = ["${now.toEpochSecond()}"]
-        for (int i = 0; i < averagesAndMinMax.length; i++) newCsvRecord.add(averagesAndMinMax[i])
+        for (int i = 0; i < averagesAndMinMax.length; i++) { newCsvRecord.add(averagesAndMinMax[i]) }
         appendDataRecord("wt_${deviceId}_1w.csv", newCsvRecord, attrs, conf_1WeekMaxLines ?: 522, true)
     } catch (NoSuchFileException ex) {
         warn "update1DayData: File not found: ${lowerFileName}"
@@ -932,15 +930,15 @@ void update1WeekData(ZonedDateTime now, String deviceId, List<String> attrs) {
 void appendDataRecord(String fileName, List<String> csvRecord, List<String> attrs, Long maxLines, boolean minMaxHeaders) {
     if (logEnable) debug "appendDataRecord(fileName=${fileName}, csvRecord=${csvRecord}, attrs=${attrs}, maxLines=${maxLines}, minMaxHeaders=${minMaxHeaders})"
     List<String> csvLines = []
-    csvLines.add("timestamp,${attrs.join(',')}${!minMaxHeaders ? '' : ",${attrs.join('_min,')}_min,${attrs.join('_max,')}_max"}")
+    csvLines.add("timestamp,${attrs.join(',')}${minMaxHeaders ? ",${attrs.join('_min,')}_min,${attrs.join('_max,')}_max" : ''}")
     csvLines.addAll(loadDataLines(fileName, maxLines - 1))
     csvLines.add("${csvRecord.join(',')}")
-    uploadHubFile(fileName, csvLines.join("\n").replaceAll(',null', ',').getBytes())
+    uploadHubFile(fileName, csvLines.join('\n').replaceAll(',null', ',').getBytes())
 }
 
 List<String> loadDataLines(String fileName, Long maxLines) {
     try {
-        return new String(downloadHubFile(fileName), 'UTF-8').trim().split("\n").drop(1).takeRight((int) maxLines)
+        return new String(downloadHubFile(fileName), 'UTF-8').trim().split('\n').drop(1).takeRight((int) maxLines)
     } catch (NoSuchFileException ex) {
         warn "Creating data file: ${fileName}"
         return []
@@ -1011,10 +1009,10 @@ String[] computeAveragesAndMinMax(String fileContents, List<String> attrs, Long 
 void deleteDataFiles(DeviceWrapper device) {
     if (device == null) return
     warn "Deleting data files for ${device} (${device.id})"
-    try { deleteHubFile("wt_${device.id}_5m.csv") } catch (NoSuchFileException ex) { }
-    try { deleteHubFile("wt_${device.id}_1h.csv") } catch (NoSuchFileException ex) { }
-    try { deleteHubFile("wt_${device.id}_1d.csv") } catch (NoSuchFileException ex) { }
-    try { deleteHubFile("wt_${device.id}_1w.csv") } catch (NoSuchFileException ex) { }
+    try { deleteHubFile("wt_${device.id}_5m.csv") } catch (NoSuchFileException ex) { debug "File wt_${device.id}_5m.csv not found" }
+    try { deleteHubFile("wt_${device.id}_1h.csv") } catch (NoSuchFileException ex) { debug "File wt_${device.id}_1h.csv not found" }
+    try { deleteHubFile("wt_${device.id}_1d.csv") } catch (NoSuchFileException ex) { debug "File wt_${device.id}_1d.csv not found" }
+    try { deleteHubFile("wt_${device.id}_1w.csv") } catch (NoSuchFileException ex) { debug "File wt_${device.id}_1w.csv not found" }
 
     // Also cleanup app state entries used for counter attributes (e.g. energy)
     // @see calc5minIncrease()
@@ -1025,16 +1023,16 @@ void deleteDataFiles(DeviceWrapper device) {
 // ===================================================================================================================
 
 mappings {
-    path('/watchtower.html') { action:[GET:'getDashboardHtmlMapping']}
-    path('/watchtower.js') { action:[GET:'getDashboardJsMapping']}
-    path('/watchtower.csv') { action:[GET:'getDashboardCsvMapping']}
-    path('/icon.png') { action:[GET:'getIconMapping']}
-    path('/app.webmanifest') { action:[GET:'getAppManifestMapping']}
-    path('/grid-layout.json') { action:[GET:'getGridLayoutMapping', PUT:'putGridLayoutMapping']}
-    path('/monitored-devices.json') { action:[GET:'getMonitoredDevicesMapping']}
-    path('/supported-attributes.json') { action:[GET:'getSupportedAttributesMapping']}
-    path("/hub-info.json") { action:[GET:'getHubInfoMapping']}
-    path("/collect-device-metrics") { action:[GET:'getCollectDeviceMetricsMapping']}
+    path('/watchtower.html') { action:[GET:'getDashboardHtmlMapping'] }
+    path('/watchtower.js') { action:[GET:'getDashboardJsMapping'] }
+    path('/watchtower.csv') { action:[GET:'getDashboardCsvMapping'] }
+    path('/icon.png') { action:[GET:'getIconMapping'] }
+    path('/app.webmanifest') { action:[GET:'getAppManifestMapping'] }
+    path('/grid-layout.json') { action:[GET:'getGridLayoutMapping', PUT:'putGridLayoutMapping'] }
+    path('/monitored-devices.json') { action:[GET:'getMonitoredDevicesMapping'] }
+    path('/supported-attributes.json') { action:[GET:'getSupportedAttributesMapping'] }
+    path('/hub-info.json') { action:[GET:'getHubInfoMapping'] }
+    path('/collect-device-metrics') { action:[GET:'getCollectDeviceMetricsMapping'] }
 }
 
 def getDashboardHtmlMapping() {
@@ -1074,7 +1072,7 @@ def getAppManifestMapping() {
     return render(status:200, contentType:'application/manifest+json',
         data: """\
         {
-            "id": "${java.util.UUID.nameUUIDFromBytes(params.name.getBytes())}",
+            "id": "${UUID.nameUUIDFromBytes(params.name.getBytes())}",
             "name": "${params.name}",
             "short_name": "${params.name}",
             "description": "View metrics for your smart devices.",
@@ -1092,8 +1090,8 @@ def getAppManifestMapping() {
             "categories": ["utilities"],
             "display": "standalone",
             "orientation": "any",
-            "theme_color": "${params.theme == 'dark' ? "#1b1b1b" : "#eee8d5"}",
-            "background_color": "${params.theme == 'dark' ? "#1b1b1b" : "#eee8d5"}"
+            "theme_color": "${params.theme == 'dark' ? '#1b1b1b' : '#eee8d5'}",
+            "background_color": "${params.theme == 'dark' ? '#1b1b1b' : '#eee8d5'}"
         }
         """
     )
@@ -1169,7 +1167,7 @@ def getCollectDeviceMetricsMapping() {
         DeviceWrapper device = conf[1]
         List<String> attrs = conf[2]
         String deviceId = device?.id ?: '0'
-        try { update5MinData(now, device, attrs, lookbackMinutes) } catch(Exception ex) { error "Failed to collect metrics for device #${deviceId}: ${ex.getMessage()}" }
+        try { update5MinData(now, device, attrs, lookbackMinutes) } catch (Exception ex) { error "Failed to collect metrics for device #${deviceId}: ${ex.getMessage()}" }
     }
     return render(status:200, contentType:'application/json', data:'{"status": "Done"}')
 }
