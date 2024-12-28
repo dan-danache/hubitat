@@ -14,7 +14,7 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0702
 // Inputs for capability.EnergyMeter
 input(
     name:'energyReportDelta', type:'enum', title:'Energy report frequency', required:true,
-    description:'<small>Configure when device reports total consumed energy.</small>',
+    description:'Configure when device reports total consumed energy',
     options:[
            '0':'Report all changes',
           '10':'Report changes of 10 Wh',

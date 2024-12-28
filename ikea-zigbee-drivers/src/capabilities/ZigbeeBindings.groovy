@@ -14,14 +14,14 @@
 // Inputs for capability.ZigbeeBindings
 input(
     name:'controlDevice', type:'enum', title:'Control Zigbee device', required:false,
-    description:'<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
+    description:'Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device',
     options:['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
     defaultValue:'----'
 )
 {{# params.groups }}
 input(
     name:'controlGroup', type:'enum', title:'Control Zigbee group', required:false,
-    description:'<small>Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
+    description:'Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device',
     options:['0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -'] + GROUPS,
     defaultValue:'----'
 )

@@ -18,7 +18,7 @@ cmds += "he cr 0x${device.deviceNetworkId} 0x${device.endpointId} 0x0B04 0x0605 
 // Inputs for capability.PowerMeter
 input(
     name:'powerReportDelta', type:'enum', title:'Power report frequency', required:true,
-    description:'<small>Configure when device reports current power demand.</small>',
+    description:'Configure when device reports current power demand',
     options:[
           '0':'Report all changes',
           '1':'Report changes of +/- 1 watt',

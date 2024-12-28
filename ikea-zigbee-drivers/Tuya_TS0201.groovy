@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'Tuya Temperature and Humidity Sensor (TS0201)'
-@Field static final String DRIVER_VERSION = '5.2.0'
+@Field static final String DRIVER_VERSION = '5.3.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -44,7 +44,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Tuya_TS0201.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Tuya Temperature and Humidity Sensor (TS0201) <small>v5.2.0</small><br>
+                Tuya Temperature and Humidity Sensor (TS0201) <small>v5.3.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tuya-temperature-and-humidity-sensor-ts0201" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -54,7 +54,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )

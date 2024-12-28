@@ -16,7 +16,7 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04
 // Inputs for capability.CurrentMeter
 input(
     name:'amperageReportDelta', type:'enum', title:'Amperage report frequency', required:true,
-    description:'<small>Configure when device reports current amperage.</small>',
+    description:'Configure when device reports current amperage',
     options:[
           '0':'Report all changes',
           '5':'Report changes of +/- 5 milliamperes',

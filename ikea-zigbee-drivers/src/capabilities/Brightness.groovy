@@ -10,13 +10,13 @@ capability 'SwitchLevel'
 // Inputs for capability.Brightness
 input(
     name:'levelStep', type:'enum', title:'Brightness up/down shift', required:true,
-    description:'<small>Brightness +/- adjust for the shiftLevel() command.</small>',
+    description:'Brightness +/- adjust for the shiftLevel() command',
     options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
     defaultValue:'25'
 )
 input(
     name:'levelChangeRate', type:'enum', title:'Brightness change rate', required:true,
-    description:'<small>Brightness +/- adjust for the startLevelChange() command.</small>',
+    description:'Brightness +/- adjust for the startLevelChange() command',
     options:[
          '10': '10% / sec - from 0% to 100% in 10 seconds',
          '20': '20% / sec - from 0% to 100% in 5 seconds',
@@ -28,7 +28,7 @@ input(
 )
 input(
     name:'levelTransitionTime', type:'enum', title:'Brightness transition time', required:true,
-    description:'<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
+    description:'Time taken to move to/from the target brightness when device is turned On/Off',
     options:[
          '0': 'Instant',
          '5': '0.5 seconds',
@@ -44,7 +44,7 @@ input(
 )
 input(
     name:'turnOnBehavior', type:'enum', title:'Turn On behavior', required:true,
-    description:'<small>Select what happens when the device is turned On.</small>',
+    description:'Select what happens when the device is turned On',
     options:[
         'RESTORE_PREVIOUS_LEVEL': 'Restore previous brightness',
         'FIXED_VALUE': 'Always start with the same fixed brightness'
@@ -54,14 +54,14 @@ input(
 if (turnOnBehavior == 'FIXED_VALUE') {
     input(
         name:'onLevelValue', type:'number', title:'Fixed brightness value', required:true,
-        description:'<small>Range 1..100</small>',
+        description:'Range 1..100',
         range:'1..100',
         defaultValue:50
     )
 }
 input(
     name:'prestaging', type:'bool', title:'Pre-staging', required:true,
-    description:'<small>Set brightness level without turning On the device (for later use).</small>',
+    description:'Set brightness level without turning On the device (for later use)',
     defaultValue:false
 )
 {{/ @inputs }}
@@ -75,6 +75,7 @@ command 'shiftLevel', [[name:'Direction*', type:'ENUM', constraints: ['up', 'dow
 {{# @implementation }}
 
 // Implementation for capability.Brightness
+void setLevel(String level, String duration = '0') { setLevel(Integer.parseInt(level), Integer.parseInt(duration)) }
 void setLevel(BigDecimal level, BigDecimal duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
     Integer lvl = newLevel * 2.54

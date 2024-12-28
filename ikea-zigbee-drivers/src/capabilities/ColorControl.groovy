@@ -37,6 +37,7 @@ void setColor(Map colormap) {
     /* groovylint-disable-next-line UnnecessarySetter */
     setLevel newLevel
 }
+void setHue(String hue) { setHue Integer.parseInt(hue) }
 void setHue(BigDecimal hue) {
     Integer newHue = hue > 100 ? 100 : (hue < 0 ? 0 : hue)
     log_debug "Setting color hue to ${newHue}%"
@@ -44,6 +45,7 @@ void setHue(BigDecimal hue) {
     String payload = "${utils_payload newHue, 2} 00 0000 00 00"
     utils_sendZigbeeCommands(["he raw 0x${device.deviceNetworkId} 0x01 0x${device.endpointId} 0x0300 {114300 ${payload}}"]) // Move to Hue
 }
+void setSaturation(String saturation) { setSaturation Integer.parseInt(saturation) }
 void setSaturation(BigDecimal saturation) {
     Integer newSaturation = saturation > 100 ? 100 : (saturation < 0 ? 0 : saturation)
     log_debug "Setting color saturation to ${newSaturation}%"

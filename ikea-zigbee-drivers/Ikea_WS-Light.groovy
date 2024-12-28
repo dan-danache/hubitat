@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA White Spectrum Light'
-@Field static final String DRIVER_VERSION = '5.2.0'
+@Field static final String DRIVER_VERSION = '5.3.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -71,7 +71,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_WS-Light.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA White Spectrum Light <small>v5.2.0</small><br>
+                IKEA White Spectrum Light <small>v5.3.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#white-spectrum-light" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -81,7 +81,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -89,7 +89,7 @@ metadata {
         // Inputs for capability.Switch
         input(
             name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
-            description:'<small>Select what happens after a power outage.</small>',
+            description:'Select what happens after a power outage',
             options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
             defaultValue:'RESTORE_PREVIOUS_STATE'
         )
@@ -97,13 +97,13 @@ metadata {
         // Inputs for capability.ColorTemperature
         input(
             name:'colorTemperatureStep', type:'enum', title:'Color Temperature up/down shift', required:true,
-            description:'<small>Color Temperature +/- adjust for the shiftColorTemperature() command.</small>',
+            description:'Color Temperature +/- adjust for the shiftColorTemperature() command',
             options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
             defaultValue:'25'
         )
         input(
             name:'colorTemperatureChangeRate', type:'enum', title:'Color Temperature change rate', required:true,
-            description:'<small>Color Temperature +/- adjust for the startColorTemperatureChange() command.</small>',
+            description:'Color Temperature +/- adjust for the startColorTemperatureChange() command',
             options:[
                  '10': '10% / sec - from hot to cold in 10 seconds',
                  '20': '20% / sec - from hot to cold in 5 seconds',
@@ -117,13 +117,13 @@ metadata {
         // Inputs for capability.Brightness
         input(
             name:'levelStep', type:'enum', title:'Brightness up/down shift', required:true,
-            description:'<small>Brightness +/- adjust for the shiftLevel() command.</small>',
+            description:'Brightness +/- adjust for the shiftLevel() command',
             options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
             defaultValue:'25'
         )
         input(
             name:'levelChangeRate', type:'enum', title:'Brightness change rate', required:true,
-            description:'<small>Brightness +/- adjust for the startLevelChange() command.</small>',
+            description:'Brightness +/- adjust for the startLevelChange() command',
             options:[
                  '10': '10% / sec - from 0% to 100% in 10 seconds',
                  '20': '20% / sec - from 0% to 100% in 5 seconds',
@@ -135,7 +135,7 @@ metadata {
         )
         input(
             name:'levelTransitionTime', type:'enum', title:'Brightness transition time', required:true,
-            description:'<small>Time taken to move to/from the target brightness when device is turned On/Off.</small>',
+            description:'Time taken to move to/from the target brightness when device is turned On/Off',
             options:[
                  '0': 'Instant',
                  '5': '0.5 seconds',
@@ -151,7 +151,7 @@ metadata {
         )
         input(
             name:'turnOnBehavior', type:'enum', title:'Turn On behavior', required:true,
-            description:'<small>Select what happens when the device is turned On.</small>',
+            description:'Select what happens when the device is turned On',
             options:[
                 'RESTORE_PREVIOUS_LEVEL': 'Restore previous brightness',
                 'FIXED_VALUE': 'Always start with the same fixed brightness'
@@ -161,21 +161,21 @@ metadata {
         if (turnOnBehavior == 'FIXED_VALUE') {
             input(
                 name:'onLevelValue', type:'number', title:'Fixed brightness value', required:true,
-                description:'<small>Range 1..100</small>',
+                description:'Range 1..100',
                 range:'1..100',
                 defaultValue:50
             )
         }
         input(
             name:'prestaging', type:'bool', title:'Pre-staging', required:true,
-            description:'<small>Set brightness level without turning On the device (for later use).</small>',
+            description:'Set brightness level without turning On the device (for later use)',
             defaultValue:false
         )
         
         // Inputs for capability.ZigbeeBindings
         input(
             name:'joinGroup', type:'enum', title:'Join a Zigbee group', required:false,
-            description:'<small>Select a Zigbee group you want to join.</small>',
+            description:'Select a Zigbee group you want to join',
             options:['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue:'----'
         )
@@ -443,6 +443,7 @@ void onWithTimedOff(BigDecimal onTime = 1) {
 }
 
 // Implementation for capability.ColorTemperature
+void setColorTemperature(String colorTemperature, String level = '-1', String duration = '0') { setColorTemperature(Integer.parseInt(colorTemperature), Integer.parseInt(level), Integer.parseInt(duration)) }
 void setColorTemperature(BigDecimal colorTemperature, BigDecimal level = -1, BigDecimal duration = 0) {
     Integer mireds = Math.round(1000000 / colorTemperature)
     mireds = mireds < state.minMireds ? state.minMireds : (mireds > state.maxMireds ? state.maxMireds : mireds)
@@ -508,6 +509,7 @@ private void processMultipleColorTemperatureAttributes(Map msg, String type) {
 }
 
 // Implementation for capability.Brightness
+void setLevel(String level, String duration = '0') { setLevel(Integer.parseInt(level), Integer.parseInt(duration)) }
 void setLevel(BigDecimal level, BigDecimal duration = 0) {
     Integer newLevel = level > 100 ? 100 : (level < 0 ? 0 : level)
     Integer lvl = newLevel * 2.54

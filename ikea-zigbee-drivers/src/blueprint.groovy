@@ -54,7 +54,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )

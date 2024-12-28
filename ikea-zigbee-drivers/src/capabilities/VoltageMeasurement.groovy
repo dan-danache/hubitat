@@ -16,7 +16,7 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0B04
 // Inputs for capability.VoltageMeasurement
 input(
     name:'voltageReportDelta', type:'enum', title:'Voltage report frequency', required:true,
-    description:'<small>Configure when device reports current voltage.</small>',
+    description:'Configure when device reports current voltage',
     options:[
           '0':'Report all changes',
           '1':'Report changes of +/- 1 volt',

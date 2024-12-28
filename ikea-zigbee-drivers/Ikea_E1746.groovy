@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Tradfri Signal Repeater (E1746)'
-@Field static final String DRIVER_VERSION = '5.2.0'
+@Field static final String DRIVER_VERSION = '5.3.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -54,7 +54,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1746.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Tradfri Signal Repeater (E1746) <small>v5.2.0</small><br>
+                IKEA Tradfri Signal Repeater (E1746) <small>v5.3.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tradfri-signal-repeater-e1746" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -64,7 +64,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -256,7 +256,7 @@ private String printWeirdTable(String stateKeyName, Integer columnsNo) {
         rows.add row
     }
 
-    String data = '<style>.ka_div { margin-left:-40px; width:calc(100% + 40px) } @media (max-width: 840px) { .ka_div { overflow-x:scroll; padding:0 1px; margin-left:-64px; width:calc(100% + 87px) } }</style><div class="ka_div"><pre>'
+    String data = '<style>@media (max-width: 840px) { .ka_div { overflow-x:scroll; padding:0 1px }}</style><div class="ka_div"><pre style="margin:0">'
     if (rows.size == 0) {
         data += '▸ Could not retrieve data\n'
     } else {

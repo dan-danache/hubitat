@@ -9,13 +9,13 @@ capability 'ColorMode'
 // Inputs for capability.ColorTemperature
 input(
     name:'colorTemperatureStep', type:'enum', title:'Color Temperature up/down shift', required:true,
-    description:'<small>Color Temperature +/- adjust for the shiftColorTemperature() command.</small>',
+    description:'Color Temperature +/- adjust for the shiftColorTemperature() command',
     options:['1':'1%', '2':'2%', '5':'5%', '10':'10%', '20':'20%', '25':'25%', '33':'33%', '50':'50%'],
     defaultValue:'25'
 )
 input(
     name:'colorTemperatureChangeRate', type:'enum', title:'Color Temperature change rate', required:true,
-    description:'<small>Color Temperature +/- adjust for the startColorTemperatureChange() command.</small>',
+    description:'Color Temperature +/- adjust for the startColorTemperatureChange() command',
     options:[
          '10': '10% / sec - from hot to cold in 10 seconds',
          '20': '20% / sec - from hot to cold in 5 seconds',
@@ -38,6 +38,7 @@ command 'shiftColorTemperature', [[name:'Direction*', type:'ENUM', constraints: 
 {{# @implementation }}
 
 // Implementation for capability.ColorTemperature
+void setColorTemperature(String colorTemperature, String level = '-1', String duration = '0') { setColorTemperature(Integer.parseInt(colorTemperature), Integer.parseInt(level), Integer.parseInt(duration)) }
 void setColorTemperature(BigDecimal colorTemperature, BigDecimal level = -1, BigDecimal duration = 0) {
     Integer mireds = Math.round(1000000 / colorTemperature)
     mireds = mireds < state.minMireds ? state.minMireds : (mireds > state.maxMireds ? state.maxMireds : mireds)

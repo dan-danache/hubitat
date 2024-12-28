@@ -89,7 +89,7 @@ private String printWeirdTable(String stateKeyName, Integer columnsNo) {
         rows.add row
     }
 
-    String data = '<style>.ka_div { margin-left:-40px; width:calc(100% + 40px) } @media (max-width: 840px) { .ka_div { overflow-x:scroll; padding:0 1px; margin-left:-64px; width:calc(100% + 87px) } }</style><div class="ka_div"><pre>'
+    String data = '<style>@media (max-width: 840px) { .ka_div { overflow-x:scroll; padding:0 1px }}</style><div class="ka_div"><pre style="margin:0">'
     if (rows.size == 0) {
         data += '▸ Could not retrieve data\n'
     } else {

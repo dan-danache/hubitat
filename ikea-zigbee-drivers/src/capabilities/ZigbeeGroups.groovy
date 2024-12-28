@@ -12,7 +12,7 @@
 // Inputs for capability.ZigbeeBindings
 input(
     name:'joinGroup', type:'enum', title:'Join a Zigbee group', required:false,
-    description:'<small>Select a Zigbee group you want to join.</small>',
+    description:'Select a Zigbee group you want to join',
     options:['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
     defaultValue:'----'
 )

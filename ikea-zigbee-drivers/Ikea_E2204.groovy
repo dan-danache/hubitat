@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Tretakt Smart Plug (E2204)'
-@Field static final String DRIVER_VERSION = '5.2.0'
+@Field static final String DRIVER_VERSION = '5.3.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -58,7 +58,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2204.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Tretakt Smart Plug (E2204) <small>v5.2.0</small><br>
+                IKEA Tretakt Smart Plug (E2204) <small>v5.3.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#tretakt-smart-plug-e2204" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -68,7 +68,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -76,7 +76,7 @@ metadata {
         // Inputs for capability.Switch
         input(
             name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
-            description:'<small>Select what happens after a power outage.</small>',
+            description:'Select what happens after a power outage',
             options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
             defaultValue:'RESTORE_PREVIOUS_STATE'
         )
@@ -91,7 +91,7 @@ metadata {
         // Inputs for capability.ZigbeeBindings
         input(
             name:'joinGroup', type:'enum', title:'Join a Zigbee group', required:false,
-            description:'<small>Select a Zigbee group you want to join.</small>',
+            description:'Select a Zigbee group you want to join',
             options:['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue:'----'
         )

@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'Aqara Dual Relay Module T2 (DCM-K01)'
-@Field static final String DRIVER_VERSION = '5.2.0'
+@Field static final String DRIVER_VERSION = '5.3.0'
 
 // Fields for capability.MultiRelay
 import com.hubitat.app.ChildDeviceWrapper
@@ -61,7 +61,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Aqara_DCM-K01.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Aqara Dual Relay Module T2 (DCM-K01) <small>v5.2.0</small><br>
+                Aqara Dual Relay Module T2 (DCM-K01) <small>v5.3.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#aqara-dual-relay-module-t2-dcm-k01" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -71,7 +71,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -146,7 +146,7 @@ metadata {
         // Inputs for capability.PowerMeter
         input(
             name:'powerReportDelta', type:'enum', title:'Power report frequency', required:true,
-            description:'<small>Configure when device reports current power demand.</small>',
+            description:'Configure when device reports current power demand',
             options:[
                   '0':'Report all changes',
                   '1':'Report changes of +/- 1 watt',
@@ -165,7 +165,7 @@ metadata {
         // Inputs for capability.EnergyMeter
         input(
             name:'energyReportDelta', type:'enum', title:'Energy report frequency', required:true,
-            description:'<small>Configure when device reports total consumed energy.</small>',
+            description:'Configure when device reports total consumed energy',
             options:[
                    '0':'Report all changes',
                   '10':'Report changes of 10 Wh',

@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Symfonisk Sound Remote Gen2 (E2123)'
-@Field static final String DRIVER_VERSION = '5.2.0'
+@Field static final String DRIVER_VERSION = '5.3.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -65,7 +65,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2123.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Symfonisk Sound Remote Gen2 (E2123) <small>v5.2.0</small><br>
+                IKEA Symfonisk Sound Remote Gen2 (E2123) <small>v5.3.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#symfonisk-sound-remote-gen2-e2123" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -75,7 +75,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'<small>Select what type of messages appear in the "Logs" section.</small>',
+            description:'Select what type of messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -83,13 +83,13 @@ metadata {
         // Inputs for capability.ZigbeeBindings
         input(
             name:'controlDevice', type:'enum', title:'Control Zigbee device', required:false,
-            description:'<small>Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
+            description:'Select the target Zigbee device that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device',
             options:['0000':'❌ Stop controlling all Zigbee devices', '----':'- - - -'] + retrieveSwitchDevices(),
             defaultValue:'----'
         )
         input(
             name:'controlGroup', type:'enum', title:'Control Zigbee group', required:false,
-            description:'<small>Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device.</small>',
+            description:'Select the target Zigbee group that will be <abbr title="Without involving the Hubitat hub" style="cursor:help">directly controlled</abbr> by this device',
             options:['0000':'❌ Stop controlling all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue:'----'
         )
