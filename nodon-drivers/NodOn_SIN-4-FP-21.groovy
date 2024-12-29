@@ -3,12 +3,13 @@
  *
  * @see https://dan-danache.github.io/hubitat/nodon-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'NodOn Pilot Wire Heating Module (SIN-4-FP-21)'
-@Field static final String DRIVER_VERSION = '1.0.0'
+@Field static final String DRIVER_VERSION = '1.1.0'
 
 // Fields for devices.NodOn_SIN-4-FP-21
 @Field static final Map<Integer, String> PILOT_WIRE_MODES = [
@@ -63,7 +64,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/nodon-drivers/img/NodOn_SIN-4-FP-21.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                NodOn Pilot Wire Heating Module (SIN-4-FP-21) <small>v1.0.0</small><br>
+                NodOn Pilot Wire Heating Module (SIN-4-FP-21) <small>v1.1.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/nodon-drivers/#nodon-pilot-wire-heating-module-sin-4-fp-21" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-nodon-drivers/123853" target="_blank">community page</a><br>
@@ -74,7 +75,7 @@ metadata {
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
+            description: 'Select what messages appear in the "Logs" section',
             options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue: '1',
             required: true
@@ -84,7 +85,7 @@ metadata {
         input(
             name: 'energyReportDelta', type: 'enum',
             title: 'Energy report frequency',
-            description: '<small>Configure when device reports total consumed energy.</small>',
+            description: 'Configure when device reports total consumed energy',
             options: [
                  '100':'Report changes of +/- 0.1kWh',
                  '500':'Report changes of +/- 0.5kWh',
@@ -96,7 +97,7 @@ metadata {
         input(
             name: 'powerReportDelta', type: 'enum',
             title: 'Power report frequency',
-            description: '<small>Configure when device reports current power demand.</small>',
+            description: 'Configure when device reports current power demand',
             options: [
                   '2':'Report changes of +/- 2W',
                  '10':'Report changes of +/- 10W',
@@ -358,7 +359,7 @@ void parse(String description) {
         // Report/Read Attributes Reponse: EnergySummation
         case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0000] }:
         case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
-            Long energy = Long.parseLong(msg.value, 16) * (state.multiplier ?: 1) / (state.divisor ?: 1000)
+            String energy = new BigDecimal(Long.parseLong(msg.value, 16) * (state.multiplier ?: 1) / (state.divisor ?: 1000)).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
             utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Total consumed energy is ${energy} kWh", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "EnergySummation=${msg.value} (${energy}kWh)"
             return
@@ -366,7 +367,7 @@ void parse(String description) {
         // Report/Read Attributes Reponse: InstantaneousDemand
         case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0400] }:
         case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0400] }:
-            Integer power = Integer.parseInt(msg.value, 16) * 1000 * (state.multiplier ?: 1) / (state.divisor ?: 1000)
+            String power = new BigDecimal(Integer.parseInt(msg.value, 16) * 1000 * (state.multiplier ?: 1) / (state.divisor ?: 1000)).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
             utils_sendEvent name:'power', value:power, unit:'Watt', descriptionText:"Current power demand is ${power} W", type:type
             utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Power=${msg.value} (${power}W)"
             return

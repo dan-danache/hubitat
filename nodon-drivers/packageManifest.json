@@ -1,10 +1,10 @@
 {
     "packageName": "Hubitat drivers for NodOn smart devices",
-    "version": "1.0.0",
-    "releaseNotes": "v1.0.0\n - Add driver for NodOn Multifunction Relay (SIN-4-1-20)\n - Add driver for Relay Switch with Metering (SIN-4-1-21)\n - Add driver for Lighting Relay Switch (SIN-4-2-20)\n - Add driver for Pilot Wire Heating Module (SIN-4-FP-21)\n - Add driver for Roller Shutter Relay Switch (SIN-4-RS-20)",
+    "version": "1.1.0",
+    "releaseNotes": "v1.1.0\n - Small fixes for the new UI in Platform Update 2.4.0",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2024-06-08",
+    "dateReleased": "2024-12-30",
     "documentationLink": "https://dan-danache.github.io/hubitat/nodon-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",

@@ -3,6 +3,7 @@
  *
  * @see https://dan-danache.github.io/hubitat/nodon-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
@@ -54,7 +55,7 @@ metadata {
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
+            description: 'Select what messages appear in the "Logs" section',
             options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue: '1',
             required: true

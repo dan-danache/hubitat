@@ -16,7 +16,7 @@ import java.text.DecimalFormat
 input(
     name: 'openRunTime', type: 'number',
     title: 'Open run time',
-    description: '<small>Set seconds required to go from fully closed to fully open. Range 1s .. 600s.</small>',
+    description: 'Set seconds required to go from fully closed to fully open (range 1s .. 600s)',
     defaultValue: 1.00,
     range: '1..600',
     required: true
@@ -24,7 +24,7 @@ input(
 input(
     name: 'closeRunTime', type: 'number',
     title: 'Close run time',
-    description: '<small>Set seconds required to go from fully open to fully closed. Range 1s .. 600s.</small>',
+    description: 'Set seconds required to go from fully open to fully closed (range 1s .. 600s)',
     defaultValue: 1.00,
     range: '1..600',
     required: true

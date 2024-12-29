@@ -3,12 +3,13 @@
  *
  * @see https://dan-danache.github.io/hubitat/nodon-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'NodOn Multifunction Relay Switch (SIN-4-1-20)'
-@Field static final String DRIVER_VERSION = '1.0.0'
+@Field static final String DRIVER_VERSION = '1.1.0'
 
 // Fields for capabilities.RelaySwitch
 @Field static final Map<Integer, String> PULSE_DURATIONS = [
@@ -70,7 +71,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/nodon-drivers/img/NodOn_SIN-4-1-20.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                NodOn Multifunction Relay Switch (SIN-4-1-20) <small>v1.0.0</small><br>
+                NodOn Multifunction Relay Switch (SIN-4-1-20) <small>v1.1.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/nodon-drivers/#nodon-multifunction-relay-switch-sin-4-1-20" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-nodon-drivers/123853" target="_blank">community page</a><br>
@@ -81,7 +82,7 @@ metadata {
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
+            description: 'Select what messages appear in the "Logs" section',
             options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue: '1',
             required: true
@@ -92,7 +93,7 @@ metadata {
             name: 'powerOnBehavior',
             type: 'enum',
             title: 'Power On behaviour',
-            description: '<small>Select what happens after a power outage.</small>',
+            description: 'Select what happens after a power outage',
             options: ['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
             defaultValue: 'RESTORE_PREVIOUS_STATE',
             required: true
@@ -100,7 +101,7 @@ metadata {
         input(
             name: 'pulseDuration', type: 'enum',
             title: 'Relay Impulse Mode',
-            description: '<small>Disable Inpulse Mode or configure relay pulse duration.</small>',
+            description: 'Disable Inpulse Mode or configure relay pulse duration',
             options: PULSE_DURATIONS,
             defaultValue: '0',
             required: true
@@ -110,7 +111,7 @@ metadata {
         input(
             name: 'joinGroup', type: 'enum',
             title: 'Join a Zigbee group',
-            description: '<small>Select a Zigbee group you want to join.</small>',
+            description: 'Select a Zigbee group you want to join',
             options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
             defaultValue: '----',
             required: false

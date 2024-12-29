@@ -3,12 +3,13 @@
  *
  * @see https://dan-danache.github.io/hubitat/nodon-drivers/
  */
+import java.math.RoundingMode
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'NodOn Roller Shutter Relay Switch (SIN-4-RS-20)'
-@Field static final String DRIVER_VERSION = '1.0.0'
+@Field static final String DRIVER_VERSION = '1.1.0'
 
 // Fields for capability.WindowShade
 import java.text.DecimalFormat
@@ -53,7 +54,7 @@ metadata {
             name: 'helpInfo', type: 'hidden',
             title: '''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/nodon-drivers/img/NodOn_SIN-4-RS-20.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                NodOn Roller Shutter Relay Switch (SIN-4-RS-20) <small>v1.0.0</small><br>
+                NodOn Roller Shutter Relay Switch (SIN-4-RS-20) <small>v1.1.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/nodon-drivers/#nodon-roller-shutter-relay-switch-sin-4-rs-20" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-nodon-drivers/123853" target="_blank">community page</a><br>
@@ -64,7 +65,7 @@ metadata {
         input(
             name: 'logLevel', type: 'enum',
             title: 'Log verbosity',
-            description: '<small>Select what type of messages appear in the "Logs" section.</small>',
+            description: 'Select what messages appear in the "Logs" section',
             options: ['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue: '1',
             required: true
@@ -74,7 +75,7 @@ metadata {
         input(
             name: 'openRunTime', type: 'number',
             title: 'Open run time',
-            description: '<small>Set seconds required to go from fully closed to fully open. Range 1s .. 600s.</small>',
+            description: 'Set seconds required to go from fully closed to fully open (range 1s .. 600s)',
             defaultValue: 1.00,
             range: '1..600',
             required: true
@@ -82,7 +83,7 @@ metadata {
         input(
             name: 'closeRunTime', type: 'number',
             title: 'Close run time',
-            description: '<small>Set seconds required to go from fully open to fully closed. Range 1s .. 600s.</small>',
+            description: 'Set seconds required to go from fully open to fully closed (range 1s .. 600s)',
             defaultValue: 1.00,
             range: '1..600',
             required: true

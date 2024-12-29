@@ -18,7 +18,7 @@ cmds += "zdo bind 0x${device.deviceNetworkId} 0x${device.endpointId} 0x01 0x0702
 input(
     name: 'energyReportDelta', type: 'enum',
     title: 'Energy report frequency',
-    description: '<small>Configure when device reports total consumed energy.</small>',
+    description: 'Configure when device reports total consumed energy',
     options: [
          '100':'Report changes of +/- 0.1kWh',
          '500':'Report changes of +/- 0.5kWh',
@@ -30,7 +30,7 @@ input(
 input(
     name: 'powerReportDelta', type: 'enum',
     title: 'Power report frequency',
-    description: '<small>Configure when device reports current power demand.</small>',
+    description: 'Configure when device reports current power demand',
     options: [
           '2':'Report changes of +/- 2W',
          '10':'Report changes of +/- 10W',
@@ -77,7 +77,7 @@ cmds += zigbee.readAttribute(0x0702, 0x0400) // InstantaneousDemand
 // Report/Read Attributes Reponse: EnergySummation
 case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0000] }:
 case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
-    Long energy = Long.parseLong(msg.value, 16) * (state.multiplier ?: 1) / (state.divisor ?: 1000)
+    String energy = new BigDecimal(Long.parseLong(msg.value, 16) * (state.multiplier ?: 1) / (state.divisor ?: 1000)).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
     utils_sendEvent name:'energy', value:energy, unit:'kWh', descriptionText:"Total consumed energy is ${energy} kWh", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "EnergySummation=${msg.value} (${energy}kWh)"
     return
@@ -85,7 +85,7 @@ case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0000] }:
 // Report/Read Attributes Reponse: InstantaneousDemand
 case { contains it, [clusterInt:0x0702, commandInt:0x0A, attrInt:0x0400] }:
 case { contains it, [clusterInt:0x0702, commandInt:0x01, attrInt:0x0400] }:
-    Integer power = Integer.parseInt(msg.value, 16) * 1000 * (state.multiplier ?: 1) / (state.divisor ?: 1000)
+    String power = new BigDecimal(Integer.parseInt(msg.value, 16) * 1000 * (state.multiplier ?: 1) / (state.divisor ?: 1000)).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
     utils_sendEvent name:'power', value:power, unit:'Watt', descriptionText:"Current power demand is ${power} W", type:type
     utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Power=${msg.value} (${power}W)"
     return

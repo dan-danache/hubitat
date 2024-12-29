@@ -13,7 +13,7 @@
 input(
     name: 'joinGroup', type: 'enum',
     title: 'Join a Zigbee group',
-    description: '<small>Select a Zigbee group you want to join.</small>',
+    description: 'Select a Zigbee group you want to join',
     options: ['0000':'❌ Leave all Zigbee groups', '----':'- - - -'] + GROUPS,
     defaultValue: '----',
     required: false
