@@ -70,7 +70,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'Select what type of messages appear in the "Logs" section',
+            description:'Select what messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -78,13 +78,13 @@ metadata {
         // Inputs for devices.Gewiss_GWA1501
         input(
             name:'buttonType', type:'enum', title:'Button type', required:true,
-            description:'<small>Select wired buttons type.</small>',
+            description:'Select wired buttons type',
             options:BUTTON_TYPES,
             defaultValue:'toggle'
         )
         input(
             name:'enableContacts', type:'bool', title:'Use as Contact Sensor', required:true,
-            description:'<small>Track open/closed state using two Contact Sensor child devices.</small>',
+            description:'Track open/closed state using two Contact Sensor child devices',
             defaultValue:false
         )
     }

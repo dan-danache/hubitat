@@ -37,7 +37,7 @@ command 'setIndicatorStatus', [[name:'Status*', type:'ENUM', description:'Select
 // Inputs for devices.Ikea_E2006
 input(
     name:'pm25ReportDelta', type:'enum', title:'Sensor report frequency', required:true,
-    description:'<small>Adjust how often the device sends its PM 2.5 sensor data.</small>',
+    description:'Adjust how often the device sends its PM 2.5 sensor data',
     options:[
         '01': 'Very High - report changes of +/- 1μg/m3',
         '02': 'High - report changes of +/- 2μg/m3',
@@ -49,7 +49,7 @@ input(
 )
 input(
     name:'filterLifeTime', type:'enum', title:'Filter life time', required:true,
-    description:'<small>Configure time between filter changes (default 6 months).</small>',
+    description:'Configure time between filter changes (default 6 months)',
     options:[
          '90': '3 months',
         '180': '6 months',
@@ -60,7 +60,7 @@ input(
 )
 input(
     name:'childLock', type:'bool', title:'Child lock',
-    description:'<small>Lock physical controls, safeguarding against accidental operation.</small>',
+    description:'Lock physical controls, safeguarding against accidental operation',
     defaultValue:false
 )
 {{/ @inputs }}

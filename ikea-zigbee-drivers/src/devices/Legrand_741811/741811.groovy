@@ -5,7 +5,7 @@
 input(
     name: 'ledMode', type: 'enum',
     title: 'LED mode',
-    description: '<small>Select how the LED indicator behaves.</small>',
+    description: 'elect how the LED indicator behaves',
     options: [
         'ALWAYS_ON': 'Always On - LED remains lit at all times, making it easy to find in the dark',
         'ALWAYS_OFF': 'Always Off - LED remains off, ensuring total darkness',

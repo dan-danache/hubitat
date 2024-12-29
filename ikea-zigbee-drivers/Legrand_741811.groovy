@@ -64,7 +64,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'Select what type of messages appear in the "Logs" section',
+            description:'Select what messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -81,7 +81,7 @@ metadata {
         input(
             name: 'ledMode', type: 'enum',
             title: 'LED mode',
-            description: '<small>Select how the LED indicator behaves.</small>',
+            description: 'elect how the LED indicator behaves',
             options: [
                 'ALWAYS_ON': 'Always On - LED remains lit at all times, making it easy to find in the dark',
                 'ALWAYS_OFF': 'Always Off - LED remains off, ensuring total darkness',

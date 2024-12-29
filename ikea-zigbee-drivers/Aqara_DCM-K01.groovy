@@ -71,7 +71,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'Select what type of messages appear in the "Logs" section',
+            description:'Select what messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -79,7 +79,7 @@ metadata {
         // Inputs for devices.Aqara_DCM-K01
         input(
             name:'switchType', type:'enum', title:'Switch type', required:true,
-            description:'<small>What type of switches are connected to S1 and S2.</small>',
+            description:'What type of switches are connected to S1 and S2',
             options:[
                 '1':'Latching switch - toggle/rocker',
                 '2':'Momentary switch - push button',
@@ -89,7 +89,7 @@ metadata {
         )
         input(
             name:'operationModeS1', type:'enum', title:'Operation mode for Switch S1', required:true,
-            description:'<small>What happens when Switch S1 is used.</small>',
+            description:'What happens when Switch S1 is used',
             options:[
                 '1':'Standard - Switch S1 controls Relay L1',
                 '0':'Decoupled - Switch S1 only sends button events',
@@ -98,7 +98,7 @@ metadata {
         )
         input(
             name:'operationModeS2', type:'enum', title:'Operation mode for Switch S2', required:true,
-            description:'<small>What happens when Switch S2 is used.</small>',
+            description:'What happens when Switch S2 is used',
             options:[
                 '1':'Standard - Switch S2 controls Relay L2',
                 '0':'Decoupled - Switch S2 only sends button events',
@@ -107,7 +107,7 @@ metadata {
         )
         input(
             name:'relayMode', type:'enum', title:'Relay mode', required:true,
-            description:'<small>How Relay L1 and Relay L2 operate.</small>',
+            description:'How Relay L1 and Relay L2 operate',
             options:[
                 '0':'Wet contact - connect L to L1, L2 (jumper wire installed)',
                 '3':'Dry contact - connect LOUT to L1, L2 (no jumper wire)',
@@ -118,14 +118,14 @@ metadata {
         if ("${relayMode}" == '1') {
             input(
                 name:'pulseDuration', type:'number', title:'Pulse duration', required:true,
-                description:'<small>Only when Relay mode is Pulse. Range 200ms .. 2000ms.</small>',
+                description:'Only when Relay mode is Pulse (range 200ms .. 2000ms)',
                 range: '200..2000',
                 defaultValue: 1000
             )
         }
         input(
             name:'interlock', type:'enum', title:'Interlock', required:true,
-            description:'<small>Prevent both Relay L1 and Relay L2 being On at the same time.</small>',
+            description:'Prevent both Relay L1 and Relay L2 being On at the same time',
             options:[
                 '0':'Disabled - control lights and other devices',
                 '1':'Enabled - control bi-directional motors',
@@ -134,7 +134,7 @@ metadata {
         )
         input(
             name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
-            description:'<small>What happens after a power outage.</small>',
+            description:'What happens after a power outage',
             options:[
                 '0': 'Turn power On',
                 '2': 'Turn power Off',

@@ -15,7 +15,7 @@
 // Inputs for devices.Philips_RDM001
 input(
     name:'switchStyle', type:'enum', title:'Switch Style', required:true,
-    description:'<small>Select physical switch button configuration</small>',
+    description:'Select physical switch button configuration',
     options:RDM001_SWITCH_STYLE,
     defaultValue:'02'
 )

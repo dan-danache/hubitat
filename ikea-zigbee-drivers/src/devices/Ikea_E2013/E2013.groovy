@@ -10,7 +10,7 @@ command 'setContact', [[name:'State*', type:'ENUM', constraints:['open', 'closed
 // Inputs for devices.Ikea_E2013
 input(
     name:'swapOpenClosed', type:'bool', title:'Invert contact state', required:true,
-    description:'<small>Swaps "open" and "closed" status reports.</small>',
+    description:'Swaps "open" and "closed" status reports',
     defaultValue:false
 )
 {{/ @inputs }}

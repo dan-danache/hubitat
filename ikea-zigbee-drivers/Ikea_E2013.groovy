@@ -70,7 +70,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'Select what type of messages appear in the "Logs" section',
+            description:'Select what messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -78,7 +78,7 @@ metadata {
         // Inputs for devices.Ikea_E2013
         input(
             name:'swapOpenClosed', type:'bool', title:'Invert contact state', required:true,
-            description:'<small>Swaps "open" and "closed" status reports.</small>',
+            description:'Swaps "open" and "closed" status reports',
             defaultValue:false
         )
         

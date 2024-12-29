@@ -68,7 +68,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'Select what type of messages appear in the "Logs" section',
+            description:'Select what messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -84,7 +84,7 @@ metadata {
         // Inputs for devices.Ikea_E2204
         input(
             name:'childLock', type:'bool', title:'Child lock',
-            description:'<small>Lock physical button, safeguarding against accidental operation.</small>',
+            description:'Lock physical button, safeguarding against accidental operation',
             defaultValue:false
         )
         

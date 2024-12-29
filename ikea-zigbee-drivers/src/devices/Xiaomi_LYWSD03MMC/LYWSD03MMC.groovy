@@ -10,24 +10,24 @@ import java.math.RoundingMode
 // Inputs for devices.Xiaomi_LYWSD03MMC
 input(
     name:'temperatureCalibration', type:'number', title:'Temperature calibration', required:true,
-    description:'<small>Temperature calibration offset. Range -10.00°C .. 10.00°C.</small>',
+    description:'Temperature calibration offset (range -10.00°C .. 10.00°C)',
     range:'-10..10',
     defaultValue:0.00
 )
 input(
     name:'humidityCalibration', type:'number', title:'Humidity calibration', required:true,
-    description:'<small>Humidity calibration offset. Range -10.00% .. 10.00%.</small>',
+    description:'Humidity calibration offset (range -10.00% .. 10.00%)',
     range:'-10..10',
     defaultValue:0.00
 )
 input(
     name:'enableDisplay', type:'bool', title:'Enable device display', required:true,
-    description:'<small>Turn device display on.</small>',
+    description:'Keep device display on',
     defaultValue:true
 )
 input(
     name:'showSmiley', type:'bool', title:'Show smiley', required:true,
-    description:'<small>Show the smiley on the device screen.</small>',
+    description:'Show the smiley on the device screen',
     defaultValue:true
 )
 {{/ @inputs }}
@@ -100,14 +100,14 @@ case { contains it, [clusterInt:0x0405, commandInt:0x01, attrInt:0x0010] }:
 
 // Read Attributes: EnableDisplay
 case { contains it, [clusterInt:0x0204, commandInt:0x01, attrInt:0x0011] }:
-    enableDisplay = msg.value == '01' ? true : false
+    enableDisplay = msg.value == '01'
     device.updateSetting 'enableDisplay', [value:enableDisplay, type:'bool']
     utils_processedZclMessage 'Read Attributes Response', "EnableDisplay=${msg.value} (${enableDisplay})"
     return
 
 // Read Attributes: ShowSmiley
 case { contains it, [clusterInt:0x0204, commandInt:0x01, attrInt:0x0010] }:
-    showSmiley = msg.value == '01' ? true : false
+    showSmiley = msg.value == '01'
     device.updateSetting 'showSmiley', [value:showSmiley, type:'bool']
     utils_processedZclMessage 'Read Attributes Response', "ShowSmiley=${msg.value} (${showSmiley})"
     return

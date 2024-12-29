@@ -65,7 +65,7 @@ metadata {
         )
         input(
             name:'logLevel', type:'enum', title:'Log verbosity', required:true,
-            description:'Select what type of messages appear in the "Logs" section',
+            description:'Select what messages appear in the "Logs" section',
             options:['1':'Debug - log everything', '2':'Info - log important events', '3':'Warning - log events that require attention', '4':'Error - log errors'],
             defaultValue:'1'
         )
@@ -73,7 +73,7 @@ metadata {
         // Inputs for devices.Ikea_E1745
         input(
             name:'clearMotionPeriod', type:'enum', title:'Clear motion after', required:true,
-            description:'<small>Set status inactive if no motion is detected in this period.</small>',
+            description:'Set status inactive if no motion is detected in this period',
             options:[
                  '60': '1 minute',
                 '120': '2 minutes',
@@ -91,7 +91,7 @@ metadata {
         // Inputs for devices.Ikea_E1745
         input(
             name:'onlyTriggerInDimLight', type:'bool', title:'Only detect motion in the dark', required:true,
-            description:'<small>Select the night mode 🌙 option on device for this to work.</small>',
+            description:'Select the night mode 🌙 option on device for this to work',
             defaultValue:false
         )
         

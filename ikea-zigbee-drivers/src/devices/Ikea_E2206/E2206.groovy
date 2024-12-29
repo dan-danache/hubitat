@@ -16,7 +16,7 @@ command 'setIndicatorStatus', [[name:'Status*', type:'ENUM', description:'Select
 // Inputs for devices.Ikea_E2206
 input(
     name:'childLock', type:'bool', title:'Child lock',
-    description:'<small>Lock physical button, safeguarding against accidental operation.</small>',
+    description:'Lock physical button, safeguarding against accidental operation',
     defaultValue:false
 )
 {{/ @inputs }}
