@@ -11,7 +11,7 @@ capability 'Switch'
 input(
     name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
     description:'Select what happens after a power outage',
-    options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
+    options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state', 'TOGGLE':'Toggle state'],
     defaultValue:'RESTORE_PREVIOUS_STATE'
 )
 {{/ params.powerOnBehavior }}
@@ -63,7 +63,7 @@ if (powerOnBehavior == null) {
     device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
 }
 log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : 0xFF))
+cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : (powerOnBehavior == 'TOGGLE' ? 0x02 : 0xFF)))
 {{/ params.powerOnBehavior }}
 {{/ @updated }}
 {{!--------------------------------------------------------------------------}}

@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Inspelning Smart Plug (E2206)'
-@Field static final String DRIVER_VERSION = '5.3.0'
+@Field static final String DRIVER_VERSION = '5.4.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -65,7 +65,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2206.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Inspelning Smart Plug (E2206) <small>v5.3.0</small><br>
+                IKEA Inspelning Smart Plug (E2206) <small>v5.4.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#inspelning-smart-plug-e2206" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -84,7 +84,7 @@ metadata {
         input(
             name:'powerOnBehavior', type:'enum', title:'Power On behaviour', required:true,
             description:'Select what happens after a power outage',
-            options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state'],
+            options:['TURN_POWER_ON':'Turn power On', 'TURN_POWER_OFF':'Turn power Off', 'RESTORE_PREVIOUS_STATE':'Restore previous state', 'TOGGLE':'Toggle state'],
             defaultValue:'RESTORE_PREVIOUS_STATE'
         )
         
@@ -208,7 +208,7 @@ List<String> updated(boolean auto = false) {
         device.updateSetting 'powerOnBehavior', [value:powerOnBehavior, type:'enum']
     }
     log_info "🛠️ powerOnBehavior = ${powerOnBehavior}"
-    cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : 0xFF))
+    cmds += zigbee.writeAttribute(0x0006, 0x4003, 0x30, powerOnBehavior == 'TURN_POWER_OFF' ? 0x00 : (powerOnBehavior == 'TURN_POWER_ON' ? 0x01 : (powerOnBehavior == 'TOGGLE' ? 0x02 : 0xFF)))
     
     // Preferences for capability.PowerMeter
     if (powerReportDelta == null) {

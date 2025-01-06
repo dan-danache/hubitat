@@ -9,8 +9,10 @@ device:
     url: https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853
 
   fingerprints:
-  - firmwares: Unknown
+  - firmwares: /devbis/z03mmc
     value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0001,0405,0402,0204', outClusters:'0019', model:'LYWSD03MMC', manufacturer:'Xiaomi', controllerType:'ZGB'
+  - firmwares: /pvvx/ZigbeeTLc
+    value: fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0020,0204,0402,0405', outClusters:'0019', model:'LYWSD03MMC-z', manufacturer:'Xiaomi', controllerType:'ZGB'
 
   capabilities:
     - name: Sensor

@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Knycklan Water Valve Remote (E1841)'
-@Field static final String DRIVER_VERSION = '5.3.0'
+@Field static final String DRIVER_VERSION = '5.4.0'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -53,7 +53,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E1841.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Knycklan Water Valve Remote (E1841) <small>v5.3.0</small><br>
+                IKEA Knycklan Water Valve Remote (E1841) <small>v5.4.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#knycklan-water-valve-remote-e1841" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

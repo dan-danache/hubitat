@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'Vimar IoT Dial Thermostat (02973)'
-@Field static final String DRIVER_VERSION = '5.3.0'
+@Field static final String DRIVER_VERSION = '5.4.0'
 @Field static final Map<String, String> TH_MODES = ['00':'off', '03':'cool', '04':'heat']
 @Field static final Map<String, String> TH_STATES = ['00':'idle', '01':'heating', '02':'cooling']
 
@@ -51,7 +51,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Vimar_02973.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Vimar IoT Dial Thermostat (02973) <small>v5.3.0</small><br>
+                Vimar IoT Dial Thermostat (02973) <small>v5.4.0</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vimar-iot-dial-thermostat-02973" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

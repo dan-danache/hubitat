@@ -1097,7 +1097,7 @@ Unknown
 
 ### Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
 
-Converted from Bluetooth to Zigbee using this [Zigbee 3.0 Firmware](https://github.com/devbis/z03mmc) directly from the web browser (no wire soldering required).
+Converted from Bluetooth to use [devbis/z03mmc](https://github.com/devbis/z03mmc) or [pvvx/ZigbeeTLc](https://github.com/pvvx/ZigbeeTLc) Zigbee 3.0 firmwares directly from the web browser (no wire soldering required).
 
 | Parameter | Details |
 |-----------|---------|
