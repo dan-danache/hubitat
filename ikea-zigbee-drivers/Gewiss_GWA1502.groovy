@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'Gewiss 2-channel Contact Interface 230V (GWA1502)'
-@Field static final String DRIVER_VERSION = '5.4.0'
+@Field static final String DRIVER_VERSION = '5.4.1'
 
 // Fields for devices.Gewiss_GWA1502
 import com.hubitat.app.ChildDeviceWrapper
@@ -56,7 +56,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Gewiss_GWA1502.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Gewiss 2-channel Contact Interface 230V (GWA1502) <small>v5.4.0</small><br>
+                Gewiss 2-channel Contact Interface 230V (GWA1502) <small>v5.4.1</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#gewiss-2-channel-contact-interface-230v-gwa1502" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

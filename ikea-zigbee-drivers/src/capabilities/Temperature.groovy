@@ -31,10 +31,13 @@ case { contains it, [clusterInt:0x0402, commandInt:0x01, attrInt:0x0000] }:
         return
     }
 
+    Integer value = Integer.parseUnsignedInt(msg.value, 16)
+    if (value > 0x7FFF) value -= 0x10000
+
     // https://www.urbandictionary.com/define.php?term=Retard%20Unit
-    String temperature = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
+    String temperature = "${location.temperatureScale == 'C' ? value / 100 : Math.round((value * 0.018 + 32) * 100) / 100}"
     utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
-    utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
+    utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value} (${value})"
     return
 
 // Other events that we expect but are not usefull

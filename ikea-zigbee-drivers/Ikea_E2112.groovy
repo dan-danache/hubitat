@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'IKEA Vindstyrka Air Quality Sensor (E2112)'
-@Field static final String DRIVER_VERSION = '5.4.0'
+@Field static final String DRIVER_VERSION = '5.4.1'
 
 // Fields for capability.HealthCheck
 import groovy.time.TimeCategory
@@ -51,7 +51,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Ikea_E2112.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                IKEA Vindstyrka Air Quality Sensor (E2112) <small>v5.4.0</small><br>
+                IKEA Vindstyrka Air Quality Sensor (E2112) <small>v5.4.1</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#vindstyrka-air-quality-sensor-e2112" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>
@@ -372,10 +372,13 @@ void parse(String description) {
                 return
             }
         
+            Integer value = Integer.parseUnsignedInt(msg.value, 16)
+            if (value > 0x7FFF) value -= 0x10000
+        
             // https://www.urbandictionary.com/define.php?term=Retard%20Unit
-            String temperature = "${location.temperatureScale == 'C' ? Integer.parseInt(msg.value, 16) / 100 : Math.round((Integer.parseInt(msg.value, 16) * 0.018 + 32) * 100) / 100}"
+            String temperature = "${location.temperatureScale == 'C' ? value / 100 : Math.round((value * 0.018 + 32) * 100) / 100}"
             utils_sendEvent name:'temperature', value:temperature, unit:"°${location.temperatureScale}", descriptionText:"Temperature is ${temperature}°${location.temperatureScale}", type:type
-            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value}"
+            utils_processedZclMessage "${msg.commandInt == 0x0A ? 'Report' : 'Read'} Attributes Response", "Temperature=${msg.value} (${value})"
             return
         
         // Other events that we expect but are not usefull

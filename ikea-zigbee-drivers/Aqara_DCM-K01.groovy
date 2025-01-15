@@ -9,7 +9,7 @@ import groovy.transform.Field
 import com.hubitat.zigbee.DataType
 
 @Field static final String DRIVER_NAME = 'Aqara Dual Relay Module T2 (DCM-K01)'
-@Field static final String DRIVER_VERSION = '5.4.0'
+@Field static final String DRIVER_VERSION = '5.4.1'
 
 // Fields for capability.MultiRelay
 import com.hubitat.app.ChildDeviceWrapper
@@ -61,7 +61,7 @@ metadata {
             name:'helpInfo', type:'hidden',
             title:'''
             <div style="min-height:55px; background:transparent url('https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/img/Aqara_DCM-K01.webp') no-repeat left center;background-size:auto 55px;padding-left:60px">
-                Aqara Dual Relay Module T2 (DCM-K01) <small>v5.4.0</small><br>
+                Aqara Dual Relay Module T2 (DCM-K01) <small>v5.4.1</small><br>
                 <small><div>
                 • <a href="https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/#aqara-dual-relay-module-t2-dcm-k01" target="_blank">device details</a><br>
                 • <a href="https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853" target="_blank">community page</a><br>

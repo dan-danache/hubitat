@@ -4,6 +4,9 @@
         "BlockStartsWithBlankLine": {
             "enabled": false
         },
+        "CatchException": {
+            "enabled": false
+        },
         "CompileStatic": {
             "enabled": false
         },
@@ -37,6 +40,9 @@
         "NestedBlockDepth": {
             "enabled": false
         },
+        "NestedForLoop": {
+            "enabled": false
+        },
         "NoJavaUtilDate": {
             "enabled": false
         },
@@ -44,6 +50,12 @@
             "enabled": false
         },
         "PublicMethodsBeforeNonPublicMethods": {
+            "enabled": false
+        },
+        "StaticMethodsBeforeInstanceMethods": {
+            "enabled": false
+        },
+        "ThrowRuntimeException": {
             "enabled": false
         },
         "TrailingWhitespace": {
