@@ -5,10 +5,10 @@
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
     "dateReleased": "2025-01-17",
-    "documentationLink": "https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/",
+    "documentationLink": "https://dan-danache.github.io/hubitat/lgtv-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
-    "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
+    "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/main/LICENSE",
     "category": "Control",
     "tags": [ "Appliances", "LAN", "Multimedia" ],
     "drivers" : [

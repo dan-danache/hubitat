@@ -74,6 +74,14 @@
             "category": "Utility",
             "tags": [ "Motion Control", "Doors & Windows", "Lights & Switches"],
             "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/lumos-app/packageManifest.json"
+        },
+        {
+            "id": "832237ca-d029-4c3f-8a4b-9933efd00f21",
+            "name": "LGTV with webOS",
+            "description": "Control your LG webOS TV.",
+            "category": "Utility",
+            "tags": [ "Appliances", "LAN", "Multimedia" ],
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/main/lgtv-drivers/packageManifest.json"
         }
     ]
 }
