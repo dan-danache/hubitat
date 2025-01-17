@@ -49,7 +49,7 @@ Follow these steps in order to create a new LG TV device:
 1. Enter the TV IP address, then click **Save**.
 1. Check your TV screen and approve the notification that pops up.
 1. Select the **Commands** tab, then refresh the browser page.
-1. If the **State Variables** section does not populate with attributes, check the Hubitat logs for clues.
+1. If the **Current States** section does not populate with multiple attributes, check the Hubitat logs for clues.
 
 Have fun!
 
