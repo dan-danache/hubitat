@@ -7,11 +7,11 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.0.0'
+@Field static final String DRIVER_VERSION = '1.1.0'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
 metadata {
-    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/master/lgtv-driver/lgtv.groovy') {
+    definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/main/lgtv-drivers/lgtv-with-webos.groovy') {
         capability 'Actuator'
         capability 'Refresh'
         capability 'Switch'
@@ -103,18 +103,12 @@ void logsOff() {
 
 // capability.Refresh
 void refresh() {
-
-    // Reset state
-    state.activities = [:]
-
-    // Request data from the TV
     utils_sendMessage([type:'request', uri:'ssap://system/getSystemInfo'])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.update/getCurrentSWInformation'])
     utils_sendMessage([type:'request', uri:'ssap://audio/getVolume'])
     utils_sendMessage([type:'request', uri:'ssap://tv/getCurrentChannel'])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.connectionmanager/getinfo'])
     getAllActivities()
-    getCurrentActivity()
 
     //utils_sendMessage([type:'request', uri:'ssap://config/getConfigs', payload:[configNames:['tv.model.*']]])
 }
@@ -124,8 +118,8 @@ void on() {
     util_wakeOnLan(getDataValue('wifiMacAddress'))
     util_wakeOnLan(getDataValue('wiredMacAddress'))
 
-    // Start websocket in 5 seconds
-    runIn 5, 'connect'
+    // Start websocket in 7 seconds
+    runIn 7, 'connect'
 }
 void off() {
     utils_sendMessage([type:'request', uri:'ssap://system/turnOff'])
@@ -169,6 +163,14 @@ void deviceNotification(String text, String type = 'Toast') {
 
 // capability.MediaController
 void getAllActivities() {
+
+    // Remove old activities
+    Map<String, String> activities = [:]
+    activities['com.webos.app.home'] = 'Home'
+    activities['com.webos.app.livetv'] = 'Live TV'
+    activities['com.webos.app.miracast'] = 'Miracast'
+    state.activities = activities
+
     utils_sendMessage([type:'request', uri:'ssap://tv/getExternalInputList'])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/listLaunchPoints'])
 }
@@ -216,7 +218,7 @@ void disconnect() {
 
 void startupPolling() {
     if (!ipAddr || "${device.currentValue('sessionStatus', true)}" == 'online') return
-    log.debug 'Trying to connect ...'
+    log_debug 'Trying to connect ...'
     interfaces.webSocket.connect(useSSL ? "wss://${ipAddr}:3001/" : "ws://${ipAddr}:3000/", headers: ['Content-Type': 'application/json'], ignoreSSLIssues: true)
 }
 
@@ -225,6 +227,7 @@ void register() {
         type: 'register',
         payload: [
             'client-key': state.pk ?: '',
+            pairingType: 'PROMPT',
             manifest: [
                 appVersion: '1.1',
                 manifestVersion: 1,
@@ -324,15 +327,16 @@ void register() {
 void webSocketStatus(String message) {
     log_debug "Websocket status changed: ${message}"
 
-    // Update the "sessionStatus" attribute
     String sessionStatus = utils_parseStatus message
-    utils_sendEvent name:'sessionStatus', value:sessionStatus, descriptionText:"Websocket status is ${sessionStatus}", type:'physical'
 
-    // Register after socket open
+    // If websocket just opened, say hello (skip state checks)
     if (sessionStatus == 'online') {
-        utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:'physical'
-        register()
+        utils_sendMessage([type:'hello', id:'hello'], false)
+        return
     }
+
+    // Update "sessionStatus" attribute
+    utils_sendEvent name:'sessionStatus', value:sessionStatus, descriptionText:"Websocket status is ${sessionStatus}", type:'physical'
 }
 
 void parse(String description) {
@@ -346,9 +350,21 @@ void parse(String description) {
 
     switch (msg.type) {
 
+        // Hello response
+        case 'hello':
+            log_debug '▶ Proper protocol has been observed. Starting authentication ...'
+
+            // Update "sessionStatus" and "switch" attributes
+            utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:'physical'
+            utils_sendEvent name:'sessionStatus', value:'online', descriptionText:'Websocket status is online', type:'physical'
+
+            // Start registration
+            runIn 1, 'register'
+            return
+
         // Register successfull
         case 'registered':
-            log_debug '▶ Registration complete. Oh yeah!'
+            log_debug '▶ Authentication complete. Oh yeah!'
             state.pk = msg.payload['client-key']
 
             // Setup subscriptions
@@ -358,7 +374,7 @@ void parse(String description) {
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.tvpower/power/getPowerState'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.apiadapter/audio/getSoundOutput'])
 
-            // Auto refresh
+            // Say hello
             refresh()
             return
 
@@ -406,18 +422,15 @@ void parse(String description) {
                     Map activities = state.activities ?: [:]
                     payload.devices.each { activities[it.appId] = it.label }
                     state.activities = activities
-                    utils_sendEvent name:'activities', value:new JsonBuilder(activities*.value.sort()), descriptionText:"Supported activities is ${activities}", type:type
+                    runIn 5, 'updateActivities'
                     return
 
-                // Supported media activities
+                // Shortcuts configured on the TV home page
                 case { contains it, [launchPoints:null] }:
                     Map activities = state.activities ?: [:]
-                    activities['com.webos.app.home'] = 'Home'
-                    activities['com.webos.app.livetv'] = 'Live TV'
-                    activities['com.webos.app.miracast'] = 'Miracast'
                     payload.launchPoints.each { activities[it.id] = it.title }
                     state.activities = activities
-                    utils_sendEvent name:'activities', value:new JsonBuilder(activities*.value.sort()), descriptionText:"Supported activities is ${activities}", type:type
+                    runIn 5, 'updateActivities'
                     return
 
                 // System info
@@ -429,7 +442,7 @@ void parse(String description) {
                 // Software info
                 case { contains it, [sw_type:null] }:
                     utils_dataValue 'fwName', payload.model_name
-                    utils_dataValue 'fwVersion', "${payload.product_name} - ${payload.major_ver}.${payload.minor_ver}"
+                    utils_dataValue 'fwVersion', "${payload.product_name} / ${payload.major_ver}.${payload.minor_ver}"
                     return
 
                 // Toast/alert displayed on TV
@@ -503,7 +516,7 @@ private void log_error(String message) {
 // Helper methods (keep them simple, keep them dumb)
 // ===================================================================================================================
 
-private void utils_sendMessage(Map message) {
+private void utils_sendMessage(Map message, boolean checkState = true) {
     log_debug "◀ Sending websocket messages: ${message}"
 
     if (!ipAddr) {
@@ -511,12 +524,12 @@ private void utils_sendMessage(Map message) {
         return
     }
 
-    if ("${device.currentValue('switch', true)}" != 'on') {
+    if (checkState && "${device.currentValue('switch', true)}" != 'on') {
         log_info 'Device is not switched on. Command not sent.'
         return
     }
 
-    if ("${device.currentValue('sessionStatus', true)}" != 'online') {
+    if (checkState && "${device.currentValue('sessionStatus', true)}" != 'online') {
         log_info 'Websocket is not connected. Connecting now ...'
         connect()
         return
@@ -564,6 +577,11 @@ private void util_wakeOnLan(String macAddr) {
     String cmd = "wake on lan ${macAddr.replaceAll(':', '').toUpperCase()}"
     log_debug "◀ Sending LAN command: ${cmd}"
     sendHubCommand(new HubAction(cmd, Protocol.LAN))
+}
+
+void updateActivities() {
+    List<String> activities = state.activities*.value.sort()
+    utils_sendEvent name:'activities', value:new JsonBuilder(activities), descriptionText:"Supported activities is ${activities}", type:type
 }
 
 // switch/case syntactic sugar
