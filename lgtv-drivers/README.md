@@ -1,6 +1,6 @@
 # LGTV with webOS
 
-Hubitat driver for communicating with LG TV devices using webOS websockets.
+Hubitat driver to control LG TV devices using webOS websockets.
 
 Tested devices:
 - LG OLED evo C2 55 inch (OLED55C21LA) - webOSTV 7.0 / 23.20.56
