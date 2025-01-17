@@ -2,6 +2,10 @@
 
 Hubitat driver for communicating with LG TV devices using webOS websockets.
 
+Tested devices:
+- LG OLED evo C2 55 inch (OLED55C21LA) - webOSTV 7.0 / 23.20.56
+- LG OLED evo C2 48 inch (OLED48C21LA) - webOSTV 7.0 / 23.20.56
+
 ## Installation
 There are two ways to install the drivers: using Hubitat Package Manager (HPM) or manually importing the driver code.
 
@@ -48,6 +52,9 @@ Follow these steps in order to create a new LG TV device:
 1. If the **State Variables** section does not populate with attributes, check the Hubitat logs for clues.
 
 Have fun!
+
+---
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)
 
 
 
