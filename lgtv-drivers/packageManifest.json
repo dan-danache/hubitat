@@ -1,0 +1,24 @@
+{
+    "packageName": "LGTV with webOS",
+    "version": "1.0.0",
+    "releaseNotes": "v1.0.0\n - Initial release",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2025-01-17",
+    "documentationLink": "https://dan-danache.github.io/hubitat/ikea-zigbee-drivers/",
+    "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "licenseFile": "https://raw.githubusercontent.com/dan-danache/hubitat/master/LICENSE",
+    "category": "Control",
+    "tags": [ "Appliances", "LAN", "Multimedia" ],
+    "drivers" : [
+        {
+            "id" : "1111bd2d-76eb-4f0a-b2cc-2b5128a7367b",
+            "name": "LGTV with webOS",
+            "description": "Driver for LG webOS TV devices",
+            "namespace": "dandanache",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.0.0/lgtv-drivers/lgtv-with-webos.groovy",
+            "required": false
+        }
+    ]
+}
