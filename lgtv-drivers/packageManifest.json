@@ -18,7 +18,7 @@
             "description": "Driver for LG webOS TV devices",
             "namespace": "dandanache",
             "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.0.0/lgtv-drivers/lgtv-with-webos.groovy",
-            "required": false
+            "required": true
         }
     ]
 }
