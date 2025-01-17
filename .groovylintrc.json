@@ -22,6 +22,9 @@
         "DuplicateStringLiteral": {
             "enabled": false
         },
+        "EmptyCatchBlock": {
+            "enabled": false
+        },
         "IfStatementBraces": {
             "enabled": false
         },
