@@ -5,6 +5,7 @@ import groovy.transform.Field
 
 import hubitat.device.HubAction
 import hubitat.device.Protocol
+import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
 @Field static final String DRIVER_VERSION = '1.1.0'
@@ -65,6 +66,7 @@ void installed() {
     // Init state
     state.activities = [:]
     utils_sendEvent name:'switch', value:'off', descriptionText:'Power initialized to off', type:'digital'
+    utils_sendEvent name:'sessionStatus', value:'unknown', descriptionText:'Power initialized to off', type:'digital'
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -87,9 +89,9 @@ void updated(boolean auto = false) {
     // Auto-connect
     connect()
 
-    // Start polling
+    // Ping device every 1 minute to detect when it is turned on using the remote
     unschedule()
-    schedule '0 0/1 * ? * * *', 'startupPolling'
+    schedule '0 0/1 * ? * * *', 'pingDevice'
 }
 
 void logsOff() {
@@ -108,7 +110,6 @@ void refresh() {
     utils_sendMessage([type:'request', uri:'ssap://audio/getVolume'])
     utils_sendMessage([type:'request', uri:'ssap://tv/getCurrentChannel'])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.connectionmanager/getinfo'])
-    getAllActivities()
 
     //utils_sendMessage([type:'request', uri:'ssap://config/getConfigs', payload:[configNames:['tv.model.*']]])
 }
@@ -155,9 +156,9 @@ void channelDown() {
 // capability.Notification
 void deviceNotification(String text, String type = 'Toast') {
     if (type.startsWith('Toast')) {
-        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createToast', payload:[message:"${text}"]])
+        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createToast', payload:[message:text]])
     } else {
-        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createAlert', payload:[message:"${text}", buttons:[[label:'Dismiss']]]])
+        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createAlert', payload:[message:text, buttons:[[label:'Dismiss']]]])
     }
 }
 
@@ -216,17 +217,21 @@ void disconnect() {
     try { interfaces.webSocket.close() } catch (e) { }
 }
 
-void startupPolling() {
+void pingDevice() {
     if (!ipAddr || "${device.currentValue('sessionStatus', true)}" == 'online') return
-    log_debug 'Trying to connect ...'
-    interfaces.webSocket.connect(useSSL ? "wss://${ipAddr}:3001/" : "ws://${ipAddr}:3000/", headers: ['Content-Type': 'application/json'], ignoreSSLIssues: true)
+    log_debug "Pinging ${ipAddr} ..."
+    if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived == 1) connect()
 }
 
 void register() {
+    if (state.pk) {
+        utils_sendMessage([type:'register', payload:['client-key':state.pk]])
+        return
+    }
+
     utils_sendMessage([
         type: 'register',
         payload: [
-            'client-key': state.pk ?: '',
             pairingType: 'PROMPT',
             manifest: [
                 appVersion: '1.1',
@@ -304,7 +309,7 @@ void parse(String description) {
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.tvpower/power/getPowerState'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.apiadapter/audio/getSoundOutput'])
 
-            // Say hello
+            // Sync device state with Hubitat
             refresh()
             return
 
@@ -329,7 +334,7 @@ void parse(String description) {
                 // Current channel information
                 case { contains it, [channelNumber:null] }:
                     String channel = payload.channelNumber
-                    String channelName = payload.channelName ?: 'Unknown'
+                    String channelName = payload.channelName ?: 'unknown'
                     utils_sendEvent name:'channel', value:channel, descriptionText:"Channel is ${channel}", type:type
                     utils_sendEvent name:'channelName', value:channelName, descriptionText:"Channel name is ${channelName}", type:type
                     return
@@ -343,7 +348,7 @@ void parse(String description) {
                 // Current app changed
                 case { contains it, [appId:null] }:
                     utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:type
-                    String currentActivity = state.activities?.find { it.key == payload.appId }?.value ?: 'Unknown'
+                    String currentActivity = state.activities?.find { it.key == payload.appId }?.value ?: 'unknown'
                     utils_sendEvent name:'currentActivity', value:currentActivity, descriptionText:"Current activity is ${currentActivity}", type:type
                     return
 
@@ -373,11 +378,6 @@ void parse(String description) {
                 case { contains it, [sw_type:null] }:
                     utils_dataValue 'fwName', payload.model_name
                     utils_dataValue 'fwVersion', "${payload.product_name} / ${payload.major_ver}.${payload.minor_ver}"
-                    return
-
-                // Toast/alert displayed on TV
-                case { contains it, [toastId:null] }:
-                case { contains it, [alertId:null] }:
                     return
 
                 // Screen status
@@ -417,6 +417,8 @@ void parse(String description) {
                 case { contains it, [muteStatus:null] }:
                 case { contains it, [sessionId:null] }:
                 case { contains it, [volume:null] }:
+                case { contains it, [toastId:null] }:
+                case { contains it, [alertId:null] }:
                     return
             }
     }

@@ -35,11 +35,15 @@ More info about installing custom drivers is available in the [Official Document
 
 Follow these steps in order to create a new LG TV device:
 
+### Configure TV
 1. Make sure you are near your TV device, you cannot do this remotely.
 1. Make sure that the IP address for your LG TV is fixed, using DHCP reservations. This ensures that the IP address for your TV is not changing on every restart.
 1. Power on the TV, then open the TV settings.
-1. Find and disable the **Always Ready** option.
+1. Find and disable the **Always Ready** option (for OLED screens).
 1. Find and enable the **Network IP Control** and **Wake on LAN** options.
+1. Keep TV on for the following steps.
+
+### Add device
 1. In the Hubitat interface, go to **Devices**.
 1. Click **Add device**, then select **Virtual**.
 1. Select **LGTV with webOS** from the drivers list, then click **Next**.
