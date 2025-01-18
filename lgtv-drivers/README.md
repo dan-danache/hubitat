@@ -55,6 +55,8 @@ Follow these steps in order to create a new LG TV device:
 1. Select the **Commands** tab, then refresh the browser page.
 1. If the **Current States** section does not populate with multiple attributes, check the Hubitat logs for clues.
 
+![TV Attributes](img/attributes.png)
+
 Have fun!
 
 ---
