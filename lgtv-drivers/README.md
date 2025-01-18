@@ -57,6 +57,33 @@ Follow these steps in order to create a new LG TV device:
 
 ![TV Attributes](img/attributes.png)
 
+## Control options
+
+The following commands are available:
+
+### Power control
+- On / Off
+
+### Sound volume control
+- Volume Up / Volume Down
+- Set Volume
+- Mute / Unmute
+
+### Live TV channel control
+- Channel Up / Channel Down
+- Set Channel
+
+### Screen control
+- Screen On / Screen Off
+
+### App control
+- Get All Activities - Populate the **Activities** attribute with available options for the **Start Activity** command
+- Get Current Activity - Not actually needed as the current activity (running app) is automatically detected
+- Start Activity - Start the specified app on the TV
+
+### Notifications
+- Device Notification - Display a toast or an alert to the TV screen
+
 Have fun!
 
 ---
