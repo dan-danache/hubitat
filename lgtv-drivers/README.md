@@ -40,7 +40,7 @@ Follow these steps in order to create a new LG TV device:
 1. Make sure that the IP address for your LG TV is fixed, using DHCP reservations. This ensures that the IP address for your TV is not changing on every restart.
 1. Power on the TV, then open the TV settings.
 1. Find and disable the **Always Ready** option (for OLED screens).
-1. Find and enable the **Network IP Control** and **Wake on LAN** options.
+1. Find and enable the **Network IP Control** options.
 1. Keep TV on for the following steps.
 
 ### Add device
@@ -52,10 +52,13 @@ Follow these steps in order to create a new LG TV device:
 1. Select the **Preferences** tab.
 1. Enter the TV IP address, then click **Save**.
 1. Check your TV screen and approve the notification that pops up.
-1. Select the **Commands** tab, then refresh the browser page.
-1. If the **Current States** section does not populate with multiple attributes, check the Hubitat logs for clues (debug messages are displayed for 30 minutes).
+1. A toast notification should appear for a short time on your TV screen saying "Well done! Configuration is now complete".
+1. Select the **Commands** tab, then refresh the browser page (to reload the attributes list).
+1. If the **Current States** section does not populate with multiple attributes, check the Hubitat logs for clues. Debug messages are displayed for 30 minutes, then the log level automatically switches to **Info**.
 
 ![TV Attributes](img/attributes.png)
+
+![Device Data](img/device-data.png)
 
 ## Control options
 

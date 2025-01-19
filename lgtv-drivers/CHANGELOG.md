@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Use the "hello" message to test if the websocket is really open
 - Use ping to detect when device is online
-- Don't send the pairing request when we already have a Pairing Key
+- Don't send the pairing payload when we already have a Pairing Key
+- Autmatically enable Wake On Lan settings when device is first paired
 
 ## [1.0.0] - 2025-01-17
 ### Added

@@ -14,6 +14,7 @@ import hubitat.helper.NetworkUtils
 metadata {
     definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/main/lgtv-drivers/lgtv-with-webos.groovy') {
         capability 'Actuator'
+        capability 'Initialize'
         capability 'Refresh'
         capability 'Switch'
         capability 'AudioVolume'
@@ -21,10 +22,12 @@ metadata {
         capability 'Notification'
         capability 'MediaController'
 
-        attribute 'sessionStatus', 'enum', ['offline', 'online', 'unknown']
+        attribute 'networkStatus', 'enum', ['online', 'offline']
         attribute 'channelName', 'string'
         attribute 'screen', 'enum', ['on', 'off', 'standby']
         attribute 'soundOutput', 'string'
+        attribute 'pictureMode', 'string'
+        attribute 'soundMode', 'string'
     }
 
     command 'deviceNotification', [
@@ -66,7 +69,7 @@ void installed() {
     // Init state
     state.activities = [:]
     utils_sendEvent name:'switch', value:'off', descriptionText:'Power initialized to off', type:'digital'
-    utils_sendEvent name:'sessionStatus', value:'unknown', descriptionText:'Power initialized to off', type:'digital'
+    utils_sendEvent name:'networkStatus', value:'offline', descriptionText:'Network status initialized to offline', type:'digital'
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -86,12 +89,23 @@ void updated(boolean auto = false) {
     }
     log_info "🛠️ useSSL = ${useSSL}"
 
+    // Update device network Id
+    if (ipAddr != null) {
+        device.deviceNetworkId = ipAddr.tokenize('.').collect { String.format('%02X', it.toInteger()) }.join()
+    }
+
     // Auto-connect
     connect()
 
-    // Ping device every 1 minute to detect when it is turned on using the remote
+    // Ping every 1 minute to detect when TV is turned on using the remote
     unschedule()
     schedule '0 0/1 * ? * * *', 'pingDevice'
+}
+
+void pingDevice() {
+    if (!ipAddr || "${device.currentValue('networkStatus', true)}" == 'online') return
+    log_debug "Pinging ${ipAddr} ..."
+    if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived == 1) connect()
 }
 
 void logsOff() {
@@ -103,15 +117,32 @@ void logsOff() {
 // Implement Capabilities
 // ===================================================================================================================
 
+// capability.Initialize
+// This method will run when the hub starts
+void initialize() {
+    connect()
+}
+
 // capability.Refresh
 void refresh() {
-    utils_sendMessage([type:'request', uri:'ssap://system/getSystemInfo'])
-    utils_sendMessage([type:'request', uri:'ssap://com.webos.service.update/getCurrentSWInformation'])
+    log_debug '🎬 Refreshing device state ...'
+
+    // We also have subscription for this values
     utils_sendMessage([type:'request', uri:'ssap://audio/getVolume'])
     utils_sendMessage([type:'request', uri:'ssap://tv/getCurrentChannel'])
-    utils_sendMessage([type:'request', uri:'ssap://com.webos.service.connectionmanager/getinfo'])
 
+    // We can extend this further later on by allowing user control
+    utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'picture', keys:['pictureMode']]])
+    utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'sound', keys:['soundMode']]])
+
+    // These values rarely change, so we only request them on demand
+    utils_sendMessage([type:'request', uri:'ssap://com.webos.service.update/getCurrentSWInformation'])
+    utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'network', keys: ['deviceName']]])
+
+    // https://github.com/JPersson77/LGTVCompanion/blob/master/Docs/Commandline.md
     //utils_sendMessage([type:'request', uri:'ssap://config/getConfigs', payload:[configNames:['tv.model.*']]])
+    //utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'picture', keys: ['brightness', 'backlight', 'contrast', 'color', 'pictureMode']]])
+    //utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'sound', keys: ['soundMode']]])
 }
 
 // capability.Switch
@@ -217,15 +248,9 @@ void disconnect() {
     try { interfaces.webSocket.close() } catch (e) { }
 }
 
-void pingDevice() {
-    if (!ipAddr || "${device.currentValue('sessionStatus', true)}" == 'online') return
-    log_debug "Pinging ${ipAddr} ..."
-    if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived == 1) connect()
-}
-
 void register() {
     if (state.pk) {
-        utils_sendMessage([type:'register', payload:['client-key':state.pk]])
+        utils_sendMessage([type:'register', payload:['client-key':state.pk]], false)
         return
     }
 
@@ -262,16 +287,16 @@ void register() {
 void webSocketStatus(String message) {
     log_debug "Websocket status changed: ${message}"
 
-    String sessionStatus = utils_parseStatus message
+    String networkStatus = utils_parseStatus message
 
     // If websocket just opened, say hello (skip state checks)
-    if (sessionStatus == 'online') {
+    if (networkStatus == 'online') {
         utils_sendMessage([type:'hello', id:'hello'], false)
         return
     }
 
-    // Update "sessionStatus" attribute
-    utils_sendEvent name:'sessionStatus', value:sessionStatus, descriptionText:"Websocket status is ${sessionStatus}", type:'physical'
+    // Update "networkStatus" attribute
+    utils_sendEvent name:'networkStatus', value:networkStatus, descriptionText:"Network status is ${networkStatus}", type:'physical'
 }
 
 void parse(String description) {
@@ -285,19 +310,24 @@ void parse(String description) {
 
     switch (msg.type) {
 
-        // Hello response
+        // TV sent an error message
+        case 'error':
+            log_error "▶ Received error message from TV: ${msg.error}"
+            return
+
+        // Hello (request)
         case 'hello':
             log_debug '▶ Proper protocol has been observed. Starting authentication ...'
 
-            // Update "sessionStatus" and "switch" attributes
+            // Update "networkStatus" and "switch" attributes
             utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:'physical'
-            utils_sendEvent name:'sessionStatus', value:'online', descriptionText:'Websocket status is online', type:'physical'
+            utils_sendEvent name:'networkStatus', value:'online', descriptionText:'Network status is online', type:'physical'
 
             // Start registration
             runIn 1, 'register'
             return
 
-        // Register successfull
+        // Register (request)
         case 'registered':
             log_debug '▶ Authentication complete. Oh yeah!'
             state.pk = msg.payload['client-key']
@@ -309,13 +339,23 @@ void parse(String description) {
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.tvpower/power/getPowerState'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.apiadapter/audio/getSoundOutput'])
 
-            // Sync device state with Hubitat
-            refresh()
-            return
+            // First time with talk with this device
+            if (!getDataValue('modelName')) {
 
-        // TV sent an error message
-        case 'error':
-            log_error "▶ Received error message from TV: ${msg.error}"
+                // Enable Wake on LAN
+                log_debug 'Enabling Wake On LAN (WOL) ...'
+                utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'network', settings: ['wolwowlOnOff':'true']]])
+
+                // Get some device information that never changes
+                utils_sendMessage([type:'request', uri:'ssap://system/getSystemInfo'])
+                utils_sendMessage([type:'request', uri:'ssap://com.webos.service.connectionmanager/getinfo'])
+
+                // Send a notification on TV
+                deviceNotification '<b>Mesage from Hubitat</b><br>Well done! Configuration is now complete 👍'
+            }
+
+            // Auto-sync device state with Hubitat
+            refresh()
             return
 
         // TV sent a response to a command sent by us
@@ -323,7 +363,7 @@ void parse(String description) {
             Map payload = msg.payload
             switch (payload) {
 
-                // Volume status
+                // ssap://audio/getStatus (subscription)
                 case { contains it, [volumeStatus:null] }:
                     int volume = payload.volumeStatus.volume
                     String mute = payload.volumeStatus.muteStatus ? 'muted' : 'unmuted'
@@ -331,7 +371,7 @@ void parse(String description) {
                     utils_sendEvent name:'mute', value:mute, descriptionText:"Sound is ${mute}", type:type
                     return
 
-                // Current channel information
+                // ssap://tv/getCurrentChannel (subscription)
                 case { contains it, [channelNumber:null] }:
                     String channel = payload.channelNumber
                     String channelName = payload.channelName ?: 'unknown'
@@ -339,20 +379,20 @@ void parse(String description) {
                     utils_sendEvent name:'channelName', value:channelName, descriptionText:"Channel name is ${channelName}", type:type
                     return
 
-                // Shutdown
+                // ssap://com.webos.applicationManager/getForegroundAppInfo (subscription)
                 case { contains it, [appId:'', processId:'', windowId:''] }:
                     utils_sendEvent name:'switch', value:'off', descriptionText:'Power is off', type:type
                     disconnect()
                     return
 
-                // Current app changed
+                // ssap://com.webos.applicationManager/getForegroundAppInfo (subscription)
                 case { contains it, [appId:null] }:
                     utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:type
                     String currentActivity = state.activities?.find { it.key == payload.appId }?.value ?: 'unknown'
                     utils_sendEvent name:'currentActivity', value:currentActivity, descriptionText:"Current activity is ${currentActivity}", type:type
                     return
 
-                // Supported input list
+                // ssap://tv/getExternalInputList (request)
                 case { contains it, [devices:null] }:
                     Map activities = state.activities ?: [:]
                     payload.devices.each { activities[it.appId] = it.label }
@@ -360,7 +400,7 @@ void parse(String description) {
                     runIn 5, 'updateActivities'
                     return
 
-                // Shortcuts configured on the TV home page
+                // ssap://com.webos.applicationManager/listLaunchPoints (request)
                 case { contains it, [launchPoints:null] }:
                     Map activities = state.activities ?: [:]
                     payload.launchPoints.each { activities[it.id] = it.title }
@@ -368,19 +408,13 @@ void parse(String description) {
                     runIn 5, 'updateActivities'
                     return
 
-                // System info
-                case { contains it, [modelName:null] }:
-                    utils_dataValue 'modelName', payload.modelName
-                    utils_dataValue 'receiverType', payload.receiverType
-                    return
-
-                // Software info
+                // ssap://com.webos.service.update/getCurrentSWInformation (request)
                 case { contains it, [sw_type:null] }:
                     utils_dataValue 'fwName', payload.model_name
                     utils_dataValue 'fwVersion', "${payload.product_name} / ${payload.major_ver}.${payload.minor_ver}"
                     return
 
-                // Screen status
+                // ssap://com.webos.service.tvpower/power/turnOnScreen (request)
                 case { contains it, [state:'Screen Off'] }:
                     utils_sendEvent name:'screen', value:'off', descriptionText:'Screen is off', type:type
                     return
@@ -393,21 +427,40 @@ void parse(String description) {
                     utils_sendEvent name:'screen', value:'standby', descriptionText:'Screen is in active standby', type:type
                     return
 
-                // Grab MAC addresses
-                case { contains it, [wifiInfo:null] }:
-                case { contains it, [wiredInfo:null] }:
-                    String wifiMac = payload.wifiInfo?.macAddress
-                    String wiredMac = payload.wiredInfo?.macAddress
-                    if (wifiMac) utils_dataValue 'wifiMacAddress', wifiMac
-                    if (wiredMac) utils_dataValue 'wiredMacAddress', wiredMac
+                // ssap://system/getSystemInfo (request)
+                case { contains it, [modelName:null] }:
+                    utils_dataValue 'modelName', payload.modelName
+                    utils_dataValue 'receiverType', payload.receiverType
                     return
 
-                // Pairing prompt
+                // ssap://com.webos.service.connectionmanager/getinfo (request)
+                case { contains it, [wifiInfo:null] }:
+                case { contains it, [wiredInfo:null] }:
+                    utils_dataValue 'wifiMacAddress', payload.wifiInfo?.macAddress
+                    utils_dataValue 'wiredMacAddress', payload.wiredInfo?.macAddress
+                    return
+
+                // ssap://settings/getSystemSettings (request)
+                case { contains it, [category:'network'] }:
+                    utils_dataValue 'networkName', payload.settings?.deviceName
+                    return
+
+                case { contains it, [category:'picture'] }:
+                    String pictureMode = payload.settings?.pictureMode
+                    utils_sendEvent name:'pictureMode', value:pictureMode, descriptionText:"Picture mode is ${pictureMode}", type:type
+                    return
+
+                case { contains it, [category:'sound'] }:
+                    String soundMode = payload.settings?.soundMode
+                    utils_sendEvent name:'soundMode', value:soundMode, descriptionText:"Sound mode is ${soundMode}", type:type
+                    return
+
+                // Pairing prompt (request)
                 case { contains it, [pairingType:'PROMPT'] }:
                     log_warn '🙋‍♂️ Go and accept the pairing request on your TV screen. HAUL ASS!'
                     return
 
-                // Sound output
+                // ssap://audio/getVolume (request)
                 case { contains it, [soundOutput:null] }:
                     String soundOutput = payload.soundOutput
                     utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
@@ -419,12 +472,13 @@ void parse(String description) {
                 case { contains it, [volume:null] }:
                 case { contains it, [toastId:null] }:
                 case { contains it, [alertId:null] }:
+                case { contains it, [returnValue:true, method:'setSystemSettings'] }:
                     return
             }
     }
 
     // Unexpected websocket message
-    log_error "🚩 Received unexpected websocket message: description=${description}, msg=${msg}"
+    log_error "🚩 Received unexpected websocket message: description=${description}"
 }
 
 // ===================================================================================================================
@@ -456,14 +510,14 @@ private void utils_sendMessage(Map message, boolean checkState = true) {
         return
     }
 
-    if (checkState && "${device.currentValue('switch', true)}" != 'on') {
+    if (checkState && "${device.currentValue('switch')}" != 'on') {
         log_info 'Device is not switched on. Command not sent.'
         return
     }
 
-    if (checkState && "${device.currentValue('sessionStatus', true)}" != 'online') {
-        log_info 'Websocket is not connected. Connecting now ...'
-        connect()
+    if (checkState && "${device.currentValue('networkStatus')}" != 'online') {
+        log_info 'Websocket is not connected anymore. Connecting now ...'
+        runIn 1, 'connect'
         return
     }
 
@@ -500,7 +554,7 @@ private String utils_parseStatus(String message) {
         case ~/^failure: .*/:
             log_warn "Oh snap! ${message}"
             return 'offline'
-        default: return 'unknown'
+        default: return 'offline'
     }
 }
 
