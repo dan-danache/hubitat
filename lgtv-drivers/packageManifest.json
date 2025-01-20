@@ -1,10 +1,10 @@
 {
     "packageName": "LGTV with webOS",
-    "version": "1.0.0",
-    "releaseNotes": "v1.0.0\n - Initial release",
+    "version": "1.1.0",
+    "releaseNotes": "v1.1.0\n - Use the \"hello\" message to test if the websocket is really open\n - Use ping to detect when TV becomes online\n - Don't send the big pairing payload when we already have a Pairing Key\n - Automatically enable Wake On Lan settings when TV is first paired\n - Show a \"Well done\" toast on TV screen on successfull pairing\n - Add \"setPictureMode\" and \"setSoundOutput\" commands\n - Add ping interval preference",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2025-01-17",
+    "dateReleased": "2025-01-20",
     "documentationLink": "https://dan-danache.github.io/hubitat/lgtv-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
@@ -17,7 +17,7 @@
             "name": "LGTV with webOS",
             "description": "Driver for LG webOS TV devices",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.0.0/lgtv-drivers/lgtv-with-webos.groovy",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.1.0/lgtv-drivers/lgtv-with-webos.groovy",
             "required": true
         }
     ]

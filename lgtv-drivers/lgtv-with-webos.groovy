@@ -11,6 +11,10 @@ import hubitat.helper.NetworkUtils
 @Field static final String DRIVER_VERSION = '1.1.0'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
+@Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
+@Field static final List<String> SOUND_MODES = ['aiSoundPlus', 'aiSound', 'standard', 'news', 'music', 'movie', 'sports', 'game']
+@Field static final List<String> SOUND_OUTPUT = ['tv_speaker', 'external_arc', 'external_optical', 'bt_soundbar', 'mobile_phone', 'lineout', 'headphone', 'tv_speaker_bluetooth']
+
 metadata {
     definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/main/lgtv-drivers/lgtv-with-webos.groovy') {
         capability 'Actuator'
@@ -25,9 +29,9 @@ metadata {
         attribute 'networkStatus', 'enum', ['online', 'offline']
         attribute 'channelName', 'string'
         attribute 'screen', 'enum', ['on', 'off', 'standby']
-        attribute 'soundOutput', 'string'
-        attribute 'pictureMode', 'string'
-        attribute 'soundMode', 'string'
+        attribute 'pictureMode', 'enum', PICTURE_MODES
+        attribute 'soundOutput', 'enum', SOUND_OUTPUT
+        attribute 'soundMode', 'enum', SOUND_MODES
     }
 
     command 'deviceNotification', [
@@ -37,6 +41,8 @@ metadata {
     command 'setChannel', [[name:'Channel number*', type:'NUMBER']]
     command 'screenOn'
     command 'screenOff'
+    command 'setPictureMode', [[name:'Mode', type:'ENUM', description:'Select picture mode', constraints:PICTURE_MODES.sort()]]
+    command 'setSoundOutput', [[name:'Output', type:'ENUM', description:'Select sound output', constraints:SOUND_OUTPUT.sort()]]
 
     preferences {
         input(
@@ -59,6 +65,20 @@ metadata {
             description:'Enable SSL when connecting to the TV websocket',
             defaultValue:true
         )
+        input(
+            name:'pingInterval', type:'enum', title:'Ping interval', required:true,
+            description: 'Choose how often to check if the TV was turned on using the remote',
+            options: [
+                 '0' : 'Off',
+                 '1' : '1 minute',
+                 '2' : '2 minutes',
+                 '3' : '3 minutes',
+                 '5' : '5 minutes',
+                '10' : '10 minutes',
+                '20' : '20 minutes'
+            ],
+            defaultValue: '5'
+        )
     }
 }
 
@@ -75,6 +95,7 @@ void installed() {
 // Called when the "Save Preferences" button is clicked
 void updated(boolean auto = false) {
     log_info "Saving preferences${auto ? ' (auto)' : ''} ..."
+    unschedule()
 
     if (logLevel == null) {
         logLevel = '1'
@@ -83,23 +104,26 @@ void updated(boolean auto = false) {
     if (logLevel == '1') runIn 1800, 'logsOff'
     log_info "🛠️ logLevel = ${logLevel}"
 
+    // Update device network Id
+    if (ipAddr != null) {
+        device.deviceNetworkId = ipAddr.tokenize('.').collect { String.format('%02X', it.toInteger()) }.join()
+        connect()
+    }
+
     if (useSSL == null) {
         useSSL = true
         device.updateSetting('useSSL', [value:useSSL, type:'enum'])
     }
     log_info "🛠️ useSSL = ${useSSL}"
 
-    // Update device network Id
-    if (ipAddr != null) {
-        device.deviceNetworkId = ipAddr.tokenize('.').collect { String.format('%02X', it.toInteger()) }.join()
+    if (pingInterval == null) {
+        pingInterval = '5'
+        device.updateSetting('pingInterval', [value:pingInterval, type:'enum'])
     }
+    log_info "🛠️ pingInterval = ${pingInterval} min"
 
-    // Auto-connect
-    connect()
-
-    // Ping every 1 minute to detect when TV is turned on using the remote
-    unschedule()
-    schedule '0 0/1 * ? * * *', 'pingDevice'
+    // Schedule priodic device ping
+    if (pingInterval != '0') schedule "0 0/${pingInterval} * ? * * *", 'pingDevice'
 }
 
 void pingDevice() {
@@ -131,11 +155,8 @@ void refresh() {
     utils_sendMessage([type:'request', uri:'ssap://audio/getVolume'])
     utils_sendMessage([type:'request', uri:'ssap://tv/getCurrentChannel'])
 
-    // We can extend this further later on by allowing user control
-    utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'picture', keys:['pictureMode']]])
-    utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'sound', keys:['soundMode']]])
-
     // These values rarely change, so we only request them on demand
+    utils_sendMessage([type:'request', uri:'ssap://system/getSystemInfo'])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.update/getCurrentSWInformation'])
     utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'network', keys: ['deviceName']]])
 
@@ -228,6 +249,12 @@ void screenOn() {
 void screenOff() {
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.tvpower/power/turnOffScreen', payload:[standbyMode:'active']])
 }
+void setPictureMode(String mode) {
+    utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'picture', settings: ['pictureMode':mode]]])
+}
+void setSoundOutput(String output) {
+    utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'sound', settings: ['soundOutput':output]]])
+}
 
 // ===================================================================================================================
 // Websocket helpers
@@ -310,7 +337,7 @@ void parse(String description) {
 
     switch (msg.type) {
 
-        // TV sent an error message
+        // TV sent an error message. Oh noes!
         case 'error':
             log_error "▶ Received error message from TV: ${msg.error}"
             return
@@ -337,7 +364,8 @@ void parse(String description) {
             utils_sendMessage([type:'subscribe', uri:'ssap://tv/getCurrentChannel'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.applicationManager/getForegroundAppInfo'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.tvpower/power/getPowerState'])
-            utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.apiadapter/audio/getSoundOutput'])
+            utils_sendMessage([type:'subscribe', uri:'ssap://settings/getSystemSettings', payload:[category:'picture', keys:['pictureMode']]])
+            utils_sendMessage([type:'subscribe', uri:'ssap://settings/getSystemSettings', payload:[category:'sound', keys:['soundMode', 'soundOutput']]])
 
             // First time with talk with this device
             if (!getDataValue('modelName')) {
@@ -385,11 +413,24 @@ void parse(String description) {
                     disconnect()
                     return
 
-                // ssap://com.webos.applicationManager/getForegroundAppInfo (subscription)
                 case { contains it, [appId:null] }:
                     utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:type
                     String currentActivity = state.activities?.find { it.key == payload.appId }?.value ?: 'unknown'
                     utils_sendEvent name:'currentActivity', value:currentActivity, descriptionText:"Current activity is ${currentActivity}", type:type
+                    return
+
+                // ssap://settings/getSystemSettings (subscription)
+                case { contains it, [category:'picture'] }:
+                    String pictureMode = payload.settings?.pictureMode
+                    utils_sendEvent name:'pictureMode', value:pictureMode, descriptionText:"Picture mode is ${pictureMode}", type:type
+                    return
+
+                case { contains it, [category:'sound'] }:
+                    String soundOutput = payload.settings?.soundOutput
+                    if (soundOutput) utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
+
+                    String soundMode = payload.settings?.soundMode
+                    if (soundMode) utils_sendEvent name:'soundMode', value:soundMode, descriptionText:"Sound mode is ${soundMode}", type:type
                     return
 
                 // ssap://tv/getExternalInputList (request)
@@ -408,9 +449,13 @@ void parse(String description) {
                     runIn 5, 'updateActivities'
                     return
 
+                // ssap://settings/getSystemSettings (request)
+                case { contains it, [category:'network'] }:
+                    utils_dataValue 'networkName', payload.settings?.deviceName
+                    return
+
                 // ssap://com.webos.service.update/getCurrentSWInformation (request)
                 case { contains it, [sw_type:null] }:
-                    utils_dataValue 'fwName', payload.model_name
                     utils_dataValue 'fwVersion', "${payload.product_name} / ${payload.major_ver}.${payload.minor_ver}"
                     return
 
@@ -438,21 +483,6 @@ void parse(String description) {
                 case { contains it, [wiredInfo:null] }:
                     utils_dataValue 'wifiMacAddress', payload.wifiInfo?.macAddress
                     utils_dataValue 'wiredMacAddress', payload.wiredInfo?.macAddress
-                    return
-
-                // ssap://settings/getSystemSettings (request)
-                case { contains it, [category:'network'] }:
-                    utils_dataValue 'networkName', payload.settings?.deviceName
-                    return
-
-                case { contains it, [category:'picture'] }:
-                    String pictureMode = payload.settings?.pictureMode
-                    utils_sendEvent name:'pictureMode', value:pictureMode, descriptionText:"Picture mode is ${pictureMode}", type:type
-                    return
-
-                case { contains it, [category:'sound'] }:
-                    String soundMode = payload.settings?.soundMode
-                    utils_sendEvent name:'soundMode', value:soundMode, descriptionText:"Sound mode is ${soundMode}", type:type
                     return
 
                 // Pairing prompt (request)
