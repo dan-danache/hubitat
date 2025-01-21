@@ -1,7 +1,7 @@
 {
     "packageName": "LGTV with webOS",
-    "version": "1.1.1",
-    "releaseNotes": "v1.1.1\n - Also use \"getMACFromIP()\" to determine MAC when sending the WOL message",
+    "version": "1.1.2",
+    "releaseNotes": "v1.1.2\n - Set `switch:off` immediately when the "Off command is sent"",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
     "dateReleased": "2025-01-21",
@@ -17,7 +17,7 @@
             "name": "LGTV with webOS",
             "description": "Driver to control LG TV devices using webOS websockets.",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.1.1/lgtv-drivers/lgtv-with-webos.groovy",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.1.2/lgtv-drivers/lgtv-with-webos.groovy",
             "required": true
         }
     ]

@@ -8,7 +8,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.1.1'
+@Field static final String DRIVER_VERSION = '1.1.2'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
@@ -177,6 +177,7 @@ void on() {
 }
 void off() {
     utils_sendMessage([type:'request', uri:'ssap://system/turnOff'])
+    utils_sendEvent name:'switch', value:'off', descriptionText:'Power is off', type:type
 }
 
 // capability.AudioVolume
@@ -255,6 +256,7 @@ void setPictureMode(String mode) {
 }
 void setSoundOutput(String output) {
     utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'sound', settings: ['soundOutput':output]]])
+    //utils_sendMessage([type:'request', uri:'com.webos.service.apiadapter/audio/changeSoundOutput', payload:[output:output]]])
 }
 
 // ===================================================================================================================
@@ -396,8 +398,10 @@ void parse(String description) {
                 case { contains it, [volumeStatus:null] }:
                     int volume = payload.volumeStatus.volume
                     String mute = payload.volumeStatus.muteStatus ? 'muted' : 'unmuted'
+                    String soundOutput = payload.volumeStatus.soundOutput
                     utils_sendEvent name:'volume', value:volume, unit:'%', descriptionText:"Sound volume is ${volume}%", type:type
                     utils_sendEvent name:'mute', value:mute, descriptionText:"Sound is ${mute}", type:type
+                    if (soundOutput) utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
                     return
 
                 // ssap://tv/getCurrentChannel (subscription)
@@ -494,7 +498,7 @@ void parse(String description) {
                 // ssap://audio/getVolume (request)
                 case { contains it, [soundOutput:null] }:
                     String soundOutput = payload.soundOutput
-                    utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
+                    if (soundOutput) utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
                     return
 
                 // Other messages we don't care about
