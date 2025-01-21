@@ -1,7 +1,7 @@
 {
     "packageName": "LGTV with webOS",
     "version": "1.2.0",
-    "releaseNotes": "v1.1.2\n - Add \"Start Video\" command\n - Add \"Start Web Page\" command",
+    "releaseNotes": "v1.2.0\n - Add \"Start Video\" command\n - Add \"Start Web Page\" command",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
     "dateReleased": "2025-01-21",
