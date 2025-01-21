@@ -8,7 +8,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.1.0'
+@Field static final String DRIVER_VERSION = '1.1.1'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
@@ -170,6 +170,7 @@ void refresh() {
 void on() {
     util_wakeOnLan(getDataValue('wifiMacAddress'))
     util_wakeOnLan(getDataValue('wiredMacAddress'))
+    if (ipAddr) util_wakeOnLan(getMACFromIP(ipAddr))
 
     // Start websocket in 7 seconds
     runIn 7, 'connect'
@@ -589,7 +590,7 @@ private String utils_parseStatus(String message) {
 }
 
 private void util_wakeOnLan(String macAddr) {
-    if (!macAddr) return
+    if (macAddr == null || macAddr == '') return
     String cmd = "wake on lan ${macAddr.replaceAll(':', '').toUpperCase()}"
     log_debug "◀ Sending LAN command: ${cmd}"
     sendHubCommand(new HubAction(cmd, Protocol.LAN))

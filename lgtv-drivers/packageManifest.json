@@ -1,10 +1,10 @@
 {
     "packageName": "LGTV with webOS",
-    "version": "1.1.0",
-    "releaseNotes": "v1.1.0\n - Use the \"hello\" message to test if the websocket is really open\n - Use ping to detect when TV becomes online\n - Don't send the big pairing payload when we already have a Pairing Key\n - Automatically enable Wake On Lan settings when TV is first paired\n - Show a \"Well done\" toast on TV screen on successfull pairing\n - Add \"setPictureMode\" and \"setSoundOutput\" commands\n - Add ping interval preference",
+    "version": "1.1.1",
+    "releaseNotes": "v1.1.1\n - Also use \"getMACFromIP()\" to determine MAC when sending the WOL message",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2025-01-20",
+    "dateReleased": "2025-01-21",
     "documentationLink": "https://dan-danache.github.io/hubitat/lgtv-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
@@ -15,9 +15,9 @@
         {
             "id" : "1111bd2d-76eb-4f0a-b2cc-2b5128a7367b",
             "name": "LGTV with webOS",
-            "description": "Driver for LG webOS TV devices",
+            "description": "Driver to control LG TV devices using webOS websockets.",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.1.0/lgtv-drivers/lgtv-with-webos.groovy",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.1.1/lgtv-drivers/lgtv-with-webos.groovy",
             "required": true
         }
     ]
