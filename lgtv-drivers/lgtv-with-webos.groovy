@@ -8,7 +8,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.1.2'
+@Field static final String DRIVER_VERSION = '1.2.0'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
@@ -28,21 +28,23 @@ metadata {
 
         attribute 'networkStatus', 'enum', ['online', 'offline']
         attribute 'channelName', 'string'
-        attribute 'screen', 'enum', ['on', 'off', 'standby']
+        attribute 'screen', 'enum', ['on', 'off', 'standby', 'screensaver']
         attribute 'pictureMode', 'enum', PICTURE_MODES
         attribute 'soundOutput', 'enum', SOUND_OUTPUT
         attribute 'soundMode', 'enum', SOUND_MODES
     }
 
     command 'deviceNotification', [
-        [name:'Text', type:'STRING', description:'Notification text*'],
+        [name:'Text*', type:'STRING', description:'Notification text*'],
         [name:'Type', type:'ENUM', description:'Notification type', constraints:['Toast - Goes away after few seconds', 'Alert - Stays on screen until dismissed']]
     ]
     command 'setChannel', [[name:'Channel number*', type:'NUMBER']]
     command 'screenOn'
     command 'screenOff'
-    command 'setPictureMode', [[name:'Mode', type:'ENUM', description:'Select picture mode', constraints:PICTURE_MODES.sort()]]
-    command 'setSoundOutput', [[name:'Output', type:'ENUM', description:'Select sound output', constraints:SOUND_OUTPUT.sort()]]
+    command 'setPictureMode', [[name:'Mode*', type:'ENUM', description:'Select picture mode', constraints:PICTURE_MODES.sort()]]
+    command 'setSoundOutput', [[name:'Output*', type:'ENUM', description:'Select sound output', constraints:SOUND_OUTPUT.sort()]]
+    command 'startVideo', [[name:'URL*', type:'STRING', description:'URL of video file to play']]
+    command 'startWebPage', [[name:'URL*', type:'STRING', description:'URL to open in Web Browser']]
 
     preferences {
         input(
@@ -168,6 +170,7 @@ void refresh() {
 
 // capability.Switch
 void on() {
+    log_debug '🎬 Powering on ...'
     util_wakeOnLan(getDataValue('wifiMacAddress'))
     util_wakeOnLan(getDataValue('wiredMacAddress'))
     if (ipAddr) util_wakeOnLan(getMACFromIP(ipAddr))
@@ -176,39 +179,48 @@ void on() {
     runIn 7, 'connect'
 }
 void off() {
+    log_debug '🎬 Powering off ...'
     utils_sendMessage([type:'request', uri:'ssap://system/turnOff'])
-    utils_sendEvent name:'switch', value:'off', descriptionText:'Power is off', type:type
+    utils_sendEvent name:'switch', value:'off', descriptionText:'Power is off', type:'digital'
 }
 
 // capability.AudioVolume
 void mute() {
+    log_debug '🎬 Muting sound ...'
     utils_sendMessage([type:'request', uri:'ssap://audio/setMute', payload:[mute:true]])
 }
 void unmute() {
+    log_debug '🎬 Unmuting sound ...'
     utils_sendMessage([type:'request', uri:'ssap://audio/setMute', payload:[mute:false]])
 }
 void volumeUp() {
+    log_debug '🎬 Raising volume ...'
     utils_sendMessage([type:'request', uri:'ssap://audio/volumeUp'])
 }
 void volumeDown() {
+    log_debug '🎬 Lowering volume ...'
     utils_sendMessage([type:'request', uri:'ssap://audio/volumeDown'])
 }
 void setVolume(String level) { setVolume Integer.parseInt(level) }
 void setVolume(BigDecimal level) {
+    log_debug "🎬 Setting volume to ${level}% ..."
     if (level < 0 || level > 100) return
     utils_sendMessage([type:'request', uri:'ssap://audio/setVolume', payload:[volume:level]])
 }
 
 // capability.TV
 void channelUp() {
+    log_debug '🎬 Changing channel up ...'
     utils_sendMessage([type:'request', uri:'ssap://tv/channelUp'])
 }
 void channelDown() {
+    log_debug '🎬 Changing channel down ...'
     utils_sendMessage([type:'request', uri:'ssap://tv/channelDown'])
 }
 
 // capability.Notification
 void deviceNotification(String text, String type = 'Toast') {
+    log_debug "🎬 Sending ${type} notification ..."
     if (type.startsWith('Toast')) {
         utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createToast', payload:[message:text]])
     } else {
@@ -218,6 +230,7 @@ void deviceNotification(String text, String type = 'Toast') {
 
 // capability.MediaController
 void getAllActivities() {
+    log_debug '🎬 Getting all activities ...'
 
     // Remove old activities
     Map<String, String> activities = [:]
@@ -230,9 +243,11 @@ void getAllActivities() {
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/listLaunchPoints'])
 }
 void getCurrentActivity() {
+    log_debug '🎬 Getting current activity ...'
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/getForegroundAppInfo'])
 }
 void startActivity(String activityname) {
+    log_debug "🎬 Starting activity: [${activityname}] ..."
     String appId = state.activities.find { it.value == activityname }?.key ?: activityname
     log_debug "Launching ${activityname} (${appId})"
     utils_sendMessage([type:'request', uri:'ssap://system.launcher/launch', payload:[id:appId]])
@@ -243,20 +258,41 @@ void startActivity(String activityname) {
 // ===================================================================================================================
 void setChannel(String channel) { setChannel Integer.parseInt(channel) }
 void setChannel(BigDecimal channel) {
+    log_debug "🎬 Changing channel to [${channel}] ..."
     utils_sendMessage([type:'request', uri:'ssap://tv/openChannel', payload:[channelNumber:"${channel}"]])
 }
 void screenOn() {
+    log_debug '🎬 Turning screen on ...'
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.tvpower/power/turnOnScreen', payload:[standbyMode:'active']])
 }
 void screenOff() {
+    log_debug '🎬 Turning screen off ...'
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.tvpower/power/turnOffScreen', payload:[standbyMode:'active']])
 }
 void setPictureMode(String mode) {
+    log_debug "🎬 Setting picture mode to: [${mode}] ..."
     utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'picture', settings: ['pictureMode':mode]]])
 }
 void setSoundOutput(String output) {
+    log_debug "🎬 Setting sound output to: [${output}] ..."
     utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'sound', settings: ['soundOutput':output]]])
     //utils_sendMessage([type:'request', uri:'com.webos.service.apiadapter/audio/changeSoundOutput', payload:[output:output]]])
+}
+void startVideo(String url) {
+    log_debug "🎬 Playing video file: [${url}]..."
+
+    // https://gist.github.com/aabytt/bddbb1bcf031a050d89a89aeee3a6737#playling-a-link-with-standard-lg-webos-player
+    utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
+        'id': 'com.webos.app.mediadiscovery',
+        'params': ['payload': [['fullPath':url, 'mediaType':'VIDEO', 'deviceType':'DMR', 'lastPlayPosition':-1]]]
+    ]])
+}
+void startWebPage(String url) {
+    log_debug "🎬 Opening web page: [${url}]..."
+    utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
+        'id': 'com.webos.app.browser',
+        'params': ['target':url]
+    ]])
 }
 
 // ===================================================================================================================
@@ -471,6 +507,10 @@ void parse(String description) {
 
                 case { contains it, [state:'Active'] }:
                     utils_sendEvent name:'screen', value:'on', descriptionText:'Screen is on', type:type
+                    return
+
+                case { contains it, [state:'Screen Saver'] }:
+                    utils_sendEvent name:'screen', value:'screensaver', descriptionText:'Screen is in screensaver mode', type:type
                     return
 
                 case { contains it, [state:'Active Standby'] }:

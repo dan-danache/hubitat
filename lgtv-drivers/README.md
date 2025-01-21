@@ -89,6 +89,8 @@ The following commands are available:
 - Get All Activities - Populate the **Activities** attribute with available options for the **Start Activity** command
 - Get Current Activity - Not actually needed as the current activity (running app) is automatically detected
 - Start Activity - Start the specified app on the TV
+- Start Video - Play the sepcified video file in Media Player app
+- Start Web Page - Open the sepcified URL in Web Browser app
 
 ### Notifications
 - Device Notification - Display toast or an alert notifications to the TV screen
