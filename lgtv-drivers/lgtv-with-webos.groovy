@@ -8,7 +8,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.2.0'
+@Field static final String DRIVER_VERSION = '1.3.0'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
@@ -45,6 +45,8 @@ metadata {
     command 'setSoundOutput', [[name:'Output*', type:'ENUM', description:'Select sound output', constraints:SOUND_OUTPUT.sort()]]
     command 'startVideo', [[name:'URL*', type:'STRING', description:'URL of video file to play']]
     command 'startWebPage', [[name:'URL*', type:'STRING', description:'URL to open in Web Browser']]
+    command 'screenSaverOn'
+    command 'screenSaverOff'
 
     preferences {
         input(
@@ -161,11 +163,13 @@ void refresh() {
     utils_sendMessage([type:'request', uri:'ssap://system/getSystemInfo'])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.service.update/getCurrentSWInformation'])
     utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'network', keys: ['deviceName']]])
+    utils_sendMessage([type:'request', uri:'ssap://config/getConfigs', payload:[configNames:['tv.nyx.*']]])
 
     // https://github.com/JPersson77/LGTVCompanion/blob/master/Docs/Commandline.md
-    //utils_sendMessage([type:'request', uri:'ssap://config/getConfigs', payload:[configNames:['tv.model.*']]])
+    // https://github.com/chros73/bscpylgtv/blob/master/docs/available_settings_CX.md
     //utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'picture', keys: ['brightness', 'backlight', 'contrast', 'color', 'pictureMode']]])
     //utils_sendMessage([type:'request', uri:'ssap://settings/getSystemSettings', payload:[category:'sound', keys: ['soundMode']]])
+    //utils_sendMessage([type:'request', uri:'ssap://config/getConfigs', payload:[configNames:['audio.*']]])
 }
 
 // capability.Switch
@@ -221,10 +225,10 @@ void channelDown() {
 // capability.Notification
 void deviceNotification(String text, String type = 'Toast') {
     log_debug "🎬 Sending ${type} notification ..."
-    if (type.startsWith('Toast')) {
-        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createToast', payload:[message:text]])
+    if (type.startsWith('Alert') || text.startsWith('!')) {
+        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createAlert', payload:[message:text.replaceAll('^!', ''), buttons:[[label:'Dismiss']]]])
     } else {
-        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createAlert', payload:[message:text, buttons:[[label:'Dismiss']]]])
+        utils_sendMessage([type:'request', uri:'"ssap://system.notifications/createToast', payload:[message:text]])
     }
 }
 
@@ -247,9 +251,8 @@ void getCurrentActivity() {
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/getForegroundAppInfo'])
 }
 void startActivity(String activityname) {
-    log_debug "🎬 Starting activity: [${activityname}] ..."
     String appId = state.activities.find { it.value == activityname }?.key ?: activityname
-    log_debug "Launching ${activityname} (${appId})"
+    log_debug "🎬 Starting activity: [${activityname}] (${appId}) ..."
     utils_sendMessage([type:'request', uri:'ssap://system.launcher/launch', payload:[id:appId]])
 }
 
@@ -293,6 +296,14 @@ void startWebPage(String url) {
         'id': 'com.webos.app.browser',
         'params': ['target':url]
     ]])
+}
+void screenSaverOn() {
+    log_debug '🎬 Starting screen saver ...'
+    utils_sendMessage([type:'request', uri:'ssap://system.launcher/launch', payload:[id:'com.webos.app.screensaver']])
+}
+void screenSaverOff() {
+    log_debug '🎬 Stopping screen saver ...'
+    utils_sendMessage([type:'request', uri:'ssap://system.launcher/close', payload:[id:'com.webos.app.screensaver']])
 }
 
 // ===================================================================================================================
@@ -378,7 +389,11 @@ void parse(String description) {
 
         // TV sent an error message. Oh noes!
         case 'error':
-            log_error "▶ Received error message from TV: ${msg.error}"
+
+            // Ignore unsupported config keys
+            if (msg.payload?.errorText?.startsWith('Some keys are not allowed')) return
+
+            log_error "▶ Received error message: ${msg.payload?.errorText ? msg.payload?.errorText : msg.error}"
             return
 
         // Hello (request)
@@ -418,7 +433,7 @@ void parse(String description) {
                 utils_sendMessage([type:'request', uri:'ssap://com.webos.service.connectionmanager/getinfo'])
 
                 // Send a notification on TV
-                deviceNotification '<b>Mesage from Hubitat</b><br>Well done! Configuration is now complete 👍'
+                deviceNotification "<b>Mesage from ${location.hub.name}</b><br>Well done! Configuration is now complete 👍"
             }
 
             // Auto-sync device state with Hubitat
@@ -530,6 +545,11 @@ void parse(String description) {
                     utils_dataValue 'wiredMacAddress', payload.wiredInfo?.macAddress
                     return
 
+                // ssap://config/getConfigs (request)
+                case { contains it, [configs:null] }:
+                    utils_dataValue 'platformVersion', payload.configs['tv.nyx.platformVersion']
+                    return
+
                 // Pairing prompt (request)
                 case { contains it, [pairingType:'PROMPT'] }:
                     log_warn '🙋‍♂️ Go and accept the pairing request on your TV screen. HAUL ASS!'
@@ -547,6 +567,7 @@ void parse(String description) {
                 case { contains it, [volume:null] }:
                 case { contains it, [toastId:null] }:
                 case { contains it, [alertId:null] }:
+                case { contains it, [missingConfigs:null] }:
                 case { contains it, [returnValue:true, method:'setSystemSettings'] }:
                     return
             }
@@ -604,6 +625,7 @@ private void utils_sendMessage(Map message, boolean checkState = true) {
 }
 
 private void utils_sendEvent(Map event) {
+    if (event.value == null) return
     if ("${device.currentValue(event.name, true)}" != "${event.value}") {
         log_info "${event.descriptionText} [${event.type}]"
     } else {
