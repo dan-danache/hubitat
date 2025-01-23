@@ -83,7 +83,9 @@ The following commands are available:
 
 ### Screen control
 - Screen On / Screen Off
+- Screen Saver On / Screen Saver Off
 - Set Picture Mode (cinema, eco, expert1, expert2, game, normal, photo, sports, technicolor, vivid, hdrEffect, filmMaker, hdrCinema)
+- Take screenshot
 
 ### App control
 - Get All Activities - Populate the **Activities** attribute with available options for the **Start Activity** command

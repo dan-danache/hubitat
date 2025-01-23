@@ -8,7 +8,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.3.0'
+@Field static final String DRIVER_VERSION = '1.4.0'
 @Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
@@ -25,6 +25,7 @@ metadata {
         capability 'TV'
         capability 'Notification'
         capability 'MediaController'
+        capability 'ImageCapture'
 
         attribute 'networkStatus', 'enum', ['online', 'offline']
         attribute 'channelName', 'string'
@@ -148,6 +149,8 @@ void logsOff() {
 // capability.Initialize
 // This method will run when the hub starts
 void initialize() {
+    state.lastTx = 0
+    state.lastRx = 0
     connect()
 }
 
@@ -254,6 +257,12 @@ void startActivity(String activityname) {
     String appId = state.activities.find { it.value == activityname }?.key ?: activityname
     log_debug "🎬 Starting activity: [${activityname}] (${appId}) ..."
     utils_sendMessage([type:'request', uri:'ssap://system.launcher/launch', payload:[id:appId]])
+}
+
+// capability.ImageCapture
+void take() {
+    log_debug '🎬 Taking a screenshot ...'
+    utils_sendMessage([type:'request', uri:'ssap://tv/executeOneShot', payload:[path:'/tmp/capture.png', method:'DISPLAY', format:'PNG']])
 }
 
 // ===================================================================================================================
@@ -378,9 +387,10 @@ void webSocketStatus(String message) {
 
 void parse(String description) {
     log_debug "▶ Received message: ${description}"
+    state.lastRx = now()
 
     Map msg = JSON_SLURPER.parseText(description)
-    String type = msg.id?.startsWith('hubitat_') || msg.payload?.callerId == 'secondscreen.client' || msg.payload?.callerId == 'com.webos.service.apiadapter' ? 'digital' : 'physical'
+    String type = msg.payload?.callerId == 'secondscreen.client' || msg.payload?.callerId == 'com.webos.service.apiadapter' || now() - (state.lastTx ?: 0) < 2000 ? 'digital' : 'physical'
 
     // Empty reponse. Thanks for nothing!
     if (msg.payload.keySet().size() == 1 && msg.payload.returnValue == true) return
@@ -390,8 +400,8 @@ void parse(String description) {
         // TV sent an error message. Oh noes!
         case 'error':
 
-            // Ignore unsupported config keys
-            if (msg.payload?.errorText?.startsWith('Some keys are not allowed')) return
+            // Ignore unsupported config keys and TV bind fails
+            if (msg.payload?.errorText?.startsWith('Some keys are not allowed') || msg.payload?.errorText?.startsWith('com.webos.service.utp/bind returns invalid result')) return
 
             log_error "▶ Received error message: ${msg.payload?.errorText ? msg.payload?.errorText : msg.error}"
             return
@@ -483,10 +493,10 @@ void parse(String description) {
 
                 case { contains it, [category:'sound'] }:
                     String soundOutput = payload.settings?.soundOutput
-                    if (soundOutput) utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
+                    utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
 
                     String soundMode = payload.settings?.soundMode
-                    if (soundMode) utils_sendEvent name:'soundMode', value:soundMode, descriptionText:"Sound mode is ${soundMode}", type:type
+                    utils_sendEvent name:'soundMode', value:soundMode, descriptionText:"Sound mode is ${soundMode}", type:type
                     return
 
                 // ssap://tv/getExternalInputList (request)
@@ -549,6 +559,12 @@ void parse(String description) {
                 case { contains it, [configs:null] }:
                     utils_dataValue 'platformVersion', payload.configs['tv.nyx.platformVersion']
                     return
+                
+                // ssap://tv/executeOneShot
+                case { contains it, [imageUri:null] }:
+                    String image = payload.imageUri
+                    utils_sendEvent name:'image', value:image, descriptionText:"Capture URL is ${image}", type:type
+                    return
 
                 // Pairing prompt (request)
                 case { contains it, [pairingType:'PROMPT'] }:
@@ -558,7 +574,7 @@ void parse(String description) {
                 // ssap://audio/getVolume (request)
                 case { contains it, [soundOutput:null] }:
                     String soundOutput = payload.soundOutput
-                    if (soundOutput) utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
+                    utils_sendEvent name:'soundOutput', value:soundOutput, descriptionText:"Sound output is ${soundOutput}", type:type
                     return
 
                 // Other messages we don't care about
@@ -618,6 +634,7 @@ private void utils_sendMessage(Map message, boolean checkState = true) {
     }
 
     // Send websocket message
+    state.lastTx = now()
     message.id = "hubitat_${now()}"
     message.sourceId = 'hubitat.hub'
     String payload = new JsonBuilder(message)
