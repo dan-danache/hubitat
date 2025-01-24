@@ -1,7 +1,7 @@
-import groovy.transform.Field
+import com.hubitat.hub.domain.Event
 
-definition (
-    name: "Lumos Automation 1.1.0",
+definition(
+    name: 'Lumos Automation 1.1.0',
     namespace: 'dandanache',
     author: 'Dan Danache',
     description: 'Control lights using motion and contact sensors.',
@@ -10,26 +10,26 @@ definition (
     category: 'Control',
     iconUrl: '',
     iconX2Url: '',
-    parent: "dandanache:Lumos 1.1.0",
+    parent: 'dandanache:Lumos 1.1.0',
 )
 
 preferences {
     page name: 'mainPage'
 }
 
-def mainPage() {
-    dynamicPage (name:'mainPage', install:true, uninstall:true) {
+Map mainPage() {
+    return dynamicPage(name:'mainPage', install:true, uninstall:true) {
         section {
             label description:'Enter a name for this automation', required:true
         }
 
-        section (title:'Sensors that will be used to control the lights') {
+        section(title:'Sensors that will be used to control the lights') {
             input 'motionSensors', 'capability.motionSensor', title:'Select motion sensors:', multiple:true, required:true, width:4
             paragraph ''
             input 'contactSensors', 'capability.contactSensor', title:'Select contact sensors:', multiple:true, required:true, width:4
         }
 
-        section (title:'Lights to control') {
+        section(title:'Lights to control') {
             input 'lights', 'capability.switch', title:'Select lights:', multiple:true, required:true, width:4
             input 'disableLightsOut', 'bool', title:'Keep lights on when door is opened', defaultValue:false, submitOnChange:true
         }
@@ -71,7 +71,7 @@ void initialize() {
     turnOff()
 }
 
-void motionHandler(evt) {
+void motionHandler(Event evt) {
     if ('Events' in logging) info "Event: ${evt.device.displayName} motion is ${evt.value}"
 
     // Motion was detected
@@ -101,8 +101,8 @@ void motionHandler(evt) {
 
     // Bail out if other sensors still detect motion
     if (motionSensors.any { it.currentState('motion').value == 'active' }) {
-         if ('Triggers' in logging) info 'Triggered: Person not detected anymore, but at least one other motion sensor is still active -> Do nothing'
-         return
+        if ('Triggers' in logging) info 'Triggered: Person not detected anymore, but at least one other motion sensor is still active -> Do nothing'
+        return
     }
 
     if ('Triggers' in logging) info 'Triggered: Person not detected anymore -> Turning off all lights after 5 minutes'
@@ -110,7 +110,7 @@ void motionHandler(evt) {
     runIn 240, 'turnOff'
 }
 
-void contactHandler(evt) {
+void contactHandler(Event evt) {
     if ('Events' in logging) info "Event: ${evt.device.displayName} contact is ${evt.value}"
 
     // A door was opened
