@@ -73,8 +73,10 @@ export class StatusmapPanel extends LitElement {
                 borderColor: colors.Green,
                 data: [...data],
             })
-            minDate = Math.min(minDate, data[0].x[0])
-            maxDate = Math.max(maxDate, data.pop().x[1])
+            if (data.length !== 0) {
+                minDate = Math.min(minDate, data[0].x[0])
+                maxDate = Math.max(maxDate, data.pop().x[1])
+            }
         })
 
         $config.data = { labels, datasets }

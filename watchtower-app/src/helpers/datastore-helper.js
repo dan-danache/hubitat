@@ -67,6 +67,13 @@ export class DatastoreHelper {
         return this.CACHE[fileName]
     }
 
+    static addVal(target, x, vals, idx, z) {
+        if (idx === -1) return
+        const y = vals[idx] === '' || vals[idx] === '-' ? null : parseFloat(vals[idx])
+        if (target.length === 0 && y === null) return
+        target.push({x, y: y === null ? (z ? 0 : null) : y})
+    }
+
     static async fetchDeviceData({dev, precision, attr1, attr2, mm1, mm2, z1, z2}) {
         const data = { attr1: [], attr2: [], min1: [], max1: [], min2: [], max2: [] }
         try {
@@ -88,16 +95,18 @@ export class DatastoreHelper {
             lines.forEach(line => {
                 const vals = line.split(',')
                 const x = parseInt(vals[0]) * 1000
-                data.attr1.push({x, y: (vals[attr1Idx] === '' || vals[attr1Idx] === '-' ? (z1 === true ? 0 : null) : parseFloat(vals[attr1Idx]))})
-                if (attr2Idx !== -1) data.attr2.push({x, y: (vals[attr2Idx] === '' || vals[attr2Idx] === '-' ? (z2 === true ? 0 : null) : parseFloat(vals[attr2Idx]))})
+
+                this.addVal(data.attr1, x, vals, attr1Idx, z1)
+                this.addVal(data.attr2, x, vals, attr2Idx, z2)
 
                 if (addMinMax1) {
-                    data.min1.push({x, y: (vals[min1Idx] === undefined || vals[min1Idx] === '' || vals[min1Idx] === '-' ? (z1 === true ? 0 : null) : parseFloat(vals[min1Idx]))})
-                    data.max1.push({x, y: (vals[max1Idx] === undefined || vals[max1Idx] === '' || vals[max1Idx] === '-' ? (z1 === true ? 0 : null) : parseFloat(vals[max1Idx]))})
+                    this.addVal(data.min1, x, vals, min1Idx, z1)
+                    this.addVal(data.max1, x, vals, max1Idx, z2)
                 }
+
                 if (addMinMax2) {
-                    data.min2.push({x, y: (vals[min2Idx] === undefined || vals[min2Idx] === '' || vals[min2Idx] === '-' ? (z2 === true ? 0 : null) : parseFloat(vals[min2Idx]))})
-                    data.max2.push({x, y: (vals[max2Idx] === undefined || vals[max2Idx] === '' || vals[max2Idx] === '-' ? (z2 === true ? 0 : null) : parseFloat(vals[max2Idx]))})
+                    this.addVal(data.min2, x, vals, min2Idx, z1)
+                    this.addVal(data.max2, x, vals, max2Idx, z2)
                 }
             })
             return data
@@ -148,7 +157,6 @@ export class DatastoreHelper {
             }
         }
 
-        const parseVal = val => val === '' || val === '-' ? 0 : parseFloat(val)
         for (const [dev, attrs] of Object.entries(requests)) {
             const attrsLen = attrs.length
             try {
@@ -164,12 +172,7 @@ export class DatastoreHelper {
                     const vals = line.split(',')
                     const x = parseInt(vals[0]) * 1000
                     if (x < minTime) return
-
-                    for (let idx = 0; idx < attrsLen; idx++) {
-                        const attr = attrs[idx]
-                        const attrIdx = attrsIdx[idx]
-                        retVal[`${dev}_${attr}`].push({x, y: parseVal(vals[attrIdx])})
-                    }
+                    for (let idx = 0; idx < attrsLen; idx++) this.addVal(retVal[`${dev}_${attrs[idx]}`], x, vals, attrsIdx[idx], true)
                 })
             } catch (ex) {
                 console.error(ex)
@@ -189,7 +192,7 @@ export class DatastoreHelper {
         })
         Object.keys(requests).forEach(dev => requests[dev] = Array.from(requests[dev]))
 
-        const parseVal = val => val === '' || val === '-' ? 0 : parseFloat(val)
+        const parseVal = val => val === '' || val === '-' ? null : parseFloat(val)
         for (const [dev, attrs] of Object.entries(requests)) {
             const attrsLen = attrs.length
             try {
@@ -221,9 +224,9 @@ export class DatastoreHelper {
                         if (v === last[idx].v) continue
 
                         // Add to result
-                        retVal[`${dev}_${attr}`].push({
+                        if (retVal[`${dev}_${attr}`].length !== 0 || last[idx].v !== null) retVal[`${dev}_${attr}`].push({
                             x: [last[idx].x, x],
-                            v: last[idx].v,
+                            v: last[idx].v === null ? 0 : last[idx].v,
                         })
                         last[idx] = {x, v}
                     }
@@ -238,7 +241,7 @@ export class DatastoreHelper {
                     const attr = attrs[idx]
                     retVal[`${dev}_${attr}`].push({
                         x:[last[idx].x, x],
-                        v,
+                        v: v === null ? 0 : v,
                     })
                 })
             } catch (ex) {
@@ -369,7 +372,6 @@ export class DatastoreHelper {
                 }
 
             } catch (ex) {
-                console.log(ex)
                 throw new Error(`Failed to parse file contents as JSON: ${ex.message}`)
             }
         }

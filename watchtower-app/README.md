@@ -62,7 +62,7 @@ To install the Watchtower app using the Hubitat Package Manager (and receive aut
 
 The application utilizes a fixed-size database, similar in design and purpose to an RRD (Round-Robin Database). This setup allows for high-resolution data (minutes per point) to gradually degrade into lower resolutions for long-term retention of historical data.
 
-The following time resolution are used:
+The following time resolution (distance between data points) are used:
 
 - **5 minutes**: Attribute value in the last 5 minutes
 - **1 hour**: Average attribute value over the last hour
@@ -143,23 +143,25 @@ When you open the Watchtower app, the following screen will welcome you.
 
 ### Devices Screen
 
-On this screen, you can configure which smart devices will be monitored by the Watchtower app.
+On this screen, you can add and remove smart devices will be monitored by Watchtower.
 
 ![Devices screen](img/devices.png)
 
 Click the **Add device configuration** button to start monitoring a new device. You will be prompted to select a device and then select what device attributes (from device Current State) you want to monitor.
 
-**Note**: Not all device attributes are supported. Only the [official attributes](https://docs2.hubitat.com/en/developer/driver/capability-list) will be available for selection.
-
 ![Add device screen](img/add-device.png)
+
+**Note**: Not all device attributes are supported. Only the [official attributes](https://docs2.hubitat.com/en/developer/driver/capability-list) will be available for selection.
 
 After you click the **Save** button, the application will start to periodically (every 5 minutes) save the selected attributes in a CSV file that you can download from the **File Manager**.
 
-Links to the CSV files are available from the **View device** screen.
+Links to the CSV files are available from the **Edit device configuration** screen.
 
-![View device screen](img/view-device.png)
+![Edit device screen](img/edit-device.png)
 
-From this screen, you also have the option to remove the device configuration. Once you click the **Remove** button, the application will stop collecting metrics for this device. The CSV files are also removed from the **File Manager**.
+From this screen, you can also change the device attributes that will be monitored by Watchtower.
+
+**Note**: If you change the monitored attributes list, the CSV files will reflect the new changes when they are first updated (every 5 minutes, at the start of a new hour, day, or week).
 
 ### Dashboards Screen
 

@@ -18,6 +18,7 @@
         <meta name="x5-page-mode" content="app" />
         <meta name="screen-orientation" content="portrait" />
         <meta name="browsermode" content="application" />
+        <meta name="darkreader-lock" />
         <!--meta name="color-scheme" content="dark light" /-->
         <link rel="apple-touch-icon" sizes="512x512" href="./icon.png?access_token=${access_token}" />
         <link rel="icon" type="image/png" sizes="512x512" href="./icon.png?access_token=${access_token}" />
@@ -404,7 +405,14 @@
             }
             #menu button:hover {
                 background-color: var(--Blue);
+                border-color: var(--Blue);
                 color: var(--Base3);
+            }
+            #menu button:active {
+                outline: 1px solid var(--Orange);
+                background-color: var(--Orange);
+                border-color: var(--Orange);
+                color: white;
             }
             #menu label {
                 display: block;
@@ -471,11 +479,21 @@
                 color: var(--text-color-darker);
                 background-color: transparent;
                 position: absolute;
-                top: 50%;
-                right: 0px;
-                transform: translateY(-50%);
+                top: -1px;
+                right: -1px;
+                bottom: -1px;
+                border-radius: 0 4px 4px 0;
                 cursor: pointer;
                 width: 30px;
+                line-height: 100%;
+            }
+            #menu form input[type="submit"]:focus {
+                background-color: var(--Blue);
+                color: white;
+            }
+
+            #menu form input[type="submit"]:active {
+                font-size: 1.3em;
             }
 
             /* Add dialog */
@@ -578,6 +596,13 @@
             }
             #add-dialog button:hover {
                 background-color: var(--Blue);
+                border-color: var(--Blue);
+                color: var(--Base3);
+            }
+            #add-dialog button:active {
+                outline: 1px solid var(--Orange);
+                background-color: var(--Orange);
+                border-color: var(--Orange);
                 color: var(--Base3);
             }
             #add-dialog label { display: block; user-select: none; margin-bottom: 5px }
