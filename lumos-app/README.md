@@ -41,7 +41,7 @@ To control the room lights, place contact sensors on each door and one or more m
 
 1. If any motion sensor detects movement, the lights will turn on for 5 minutes. Each motion detection resets the 5-minute timer.
 
-1. If motion is detected and all doors are closed, the lights will remain on until a door is opened. In this scenario, motion events are ignored, and opening a door will immediately turn off the lights.
+1. If motion is detected and all doors are closed, the lights will remain on until a door is opened. In this scenario, motion events are ignored and, when a door is opened, the app will immediately turn off the lights (if the `Keep lights on when door is opened` option is disabled).
 
 These rules make the app ideal for bathrooms, pantries, and basements, but less suitable for bedrooms or living rooms where multiple people use the doors.
 

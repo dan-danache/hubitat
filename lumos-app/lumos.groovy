@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 definition (
-    name: "Lumos 1.0.0",
+    name: "Lumos 1.1.0",
     namespace: 'dandanache',
     author: 'Dan Danache',
     description: 'Control lights using motion and contact sensors.',
@@ -17,7 +17,7 @@ definition (
 preferences {
    page (title:'Control lights using motion and contact sensors.', name:'mainPage', install:true, uninstall:true) {
       section {
-         app (name:'childApps', appName:"Lumos Automation 1.0.0", namespace:'dandanache', title:'+ Create new Lumos Automation ...', multiple:true, width:4)
+         app (name:'childApps', appName:"Lumos Automation 1.1.0", namespace:'dandanache', title:'+ Create new Lumos Automation ...', multiple:true, width:4)
       }
    }
 }

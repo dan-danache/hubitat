@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 definition (
-    name: "Lumos Automation 1.0.0",
+    name: "Lumos Automation 1.1.0",
     namespace: 'dandanache',
     author: 'Dan Danache',
     description: 'Control lights using motion and contact sensors.',
@@ -10,7 +10,7 @@ definition (
     category: 'Control',
     iconUrl: '',
     iconX2Url: '',
-    parent: "dandanache:Lumos 1.0.0",
+    parent: "dandanache:Lumos 1.1.0",
 )
 
 preferences {
@@ -31,13 +31,14 @@ def mainPage() {
 
         section (title:'Lights to control') {
             input 'lights', 'capability.switch', title:'Select lights:', multiple:true, required:true, width:4
+            input 'disableLightsOut', 'bool', title:'Keep lights on when door is opened', defaultValue:false, submitOnChange:true
         }
 
         section {
             input(
                 name: 'logging',
-                title: 'Logging',
                 type: 'enum',
+                title: 'Logging',
                 options: ['Events', 'Triggers', 'Actions'],
                 multiple: true,
                 submitOnChange: true,
@@ -106,7 +107,7 @@ void motionHandler(evt) {
 
     if ('Triggers' in logging) info 'Triggered: Person not detected anymore -> Turning off all lights after 5 minutes'
     unschedule()
-    runIn 300, 'turnOff'
+    runIn 240, 'turnOff'
 }
 
 void contactHandler(evt) {
@@ -115,15 +116,19 @@ void contactHandler(evt) {
     // A door was opened
     if (evt.value == 'open') {
         if (state.presence == 'present') {
-            if ('Triggers' in logging) info 'Triggered: Person is leaving the room -> Turning off the lights'
+            if (disableLightsOut != true) {
+                if ('Triggers' in logging) info 'Triggered: Person is leaving the room -> Turning off the lights'
+                turnOff()
+            } else {
+                if ('Triggers' in logging) info 'Triggered: Person is leaving the room -> Leaving lights unchanged'
+            }
             state.presence = 'not present'
-            turnOff()
             return
         }
 
         if ('Triggers' in logging) info 'Triggered: Person is entering the room -> Turning on the lights for 5 minutes'
         turnOn()
-        runIn 300, 'turnOff'
+        runIn 240, 'turnOff'
         return
     }
 }
