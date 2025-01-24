@@ -14,3 +14,6 @@ Here I keep all my Hubitat stuff. Feel free to look around!
 | Lumos | [Project Homepage](https://dan-danache.github.io/hubitat/lumos-app/)｜[Changelog](https://dan-danache.github.io/hubitat/lumos-app/CHANGELOG) |
 | Zigbee Pairing Helper | [Project Homepage](https://dan-danache.github.io/hubitat/zigbee-pairing-helper-driver/)｜[Changelog](https://dan-danache.github.io/hubitat/zigbee-pairing-helper-driver/CHANGELOG) |
 | Dashboard Widgets | [Project Homepage](https://dan-danache.github.io/hubitat/dashboard-widgets-driver/)｜[Changelog](https://dan-danache.github.io/hubitat/dashboard-widgets-driver/CHANGELOG) |
+
+---
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 162px !important">](https://www.buymeacoffee.com/dandanache)
