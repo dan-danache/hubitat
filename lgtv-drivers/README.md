@@ -71,11 +71,12 @@ The following commands are available:
 ### Power control
 - On / Off
 
-### Sound volume control
+### Sound control
 - Volume Up / Volume Down
 - Set Volume (0% - 100%)
 - Mute / Unmute
 - Set Sound Output (tv_speaker, external_arc, external_optical, bt_soundbar, mobile_phone, lineout, headphone, tv_speaker_bluetooth)
+- Play TTS messages
 
 ### Live TV channel control
 - Channel Up / Channel Down
