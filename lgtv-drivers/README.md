@@ -76,7 +76,7 @@ The following commands are available:
 - Set Volume (0% - 100%)
 - Mute / Unmute
 - Set Sound Output (tv_speaker, external_arc, external_optical, bt_soundbar, mobile_phone, lineout, headphone, tv_speaker_bluetooth)
-- Play TTS messages
+- Play TTS announcements
 
 ### Live TV channel control
 - Channel Up / Channel Down

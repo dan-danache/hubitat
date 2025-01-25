@@ -7,7 +7,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.5.0'
+@Field static final String DRIVER_VERSION = '1.5.1'
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
 @Field static final List<String> SOUND_MODES = ['aiSoundPlus', 'aiSound', 'standard', 'news', 'music', 'movie', 'sports', 'game']
@@ -133,7 +133,7 @@ void updated(boolean auto = false) {
 void pingDevice() {
     if (!ipAddr || "${device.currentValue('networkStatus', true)}" == 'online') return
     log_debug "Pinging ${ipAddr} ..."
-    if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived == 1) connect()
+    if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived > 0) connect()
 }
 
 void logsOff() {
@@ -181,8 +181,21 @@ void on() {
     util_wakeOnLan(getDataValue('wiredMacAddress'))
     if (ipAddr) util_wakeOnLan(getMACFromIP(ipAddr))
 
-    // Start websocket in 7 seconds
-    runIn 7, 'connect'
+    // Start fast pinging the IP for a maximum of 15 times
+    state.remove 'fastPing'
+    runIn 1, 'fastPing', [data:[currentRetry:0]]
+}
+private void fastPing(Map data) {
+    data.currentRetry += 1
+    if (!ipAddr || "${device.currentValue('switch', true)}" == 'on' || data.currentRetry > 15) {
+        log_debug 'Fast ping terminated'
+        return
+    }
+
+    log_debug "Fast pinging ${ipAddr}: ${data.currentRetry} / 15 ..."
+    if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived > 0) connect()
+
+    runIn 1, 'fastPing', [data:data]
 }
 void off() {
     log_debug '🎬 Powering off ...'
@@ -271,7 +284,7 @@ void speak(String text, BigDecimal volume = null, String voice = null) {
     log_debug "Sending TTS file ${result} ..."
     // utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/open', payload:[target:result.uri, mime:'audio/mp3']])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
-        id: 'com.webos.app.mediadiscovery',
+        id: state.activities.find { it.value == 'Media Player' || it.value == 'Photo & Video' }?.key ?: 'com.webos.app.mediadiscovery',
         params: [payload: [[
             fullPath:result.uri, mediaType:'MUSIC', deviceType:'DMR', lastPlayPosition:0,
             fileName: "Message from ${location.hub.name}",
@@ -317,15 +330,15 @@ void startVideo(String url) {
 
     // https://gist.github.com/aabytt/bddbb1bcf031a050d89a89aeee3a6737#playling-a-link-with-standard-lg-webos-player
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
-        'id': 'com.webos.app.mediadiscovery',
-        'params': ['payload': [['fullPath':url, 'mediaType':'VIDEO', 'deviceType':'DMR', 'lastPlayPosition':-1]]]
+        id: state.activities.find { it.value == 'Media Player' || it.value == 'Photo & Video' }?.key ?: 'com.webos.app.mediadiscovery',
+        params: [payload: [[fullPath:url, mediaType:'VIDEO', deviceType:'DMR', lastPlayPosition:0]]]
     ]])
 }
 void startWebPage(String url) {
     log_debug "🎬 Opening web page: [${url}]..."
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
-        'id': 'com.webos.app.browser',
-        'params': ['target':url]
+        id: 'com.webos.app.browser',
+        params: [target:url]
     ]])
 }
 void screenSaverOn() {
