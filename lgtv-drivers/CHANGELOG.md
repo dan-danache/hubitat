@@ -5,14 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-01-25
+### Added
+- Add "SpeechSynthesis/Speak" command for TTS announcements
+
+### Fixed
+- Changed "Set Channel" to accept string channel number - `@hubitrep`
+
 ## [1.4.0] - 2025-01-23
 ### Added
-- Add "Take" command to take a TV screenshot
+- Add "ImageCapture/Take" command to take a TV screenshot
 
 ### Fixed
 - Correctly identify event type (digital vs physical)
-
-### Fixed
 - Hide errors for unsupported config keys - `@nclark`
 
 ## [1.3.0] - 2025-01-23

@@ -1,5 +1,4 @@
 import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.Field
 
@@ -8,8 +7,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.4.0'
-@Field static final JsonSlurper JSON_SLURPER = new JsonSlurper()
+@Field static final String DRIVER_VERSION = '1.5.0'
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
 @Field static final List<String> SOUND_MODES = ['aiSoundPlus', 'aiSound', 'standard', 'news', 'music', 'movie', 'sports', 'game']
@@ -26,6 +24,7 @@ metadata {
         capability 'Notification'
         capability 'MediaController'
         capability 'ImageCapture'
+        capability 'SpeechSynthesis'
 
         attribute 'networkStatus', 'enum', ['online', 'offline']
         attribute 'channelName', 'string'
@@ -39,7 +38,7 @@ metadata {
         [name:'Text*', type:'STRING', description:'Notification text*'],
         [name:'Type', type:'ENUM', description:'Notification type', constraints:['Toast - Goes away after few seconds', 'Alert - Stays on screen until dismissed']]
     ]
-    command 'setChannel', [[name:'Channel number*', type:'NUMBER']]
+    command 'setChannel', [[name:'Channel number*', type:'STRING']]
     command 'screenOn'
     command 'screenOff'
     command 'setPictureMode', [[name:'Mode*', type:'ENUM', description:'Select picture mode', constraints:PICTURE_MODES.sort()]]
@@ -265,13 +264,36 @@ void take() {
     utils_sendMessage([type:'request', uri:'ssap://tv/executeOneShot', payload:[path:'/tmp/capture.png', method:'DISPLAY', format:'PNG']])
 }
 
+// capability.SpeechSynthesis
+void speak(String text, BigDecimal volume = null, String voice = null) {
+    log_debug "🎬 Speaking text [${text}] ..."
+    Map result = textToSpeech(text, voice)
+    log_debug "Sending TTS file ${result} ..."
+    // utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/open', payload:[target:result.uri, mime:'audio/mp3']])
+    utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
+        id: 'com.webos.app.mediadiscovery',
+        params: [payload: [[
+            fullPath:result.uri, mediaType:'MUSIC', deviceType:'DMR', lastPlayPosition:0,
+            fileName: "Message from ${location.hub.name}",
+            thumbnail: "http://${location.hub.localIP}/ui2/images/apple-touch-icon.png",
+            dlnaInfo: [
+                protocolInfo: 'http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=01500000000000000000000000000000',
+                contentLength: '-1',
+                duration: result.duration,
+                opVal: 1,
+                flagVal: 0,
+                cleartextSize: '-1'
+            ]
+        ]]]
+    ]])
+}
+
 // ===================================================================================================================
 // Implement custom commands
 // ===================================================================================================================
-void setChannel(String channel) { setChannel Integer.parseInt(channel) }
-void setChannel(BigDecimal channel) {
+void setChannel(String channel) {
     log_debug "🎬 Changing channel to [${channel}] ..."
-    utils_sendMessage([type:'request', uri:'ssap://tv/openChannel', payload:[channelNumber:"${channel}"]])
+    utils_sendMessage([type:'request', uri:'ssap://tv/openChannel', payload:[channelNumber:channel]])
 }
 void screenOn() {
     log_debug '🎬 Turning screen on ...'
@@ -389,7 +411,7 @@ void parse(String description) {
     log_debug "▶ Received message: ${description}"
     state.lastRx = now()
 
-    Map msg = JSON_SLURPER.parseText(description)
+    Map msg = parseJson(description)
     String type = msg.payload?.callerId == 'secondscreen.client' || msg.payload?.callerId == 'com.webos.service.apiadapter' || now() - (state.lastTx ?: 0) < 2000 ? 'digital' : 'physical'
 
     // Empty reponse. Thanks for nothing!

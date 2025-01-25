@@ -1,10 +1,10 @@
 {
     "packageName": "LGTV with webOS",
-    "version": "1.4.0",
-    "releaseNotes": "v1.4.0\n - Add \"Take\" command to take a TV screenshot\n - Correctly identify event type (digital vs physical)",
+    "version": "1.5.0",
+    "releaseNotes": "v1.4.0\n - Add \"SpeechSynthesis/Speak\" command for TTS announcements\n - Changed \"Set Channel\" to accept string channel number - @hubitrep",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2025-01-21",
+    "dateReleased": "2025-01-25",
     "documentationLink": "https://dan-danache.github.io/hubitat/lgtv-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-lgtv-with-webos/148892",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
@@ -17,7 +17,7 @@
             "name": "LGTV with webOS",
             "description": "Driver to control LG TV devices using webOS websockets.",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.4.0/lgtv-drivers/lgtv-with-webos.groovy",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.5.0/lgtv-drivers/lgtv-with-webos.groovy",
             "required": true
         }
     ]
