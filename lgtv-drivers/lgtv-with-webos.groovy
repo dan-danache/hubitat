@@ -12,6 +12,7 @@ import hubitat.helper.NetworkUtils
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
 @Field static final List<String> SOUND_MODES = ['aiSoundPlus', 'aiSound', 'standard', 'news', 'music', 'movie', 'sports', 'game']
 @Field static final List<String> SOUND_OUTPUT = ['tv_speaker', 'external_arc', 'external_optical', 'bt_soundbar', 'mobile_phone', 'lineout', 'headphone', 'tv_speaker_bluetooth']
+@Field static final Integer MAX_FAST_PING = 20
 
 metadata {
     definition(name:DRIVER_NAME, namespace:'dandanache', author:'Dan Danache', importUrl:'https://raw.githubusercontent.com/dan-danache/hubitat/main/lgtv-drivers/lgtv-with-webos.groovy') {
@@ -26,7 +27,7 @@ metadata {
         capability 'ImageCapture'
         capability 'SpeechSynthesis'
 
-        attribute 'networkStatus', 'enum', ['online', 'offline']
+        attribute 'websocket', 'enum', ['connecting', 'online', 'offline']
         attribute 'channelName', 'string'
         attribute 'screen', 'enum', ['on', 'off', 'standby', 'screensaver']
         attribute 'pictureMode', 'enum', PICTURE_MODES
@@ -93,7 +94,7 @@ void installed() {
     // Init state
     state.activities = [:]
     utils_sendEvent name:'switch', value:'off', descriptionText:'Power initialized to off', type:'digital'
-    utils_sendEvent name:'networkStatus', value:'offline', descriptionText:'Network status initialized to offline', type:'digital'
+    utils_sendEvent name:'websocket', value:'offline', descriptionText:'Websocket initialized to offline', type:'digital'
 }
 
 // Called when the "Save Preferences" button is clicked
@@ -131,7 +132,7 @@ void updated(boolean auto = false) {
 }
 
 void pingDevice() {
-    if (!ipAddr || "${device.currentValue('networkStatus', true)}" == 'online') return
+    if (!ipAddr || "${device.currentValue('websocket', true)}" == 'online') return
     log_debug "Pinging ${ipAddr} ..."
     if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived > 0) connect()
 }
@@ -181,18 +182,17 @@ void on() {
     util_wakeOnLan(getDataValue('wiredMacAddress'))
     if (ipAddr) util_wakeOnLan(getMACFromIP(ipAddr))
 
-    // Start fast pinging the IP for a maximum of 15 times
-    state.remove 'fastPing'
+    // Start fast pinging the IP for a maximum of MAX_FAST_PING times
     runIn 1, 'fastPing', [data:[currentRetry:0]]
 }
 private void fastPing(Map data) {
     data.currentRetry += 1
-    if (!ipAddr || "${device.currentValue('switch', true)}" == 'on' || data.currentRetry > 15) {
+    if (!ipAddr || "${device.currentValue('switch', true)}" == 'on' || data.currentRetry > MAX_FAST_PING) {
         log_debug 'Fast ping terminated'
         return
     }
 
-    log_debug "Fast pinging ${ipAddr}: ${data.currentRetry} / 15 ..."
+    log_debug "Fast pinging ${ipAddr}: ${data.currentRetry} / ${MAX_FAST_PING} ..."
     if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived > 0) connect()
 
     runIn 1, 'fastPing', [data:data]
@@ -284,7 +284,7 @@ void speak(String text, BigDecimal volume = null, String voice = null) {
     log_debug "Sending TTS file ${result} ..."
     // utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/open', payload:[target:result.uri, mime:'audio/mp3']])
     utils_sendMessage([type:'request', uri:'ssap://com.webos.applicationManager/launch', payload:[
-        id: state.activities.find { it.value == 'Media Player' || it.value == 'Photo & Video' }?.key ?: 'com.webos.app.mediadiscovery',
+        id: state.activities.find { it.value == 'Media Player' || it.value == 'Music' }?.key ?: 'com.webos.app.mediadiscovery',
         params: [payload: [[
             fullPath:result.uri, mediaType:'MUSIC', deviceType:'DMR', lastPlayPosition:0,
             fileName: "Message from ${location.hub.name}",
@@ -318,11 +318,11 @@ void screenOff() {
 }
 void setPictureMode(String mode) {
     log_debug "🎬 Setting picture mode to: [${mode}] ..."
-    utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'picture', settings: ['pictureMode':mode]]])
+    utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'picture', settings: [pictureMode:mode]]])
 }
 void setSoundOutput(String output) {
     log_debug "🎬 Setting sound output to: [${output}] ..."
-    utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'sound', settings: ['soundOutput':output]]])
+    utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'sound', settings: [soundOutput:output]]])
     //utils_sendMessage([type:'request', uri:'com.webos.service.apiadapter/audio/changeSoundOutput', payload:[output:output]]])
 }
 void startVideo(String url) {
@@ -360,9 +360,19 @@ void connect() {
         return
     }
 
+    // A connection is already in progress
+    if ("${device.currentValue('websocket')}" == 'connecting') {
+        log_debug 'Connection already in progress'
+        return
+    }
+
     log_debug "Connecting to ${ipAddr} ..."
     disconnect()
     interfaces.webSocket.connect(useSSL ? "wss://${ipAddr}:3001/" : "ws://${ipAddr}:3000/", headers: ['Content-Type': 'application/json'], ignoreSSLIssues: true)
+
+    // Update "websocket" attribute
+    String websocket = 'connecting'
+    utils_sendEvent name:'websocket', value:websocket, descriptionText:"Websocket is ${websocket}", type:'physical'
 }
 
 void disconnect() {
@@ -391,7 +401,7 @@ void register() {
                     created: '20140509',
                     appId: 'com.lge.test',
                     vendorId: 'com.lge',
-                    localizedAppNames: ['':'LG Remote App', 'ko-KR': '리모컨 앱', 'zxx-XX': 'ЛГ Rэмotэ AПП'],
+                    localizedAppNames: ['':'LG Remote App', 'ko-KR':'리모컨 앱', 'zxx-XX':'ЛГ Rэмotэ AПП'],
                     localizedVendorNames: ['': 'LG Electronics'],
                     permissions: ['TEST_SECURE', 'CONTROL_INPUT_TEXT', 'CONTROL_MOUSE_AND_KEYBOARD', 'READ_INSTALLED_APPS', 'READ_LGE_SDX', 'READ_NOTIFICATIONS', 'SEARCH', 'WRITE_SETTINGS', 'WRITE_NOTIFICATION_ALERT', 'CONTROL_POWER', 'READ_CURRENT_CHANNEL', 'READ_RUNNING_APPS', 'READ_UPDATE_INFO', 'UPDATE_FROM_REMOTE_APP', 'READ_LGE_TV_INPUT_EVENTS', 'READ_TV_CURRENT_TIME'],
                     serial: '2f930e2d2cfe083771f68e4fe7bb07'
@@ -406,18 +416,18 @@ void register() {
 // ===================================================================================================================
 
 void webSocketStatus(String message) {
-    log_debug "Websocket status changed: ${message}"
+    log_debug "▶ webSocketStatus(${message})"
 
-    String networkStatus = utils_parseStatus message
+    String websocket = utils_parseStatus message
 
     // If websocket just opened, say hello (skip state checks)
-    if (networkStatus == 'online') {
+    if (websocket == 'online') {
         utils_sendMessage([type:'hello', id:'hello'], false)
         return
     }
 
-    // Update "networkStatus" attribute
-    utils_sendEvent name:'networkStatus', value:networkStatus, descriptionText:"Network status is ${networkStatus}", type:'physical'
+    // Update "websocket" attribute
+    utils_sendEvent name:'websocket', value:websocket, descriptionText:"Websocket is ${websocket}", type:'physical'
 }
 
 void parse(String description) {
@@ -445,9 +455,9 @@ void parse(String description) {
         case 'hello':
             log_debug '▶ Proper protocol has been observed. Starting authentication ...'
 
-            // Update "networkStatus" and "switch" attributes
+            // Update "websocket" and "switch" attributes
             utils_sendEvent name:'switch', value:'on', descriptionText:'Power is on', type:'physical'
-            utils_sendEvent name:'networkStatus', value:'online', descriptionText:'Network status is online', type:'physical'
+            utils_sendEvent name:'websocket', value:'online', descriptionText:'Websocket is online', type:'physical'
 
             // Start registration
             runIn 1, 'register'
@@ -471,7 +481,7 @@ void parse(String description) {
 
                 // Enable Wake on LAN
                 log_debug 'Enabling Wake On LAN (WOL) ...'
-                utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'network', settings: ['wolwowlOnOff':'true']]])
+                utils_sendMessage([type:'request', uri:'ssap://settings/setSystemSettings', payload:[category:'network', settings: [wolwowlOnOff:'true']]])
 
                 // Get some device information that never changes
                 utils_sendMessage([type:'request', uri:'ssap://system/getSystemInfo'])
@@ -662,7 +672,7 @@ private void utils_sendMessage(Map message, boolean checkState = true) {
         return
     }
 
-    if (checkState && "${device.currentValue('networkStatus')}" != 'online') {
+    if (checkState && "${device.currentValue('websocket')}" != 'online') {
         log_info 'Websocket is not connected anymore. Connecting now ...'
         runIn 1, 'connect'
         return
@@ -701,7 +711,7 @@ private String utils_parseStatus(String message) {
             log_warn 'Failed to establish a stable websocket connection to your TV. You should enable SSL in the Preferences tab. DO IT!'
             return 'offline'
         case ~/^failure: .*/:
-            log_warn "Oh snap! ${message}"
+            log_info "Oh snap! ${message}"
             return 'offline'
         default: return 'offline'
     }
