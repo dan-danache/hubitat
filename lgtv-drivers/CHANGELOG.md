@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve the fast-ping mechanism to avoid overlap connections - `@hubitrep`
 - Fix the "Speak" command for webOS 5 - `@hubitrep`
 
+### Changed
+- Renamed "networkStatus" attribute to "websocket" to avoid the red icon when TV is off
+
 ## [1.5.1] - 2025-01-25
 ### Fixed
 - Improve the detection of TV startup using a fast-ping mechanism - `@hubitrep`
