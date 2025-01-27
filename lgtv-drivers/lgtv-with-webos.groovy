@@ -7,7 +7,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.5.2'
+@Field static final String DRIVER_VERSION = '1.6.0'
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
 @Field static final List<String> SOUND_MODES = ['aiSoundPlus', 'aiSound', 'standard', 'news', 'music', 'movie', 'sports', 'game']
@@ -24,6 +24,7 @@ metadata {
         capability 'TV'
         capability 'Notification'
         capability 'MediaController'
+        capability 'MediaTransport'
         capability 'ImageCapture'
         capability 'SpeechSynthesis'
 
@@ -272,6 +273,20 @@ void startActivity(String activityname) {
     utils_sendMessage([type:'request', uri:'ssap://system.launcher/launch', payload:[id:appId]])
 }
 
+// capability.MediaTransport
+void play() {
+    log_debug '🎬 Play ...'
+    utils_sendMessage([type:'request', uri:'ssap://media.controls/play'])
+}
+void pause() {
+    log_debug '🎬 Pause ...'
+    utils_sendMessage([type:'request', uri:'ssap://media.controls/pause'])
+}
+void stop() {
+    log_debug '🎬 Stop ...'
+    utils_sendMessage([type:'request', uri:'ssap://media.controls/stop'])
+}
+
 // capability.ImageCapture
 void take() {
     log_debug '🎬 Taking a screenshot ...'
@@ -438,7 +453,7 @@ void parse(String description) {
     String type = msg.payload?.callerId == 'secondscreen.client' || msg.payload?.callerId == 'com.webos.service.apiadapter' || now() - (state.lastTx ?: 0) < 2000 ? 'digital' : 'physical'
 
     // Empty reponse. Thanks for nothing!
-    if (msg.payload.keySet().size() == 1 && msg.payload.returnValue == true) return
+    if (msg.payload.keySet().size() == 1 && (msg.payload.returnValue == true || msg.payload.subscription == true)) return
 
     switch (msg.type) {
 
@@ -472,6 +487,7 @@ void parse(String description) {
             utils_sendMessage([type:'subscribe', uri:'ssap://audio/getStatus'])
             utils_sendMessage([type:'subscribe', uri:'ssap://tv/getCurrentChannel'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.applicationManager/getForegroundAppInfo'])
+            utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.media/getForegroundAppInfo'])
             utils_sendMessage([type:'subscribe', uri:'ssap://com.webos.service.tvpower/power/getPowerState'])
             utils_sendMessage([type:'subscribe', uri:'ssap://settings/getSystemSettings', payload:[category:'picture', keys:['pictureMode']]])
             utils_sendMessage([type:'subscribe', uri:'ssap://settings/getSystemSettings', payload:[category:'sound', keys:['soundMode', 'soundOutput']]])
@@ -542,6 +558,12 @@ void parse(String description) {
 
                     String soundMode = payload.settings?.soundMode
                     utils_sendEvent name:'soundMode', value:soundMode, descriptionText:"Sound mode is ${soundMode}", type:type
+                    return
+
+                // ssap://com.webos.media/getForegroundAppInfo (subscription)
+                case { contains it, [foregroundAppInfo:null] }:
+                    String transportStatus = utils_parseForegroundAppInfo(payload.foregroundAppInfo)
+                    utils_sendEvent name:'transportStatus', value:transportStatus, descriptionText:"Media transport status is ${transportStatus}", type:type
                     return
 
                 // ssap://tv/getExternalInputList (request)
@@ -715,6 +737,12 @@ private String utils_parseStatus(String message) {
             return 'offline'
         default: return 'offline'
     }
+}
+
+private String utils_parseForegroundAppInfo(List<Map> foregroundAppInfo) {
+    String playState = foregroundAppInfo.find { it.windowId != '' }?.playState
+    if (foregroundAppInfo.size() > 1 && (playState == 'loaded' || playState == 'playing')) return 'playing'
+    return playState == 'paused' ? 'paused' : 'stopped'
 }
 
 private void util_wakeOnLan(String macAddr) {

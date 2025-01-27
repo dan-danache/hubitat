@@ -92,6 +92,9 @@ The following commands are available:
 - Get All Activities - Populate the **Activities** attribute with available options for the **Start Activity** command
 - Get Current Activity - Not actually needed as the current activity (running app) is automatically detected
 - Start Activity - Start the specified app on the TV
+
+### Media control
+- Start, Pause, Stop the current file loaded in the Media Player app
 - Start Video - Play the specified video file in Media Player app
 - Start Web Page - Open the specified URL in Web Browser app
 
