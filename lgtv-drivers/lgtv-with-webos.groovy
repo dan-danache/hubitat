@@ -7,7 +7,7 @@ import hubitat.device.Protocol
 import hubitat.helper.NetworkUtils
 
 @Field static final String DRIVER_NAME = 'LGTV with webOS'
-@Field static final String DRIVER_VERSION = '1.5.1'
+@Field static final String DRIVER_VERSION = '1.5.2'
 
 @Field static final List<String> PICTURE_MODES = ['cinema', 'eco', 'expert1', 'expert2', 'game', 'normal', 'photo', 'sports', 'technicolor', 'vivid', 'hdrEffect', 'filmMaker', 'hdrCinema']
 @Field static final List<String> SOUND_MODES = ['aiSoundPlus', 'aiSound', 'standard', 'news', 'music', 'movie', 'sports', 'game']
@@ -195,6 +195,7 @@ private void fastPing(Map data) {
     log_debug "Fast pinging ${ipAddr}: ${data.currentRetry} / ${MAX_FAST_PING} ..."
     if (NetworkUtils.ping(ipAddr, 1)?.packetsReceived > 0) connect()
 
+    // Keep fast-pinging until switch changes to 'on' or MAX_FAST_PING limit is reached
     runIn 1, 'fastPing', [data:data]
 }
 void off() {
@@ -274,7 +275,7 @@ void startActivity(String activityname) {
 // capability.ImageCapture
 void take() {
     log_debug '🎬 Taking a screenshot ...'
-    utils_sendMessage([type:'request', uri:'ssap://tv/executeOneShot', payload:[path:'/tmp/capture.png', method:'DISPLAY', format:'PNG']])
+    utils_sendMessage([type:'request', uri:'ssap://tv/executeOneShot', payload:[path:'/tmp/capture.jpg', method:'DISPLAY', format:'JPG']])
 }
 
 // capability.SpeechSynthesis
@@ -371,8 +372,7 @@ void connect() {
     interfaces.webSocket.connect(useSSL ? "wss://${ipAddr}:3001/" : "ws://${ipAddr}:3000/", headers: ['Content-Type': 'application/json'], ignoreSSLIssues: true)
 
     // Update "websocket" attribute
-    String websocket = 'connecting'
-    utils_sendEvent name:'websocket', value:websocket, descriptionText:"Websocket is ${websocket}", type:'physical'
+    utils_sendEvent name:'websocket', value:'connecting', descriptionText:'Websocket is connecting', type:'digital'
 }
 
 void disconnect() {

@@ -5,13 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.2] - 2025-01-26
+## [1.5.2] - 2025-01-27
 ### Fixed
-- Improve the fast-ping mechanism to avoid overlap connections - `@hubitrep`
+- Improve the fast-ping mechanism to avoid overlapping connections - `@hubitrep`
 - Fix the "Speak" command for webOS 5 - `@hubitrep`
 
 ### Changed
-- Renamed "networkStatus" attribute to "websocket" to avoid the red icon when TV is off
+- Rename "networkStatus" attribute to "websocket" to avoid the red icon when TV is off - `@hubitrep`
 
 ## [1.5.1] - 2025-01-25
 ### Fixed

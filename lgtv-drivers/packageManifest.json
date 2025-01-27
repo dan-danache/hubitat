@@ -1,10 +1,10 @@
 {
     "packageName": "LGTV with webOS",
-    "version": "1.5.1",
-    "releaseNotes": "v1.5.1\n - Improved the detection of TV startup using a fast-ping mechanism - @hubitrep\n - Fix the \"Start Video\" and \"Speak\" commands for webOS 5 - @hubitrep",
+    "version": "1.5.2",
+    "releaseNotes": "v1.5.2\n - Improve the fast-ping mechanism to avoid overlapping connections - @hubitrep\n - Fix the \"Speak\" command for webOS 5 - @hubitrep\n - Rename \"networkStatus\" attribute to \"websocket\" to avoid the red icon when TV is off - @hubitrep",
     "minimumHEVersion": "2.1.9",
     "author": "Dan Danache (@dandanache)",
-    "dateReleased": "2025-01-25",
+    "dateReleased": "2025-01-27",
     "documentationLink": "https://dan-danache.github.io/hubitat/lgtv-drivers/",
     "communityLink": "https://community.hubitat.com/t/release-lgtv-with-webos/148892",
     "payPalUrl": "https://www.buymeacoffee.com/dandanache",
@@ -17,7 +17,7 @@
             "name": "LGTV with webOS",
             "description": "Driver to control LG TV devices using webOS websockets.",
             "namespace": "dandanache",
-            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.5.1/lgtv-drivers/lgtv-with-webos.groovy",
+            "location": "https://raw.githubusercontent.com/dan-danache/hubitat/lgtv_1.5.2/lgtv-drivers/lgtv-with-webos.groovy",
             "required": true
         }
     ]
