@@ -1,0 +1,29 @@
+{
+    "packageName": "Lumos",
+    "version": "1.1.0",
+    "releaseNotes": "v1.1.0\n - - Add option to keep lights on when person is leaving the room",
+    "minimumHEVersion": "2.3.8.117",
+    "author": "Dan Danache",
+    "dateReleased": "2025-01-24",
+    "documentationLink": "https://codeberg.org/dan-danache/hubitat/src/branch/main/lumos-app/README.md",
+    "communityLink": "https://community.hubitat.com/t/release-zigbee-map-app/133888",
+    "licenseFile": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/LICENSE",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "category": "Utility",
+    "tags": [ "Motion Control", "Doors & Windows", "Lights & Switches"],
+    "apps": [{
+        "id": "d751ab25-2b06-4611-8c17-feb83161d64a",
+        "namespace": "dandanache",
+        "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/lumos-app_1.1.0/lumos-app/lumos.groovy",
+        "name": "Lumos",
+        "description": "Control lights using motion and contact sensors.",
+        "required": true
+    },{
+        "id": "cfd64837-4770-41fd-9a64-cd6df6a32727",
+        "namespace": "dandanache",
+        "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/lumos-app_1.1.0/lumos-app/lumos-automation.groovy",
+        "name": "Lumos Automation",
+        "description": "Control lights using motion and contact sensors.",
+        "required": true
+    }]
+}
