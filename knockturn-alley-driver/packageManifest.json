@@ -1,0 +1,24 @@
+{
+    "packageName": "Knockturn Alley",
+    "version": "3.0.0",
+    "releaseNotes": "v3.0.0\n - Fix a bug that caused all commands to always be sent to device endpoint 0x01 (ups!)\n - Add possibility to show command names in plain english\n - \"Revelio\" now shows all records, not just the ones that fit in a single Zigbee message",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2024-04-26",
+    "documentationLink": "https://codeberg.org/dan-danache/hubitat/src/branch/main/knockturn-alley-driver/README.md",
+    "communityLink": "https://community.hubitat.com/t/dev-knockturn-alley/125167/3",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "licenseFile": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/LICENSE",
+    "category": "Control",
+    "tags": [ "Zigbee" ],
+    "drivers" : [
+        {
+            "id" : "862b9ba7-1871-44eb-a513-e8a968b4cd11",
+            "name": "Knockturn Alley",
+            "description": "Skulking around Knockturn Alley? Dodgy place. Don't want no one to see you there.",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/knockturn-alley-driver/knockturn-alley.groovy",
+            "required": true
+        }
+    ]
+}
