@@ -1,0 +1,200 @@
+{
+    "packageName": "IKEA Zigbee drivers",
+    "version": "5.4.1",
+    "releaseNotes": "v5.4.1\n - Fix for subzero temperatures",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2025-01-15",
+    "documentationLink": "https://codeberg.org/dan-danache/hubitat/src/branch/main/ikea-zigbee-drivers/README.md",
+    "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "licenseFile": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/LICENSE",
+    "category": "Control",
+    "tags": [ "Zigbee", "Buttons", "Lights & Switches" ],
+    "drivers" : [
+        {
+            "id" : "4ef84dc2-c530-41c9-9bae-d809812e3e6f",
+            "name": "IKEA Askvader On/Off Switch (E1836)",
+            "description": "Zigbee driver for Askvader On/Off Switch (E1836)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1836.groovy",
+            "required": false
+        },
+        {
+            "id" : "2db58f03-eb69-4ac4-a1c1-9da00820a577",
+            "name": "IKEA Badring Water Leakage Sensor (E2202)",
+            "description": "Zigbee driver for IKEA Badring Water Leakage Sensor (E2202)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2202.groovy",
+            "required": false
+        },
+        {
+            "id" : "97ee5c2b-9c74-43f7-a149-adbfbad48da5",
+            "name": "IKEA Dimmable Light",
+            "description": "Zigbee driver for IKEA Dimmable Lights",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_DIM-Light.groovy",
+            "required": false
+        },
+        {
+            "id" : "23ef8cf5-29bd-481b-a045-4e71078153e2",
+            "name": "IKEA White Spectrum Light",
+            "description": "Zigbee driver for IKEA White Spectrum Lights",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_WS-Light.groovy",
+            "required": false
+        },
+        {
+            "id" : "6e9663e0-c76b-42e3-bbd4-01657e23adba",
+            "name": "IKEA Color White Spectrum Light",
+            "description": "Zigbee driver for IKEA Color White Spectrum Lights",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_CWS-Light.groovy",
+            "required": false
+        },
+        {
+            "id" : "1374f975-41c7-4a68-a9c5-2e311d310f6b",
+            "name": "IKEA RGB-Only Light",
+            "description": "Zigbee driver for IKEA RGB-Only Lights",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_RGBO-Light.groovy",
+            "required": false
+        },
+        {
+            "id" : "5ff298c1-bb99-4128-84d4-9cb1aa30da7a",
+            "name": "IKEA Inspelning Smart Plug (E2206)",
+            "description": "Zigbee driver for IKEA Inspelning Smart Plug (E2206)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2206.groovy",
+            "required": false
+        },
+        {
+            "id" : "d5e1cf42-b933-466b-b95b-cd0c338db077",
+            "name": "IKEA Parasoll Door/Window Sensor (E2013)",
+            "description": "Zigbee driver for IKEA Parasoll Door/Window Sensor (E2013)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2013.groovy",
+            "required": false
+        },
+        {
+            "id" : "806767c2-0a60-4250-8f79-366c6be633c4",
+            "name": "IKEA Rodret Dimmer (E2201)",
+            "description": "Zigbee driver for IKEA Rodret Dimmer (E2201)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2201.groovy",
+            "required": false
+        },
+        {
+            "id" : "4940196a-5048-473c-9c2f-af4d2fe11ece",
+            "name": "IKEA Somrig Shortcut Button (E2213)",
+            "description": "Zigbee driver for IKEA Somrig Shortcut Button (E2213)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2213.groovy",
+            "required": false
+        },
+        {
+            "id" : "d6c9f16d-f85a-4138-98d6-bc21e7c32c23",
+            "name": "IKEA Starkvind Air Purifier (E2006)",
+            "description": "Zigbee driver for IKEA Starkvind Air Purifier (E2006)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2006.groovy",
+            "required": false
+        },
+        {
+            "id" : "c4376d9a-869c-4f76-a644-0fd560411e5b",
+            "name": "IKEA Styrbar Remote Control N2 (E2002)",
+            "description": "Zigbee driver for IKEA Styrbar Remote Control N2 (E2002)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2002.groovy",
+            "required": false
+        },
+        {
+            "id" : "c0dcc1b3-a01f-46b0-9a0f-e823f1107431",
+            "name": "IKEA Symfonisk Sound Remote Gen2 (E2123)",
+            "description": "Zigbee driver for IKEA Symfonisk Sound Remote Gen2 (E2123)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2123.groovy",
+            "required": false
+        },
+        {
+            "id" : "c81334d1-a271-4348-b878-5570d2d76884",
+            "name": "IKEA Tradfri Control Outlet (E1603)",
+            "description": "Zigbee driver for IKEA Tradfri Control Outlet (E1603)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1603.groovy",
+            "required": false
+        },
+        {
+            "id" : "6360bdb9-5f25-4d42-ae70-9d06401f8c6a",
+            "name": "IKEA Tradfri Motion Sensor (E1745)",
+            "description": "Zigbee driver for IKEA Tradfri Motion Sensor (E1745)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1745.groovy",
+            "required": false
+        },
+        {
+            "id" : "b2edcd95-368e-4e6a-aafe-2b0f1543ae08",
+            "name": "IKEA Tradfri On/Off Switch (E1743)",
+            "description": "Zigbee driver for IKEA Tradfri On/Off Switch (E1743)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1743.groovy",
+            "required": false
+        },
+        {
+            "id" : "193aebdd-0bc2-4bee-a4bd-a9f309633805",
+            "name": "IKEA Tradfri Open/Close Remote (E1766)",
+            "description": "Zigbee driver for IKEA Tradfri Open/Close Remote (E1766)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1766.groovy",
+            "required": false
+        },
+        {
+            "id" : "8eeec878-5a6c-44c4-b142-5afebff2387f",
+            "name": "IKEA Tradfri Remote Control (E1810)",
+            "description": "Zigbee driver for IKEA Tradfri Remote Control (E1810)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1810.groovy",
+            "required": false
+        },
+        {
+            "id" : "e1c78569-7532-417e-bef0-bd159af5f43d",
+            "name": "IKEA Tradfri Shortcut Button (E1812)",
+            "description": "Zigbee driver for IKEA Tradfri Shortcut Button (E1812)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1812.groovy",
+            "required": false
+        },
+        {
+            "id" : "6a91bcee-df49-48e9-9da8-195b6d4ec675",
+            "name": "IKEA Tradfri Signal Repeater (E1746)",
+            "description": "Zigbee driver for IKEA Tradfri Signal Repeater (E1746)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E1746.groovy",
+            "required": false
+        },
+        {
+            "id" : "6b7d3076-4019-4409-8927-04132d7d16ab",
+            "name": "IKEA Tretakt Smart Plug (E2204)",
+            "description": "Zigbee driver for IKEA Tretakt Smart Plug (E2204)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2204.groovy",
+            "required": false
+        },
+        {
+            "id" : "4e600a5b-aac2-4879-8c4c-61f352bc6884",
+            "name": "IKEA Vallhorn Motion Sensor (E2134)",
+            "description": "Zigbee driver for IKEA Vallhorn Motion Sensor (E2134)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2134.groovy",
+            "required": false
+        },
+        {
+            "id" : "b1ddc29e-a570-4c63-92cc-faed401158a2",
+            "name": "IKEA Vindstyrka Air Quality Sensor (E2112)",
+            "description": "Zigbee driver for IKEA Vindstyrka Air Quality Sensor (E2112)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/ikea-zigbee-drivers_5.4.1/ikea-zigbee-drivers/Ikea_E2112.groovy",
+            "required": false
+        }
+    ]
+}
