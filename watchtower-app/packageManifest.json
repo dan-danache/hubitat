@@ -1,0 +1,40 @@
+{
+    "packageName": "Watchtower",
+    "version": "3.0.0",
+    "releaseNotes": "v3.0.0\n - UI refactor: Add top toolbar with some of the options from the left menu\n - Add predefined zoom position (last 1 hour, last 1 day, etc) - @hubitrep\n - Ask confirmation when leaving the page and dashboard changes were not saved - @hubitrep",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2025-02-06",
+    "documentationLink": "https://codeberg.org/dan-danache/hubitat/src/branch/main/watchtower-app/README.md",
+    "communityLink": "https://community.hubitat.com/t/release-watchtower-long-term-metrics-app/141505",
+    "licenseFile": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/LICENSE",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "category": "Utility",
+    "tags": [ "Tools & Utilities" , "Dashboards", "Monitoring"],
+    "apps": [{
+        "id": "0c00f8aa-8de9-4c3c-993f-16e3243f96e5",
+        "namespace": "dandanache",
+        "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/watchtower-app_3.0.0/watchtower-app/watchtower.groovy",
+        "name": "Watchtower",
+        "description": "Watchtower is the all-in-one app for long-term smart home monitoring and data visualization. Staying true to Hubitat's core value, the application works 100% locally, with no reliance on the cloud. Plus, there's no need for extra hardware like Raspberry Pi or NAS.",
+        "oauth": true,
+        "required": true
+    }],
+    "files": [{
+        "id": "516aff72-a2b5-43a3-b40b-ca64a5e25bf7",
+        "name": "watchtower.html",
+        "namespace": "dandanache",
+        "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/watchtower-app_3.0.0/watchtower-app/watchtower.html",
+        "required": true,
+        "oauth": false,
+        "description": "Watchtower Dashboard"
+    },{
+        "id": "67ca419a-6d2c-4fa7-81ff-99e0da16571e",
+        "name": "watchtower.js",
+        "namespace": "dandanache",
+        "location": "https://codeberg.org/dan-danache/hubitat/raw/tag/watchtower-app_3.0.0/watchtower-app/watchtower.js",
+        "required": true,
+        "oauth": false,
+        "description": "Watchtower Dashboard"
+    }]
+}
