@@ -1,0 +1,64 @@
+{
+    "packageName": "Hubitat drivers for NodOn smart devices",
+    "version": "1.1.0",
+    "releaseNotes": "v1.1.0\n - Small fixes for the new UI in Platform Update 2.4.0",
+    "minimumHEVersion": "2.1.9",
+    "author": "Dan Danache (@dandanache)",
+    "dateReleased": "2024-12-30",
+    "documentationLink": "https://codeberg.org/dan-danache/hubitat/src/branch/main/nodon-drivers/README.md",
+    "communityLink": "https://community.hubitat.com/t/release-ikea-zigbee-drivers/123853",
+    "payPalUrl": "https://www.buymeacoffee.com/dandanache",
+    "licenseFile": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/LICENSE",
+    "category": "Control",
+    "tags": [ "Zigbee", "Buttons", "Lights & Switches" ],
+    "drivers" : [
+        {
+            "id" : "15154428-ef3e-420f-9c4b-406c39917c74",
+            "name": "NodOn Component Relay Switch",
+            "description": "Hubitat driver for NodOn Component Relay Switch",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/nodon-drivers/component/NodOn_ComponentRelaySwitch.groovy",
+            "required": true
+        },
+        {
+            "id" : "36286334-32da-4d82-a2e7-c4b70cc7d10f",
+            "name": "NodOn Multifunction Relay Switch (SIN-4-1-20)",
+            "description": "Hubitat driver for NodOn Zigbee Multifunction Relay Switch (SIN-4-1-20)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/nodon-drivers/NodOn_SIN-4-1-20.groovy",
+            "required": false
+        },
+        {
+            "id" : "a33f98d8-5c98-48d4-9d87-d0f8ee4849db",
+            "name": "NodOn Relay Switch with Metering (SIN-4-1-21)",
+            "description": "Hubitat driver for NodOn Zigbee Multifunction Relay Switch with Metering (SIN-4-1-21)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/nodon-drivers/NodOn_SIN-4-1-21.groovy",
+            "required": false
+        },
+        {
+            "id" : "7e3b803e-cc0e-4d4a-a76d-e5e2ce987fe2",
+            "name": "NodOn Lighting Relay Switch (SIN-4-2-20)",
+            "description": "Hubitat driver for NodOn Zigbee ON/OFF Lighting Relay Switch (SIN-4-2-20)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/nodon-drivers/NodOn_SIN-4-2-20.groovy",
+            "required": false
+        },
+        {
+            "id" : "1af9492c-b9ed-4a2d-b199-56aae9fb73fb",
+            "name": "NodOn Pilot Wire Heating Module (SIN-4-FP-21)",
+            "description": "Hubitat driver for NodOn Zigbee Pilot Wire Heating Module (SIN-4-FP-21)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/nodon-drivers/NodOn_SIN-4-FP-21.groovy",
+            "required": false
+        },
+        {
+            "id" : "76b42057-4e66-4ffc-9a8e-4fc6aaef3a36",
+            "name": "NodOn Roller Shutter Relay Switch (SIN-4-RS-20)",
+            "description": "Hubitat driver for NodOn Zigbee Roller Shutter Relay Switch (SIN-4-RS-20)",
+            "namespace": "dandanache",
+            "location": "https://codeberg.org/dan-danache/hubitat/raw/branch/main/nodon-drivers/NodOn_SIN-4-RS-20.groovy",
+            "required": false
+        }
+    ]
+}
